@@ -8,19 +8,8 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "server.js"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/admin",
-      "dest": "/hashlay-admin.html"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/final.html"
+      "dest": "server.js"
     }
   ]
 }
