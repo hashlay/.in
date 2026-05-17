@@ -1,0 +1,10 @@
+const express = require('express');
+const r = express.Router();
+const { getAdmins, createAdmin, updateAdmin, deleteAdmin } = require('../controllers/miscControllers');
+const { verifyToken, requireRole } = require('../middleware/auth');
+r.use(verifyToken, requireRole('super_admin','admin'));
+r.get('/', getAdmins);
+r.post('/', requireRole('super_admin'), createAdmin);
+r.patch('/:id', requireRole('super_admin'), updateAdmin);
+r.delete('/:id', requireRole('super_admin'), deleteAdmin);
+module.exports = r;

@@ -1,0 +1,10 @@
+const express = require('express');
+const r = express.Router();
+const { getContacts, createContact, updateContact, deleteContact, exportContactsCSV } = require('../controllers/miscControllers');
+const { verifyToken } = require('../middleware/auth');
+r.get('/', verifyToken, getContacts);
+r.get('/export/csv', verifyToken, exportContactsCSV);
+r.post('/', createContact);
+r.patch('/:id', verifyToken, updateContact);
+r.delete('/:id', verifyToken, deleteContact);
+module.exports = r;

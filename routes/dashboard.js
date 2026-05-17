@@ -1,0 +1,10 @@
+const express = require('express');
+const r = express.Router();
+const c = require('../controllers/dashboardController');
+const { verifyToken } = require('../middleware/auth');
+r.get('/stats', verifyToken, c.getStats);
+r.get('/revenue-chart', verifyToken, c.getRevenueChart);
+r.get('/order-status', verifyToken, c.getOrderStatusChart);
+r.get('/top-products', verifyToken, c.getTopProducts);
+r.get('/customer-growth', verifyToken, c.getCustomerGrowth);
+module.exports = r;
