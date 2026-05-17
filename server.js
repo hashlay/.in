@@ -26,8 +26,8 @@ app.use(helmet({
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
+  'https://hashlay-in.vercel.app',
 ].filter(Boolean);
-
 const isDev = process.env.NODE_ENV !== 'production';
 
 app.use(cors({
