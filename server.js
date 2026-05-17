@@ -1,23 +1,20 @@
 require('dotenv').config();
 require('express-async-errors');
 
-const express   = require('express');
-const cors      = require('cors');
-const helmet      = require('helmet');
-const morgan      = require('morgan');
-const rateLimit   = require('express-rate-limit');
-const path        = require('path');
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+const path = require('path');
 const compression = require('compression');
 const mongoSanitize = require('express-mongo-sanitize');
-const xssClean    = require('xss-clean');
+const xssClean = require('xss-clean');
 
-const connectDB     = require('./config/db');
-const logger        = require('./config/logger');
-const errorHandler  = require('./middleware/errorHandler');
+const connectDB = require('./config/db');
+const logger = require('./config/logger');
+const errorHandler = require('./middleware/errorHandler');
 const { verifyToken } = require('./middleware/auth');
-
-// ── Connect Database ─────────────────────────────────────────────
-connectDB();
 
 const app = express();
 
@@ -28,27 +25,34 @@ const allowedOrigins = [
   process.env.ADMIN_URL,
 ].filter(Boolean);
 
-// In development, allow any localhost/127.0.0.1 origin
 const isDev = process.env.NODE_ENV !== 'production';
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (curl, Postman, mobile apps)
     if (!origin) return callback(null, true);
-    // In development, allow any localhost/127.0.0.1 origin
     if (isDev && (origin.includes('localhost') || origin.includes('127.0.0.1'))) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
     callback(new Error(`CORS: Origin ${origin} not allowed`));
   },
   credentials: true,
-  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(mongoSanitize()); // Prevent NoSQL injection
-app.use(xssClean());      // Prevent XSS payloads in request bodies
-app.use(compression());   // Gzip response compression
+app.use(mongoSanitize());
+app.use(xssClean());
+app.use(compression());
 app.use(morgan('combined', { stream: { write: msg => logger.info(msg.trim()) } }));
+
+// ── DB Middleware (Serverless-safe) ──────────────────────────────
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Database connection failed' });
+  }
+});
 
 // ── Rate Limiting ────────────────────────────────────────────────
 const authLimiter = rateLimit({
@@ -71,27 +75,27 @@ const orderLimiter = rateLimit({
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ── Routes ───────────────────────────────────────────────────────
-app.use('/api/auth',          authLimiter,   require('./routes/auth'));
-app.use('/api/products',      apiLimiter,    require('./routes/products'));
-app.use('/api/orders',        apiLimiter,    require('./routes/orders'));
-app.use('/api/customers',     apiLimiter,    require('./routes/customers'));
-app.use('/api/reviews',       apiLimiter,    require('./routes/reviews'));
-app.use('/api/coupons',       apiLimiter,    require('./routes/coupons'));
-app.use('/api/campaigns',     apiLimiter,    require('./routes/campaigns'));
-app.use('/api/faqs',          apiLimiter,    require('./routes/faqs'));
-app.use('/api/chatbot',       apiLimiter,    require('./routes/chatbot'));
-app.use('/api/notifications', apiLimiter,    require('./routes/notifications'));
-app.use('/api/contacts',      apiLimiter,    require('./routes/contacts'));
-app.use('/api/notify-list',   apiLimiter,    require('./routes/notifyList'));
-app.use('/api/analytics',     apiLimiter,    require('./routes/analytics'));
-app.use('/api/settings',      apiLimiter,    require('./routes/settings'));
-app.use('/api/admins',        apiLimiter,    require('./routes/admins'));
-app.use('/api/activity-log',  apiLimiter,    require('./routes/activityLog'));
-app.use('/api/upload',        apiLimiter,    require('./routes/upload'));
-app.use('/api/invoice',       apiLimiter,    require('./routes/invoice'));
-app.use('/api/razorpay',      apiLimiter,    require('./routes/razorpay'));
-app.use('/api/dashboard',     apiLimiter,    require('./routes/dashboard'));
-app.use('/api/sync',          apiLimiter,    require('./routes/sync'));
+app.use('/api/auth', authLimiter, require('./routes/auth'));
+app.use('/api/products', apiLimiter, require('./routes/products'));
+app.use('/api/orders', apiLimiter, require('./routes/orders'));
+app.use('/api/customers', apiLimiter, require('./routes/customers'));
+app.use('/api/reviews', apiLimiter, require('./routes/reviews'));
+app.use('/api/coupons', apiLimiter, require('./routes/coupons'));
+app.use('/api/campaigns', apiLimiter, require('./routes/campaigns'));
+app.use('/api/faqs', apiLimiter, require('./routes/faqs'));
+app.use('/api/chatbot', apiLimiter, require('./routes/chatbot'));
+app.use('/api/notifications', apiLimiter, require('./routes/notifications'));
+app.use('/api/contacts', apiLimiter, require('./routes/contacts'));
+app.use('/api/notify-list', apiLimiter, require('./routes/notifyList'));
+app.use('/api/analytics', apiLimiter, require('./routes/analytics'));
+app.use('/api/settings', apiLimiter, require('./routes/settings'));
+app.use('/api/admins', apiLimiter, require('./routes/admins'));
+app.use('/api/activity-log', apiLimiter, require('./routes/activityLog'));
+app.use('/api/upload', apiLimiter, require('./routes/upload'));
+app.use('/api/invoice', apiLimiter, require('./routes/invoice'));
+app.use('/api/razorpay', apiLimiter, require('./routes/razorpay'));
+app.use('/api/dashboard', apiLimiter, require('./routes/dashboard'));
+app.use('/api/sync', apiLimiter, require('./routes/sync'));
 
 // ── Health check ─────────────────────────────────────────────────
 app.get('/api/health', (req, res) => res.json({ success: true, status: 'OK', timestamp: new Date().toISOString() }));
@@ -102,8 +106,7 @@ app.use('*', (req, res) => res.status(404).json({ success: false, message: 'Rout
 // ── Global Error Handler ─────────────────────────────────────────
 app.use(errorHandler);
 
-// Only start HTTP server when running directly (local dev)
-// On Vercel, the module.exports = app is what Vercel uses
+// ── Local Dev Server ─────────────────────────────────────────────
 if (process.env.NODE_ENV !== 'production' || process.env.FORCE_LISTEN === 'true') {
   const PORT = process.env.PORT || 5000;
   const server = app.listen(PORT, () => {
@@ -126,7 +129,6 @@ if (process.env.NODE_ENV !== 'production' || process.env.FORCE_LISTEN === 'true'
 
 process.on('uncaughtException', (err) => {
   logger.error('Uncaught Exception:', err);
-  // Do not call process.exit on Vercel — just log it
   if (process.env.NODE_ENV !== 'production') process.exit(1);
 });
 
