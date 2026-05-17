@@ -19,7 +19,10 @@ const { verifyToken } = require('./middleware/auth');
 const app = express();
 
 // ── Security & Parsing ───────────────────────────────────────────
-app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  contentSecurityPolicy: false
+}));
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
