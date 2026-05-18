@@ -1,6 +1,31 @@
 {
   "version": 2,
+  "regions": ["bom1"],
+  "functions": {
+    "server.js": {
+      "maxDuration": 10,
+      "memory": 256
+    }
+  },
+  "headers": [
+    {
+      "source": "/uploads/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/(.*)\\.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400" }
+      ]
+    }
+  ],
   "routes": [
+    {
+      "src": "/uploads/(.*)",
+      "dest": "/uploads/$1"
+    },
     {
       "src": "/api/(.*)",
       "dest": "server.js"
@@ -8,6 +33,10 @@
     {
       "src": "/admin",
       "dest": "/hashlay-admin.html"
+    },
+    {
+      "src": "/privacy\\.html|/terms\\.html|/returns\\.html|/shipping\\.html|/cookies\\.html",
+      "dest": "/$0"
     },
     {
       "src": "/",

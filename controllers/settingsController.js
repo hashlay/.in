@@ -1,4 +1,5 @@
 const { Settings } = require('../models/index');
+const { getOrSet, invalidate } = require('../config/cache');
 
 const DEFAULT_SETTINGS = {
   payment: {
@@ -33,38 +34,44 @@ exports.getAll = async (req, res) => {
 };
 
 exports.get = async (req, res) => {
-  const setting = await Settings.findOne({ key: req.params.key });
-  if (!setting) {
-    const def = DEFAULT_SETTINGS[req.params.key];
-    return res.json({ success: true, data: def || null });
-  }
-  res.json({ success: true, data: setting.value });
+  // Cache individual settings for 120s
+  const data = await getOrSet(`settings:key:${req.params.key}`, 120, async () => {
+    const setting = await Settings.findOne({ key: req.params.key }).lean();
+    if (!setting) return DEFAULT_SETTINGS[req.params.key] || null;
+    return setting.value;
+  });
+  res.json({ success: true, data });
 };
 
 // Public: get non-sensitive settings for customer website
 exports.getPublic = async (req, res) => {
-  const keys = ['announcement', 'seo', 'banner', 'delivery', 'store', 'payment'];
-  const settings = await Settings.find({ key: { $in: keys } }).lean();
-  const result = {};
-  for (const s of settings) {
-    result[s.key] = s.value;
-    // Strip sensitive payment data
-    if (s.key === 'payment') {
-      result[s.key] = {
-        onlinePayment: s.value.onlinePayment,
-        codEnabled: s.value.codEnabled,
-        codCharge: s.value.codCharge,
-        razorpayKeyId: s.value.razorpayKeyId, // Only key ID, never secret
-      };
+  // Cache public settings for 90s — called on every page load
+  const result = await getOrSet('settings:public', 90, async () => {
+    const keys = ['announcement', 'seo', 'banner', 'delivery', 'store', 'payment'];
+    const settings = await Settings.find({ key: { $in: keys } }).lean();
+    const data = {};
+    for (const s of settings) {
+      data[s.key] = s.value;
+      // Strip sensitive payment data
+      if (s.key === 'payment') {
+        data[s.key] = {
+          onlinePayment: s.value.onlinePayment,
+          codEnabled: s.value.codEnabled,
+          codCharge: s.value.codCharge,
+          razorpayKeyId: s.value.razorpayKeyId, // Only key ID, never secret
+        };
+      }
     }
-  }
-  // Merge defaults
-  for (const k of keys) if (!result[k]) result[k] = DEFAULT_SETTINGS[k] || {};
+    // Merge defaults
+    for (const k of keys) if (!data[k]) data[k] = DEFAULT_SETTINGS[k] || {};
 
-  // Ensure Razorpay Key ID from .env is sent if DB is empty
-  if (result.payment && !result.payment.razorpayKeyId && process.env.RAZORPAY_KEY_ID) {
-    result.payment.razorpayKeyId = process.env.RAZORPAY_KEY_ID;
-  }
+    // Ensure Razorpay Key ID from .env is sent if DB is empty
+    if (data.payment && !data.payment.razorpayKeyId && process.env.RAZORPAY_KEY_ID) {
+      data.payment.razorpayKeyId = process.env.RAZORPAY_KEY_ID;
+    }
+
+    return data;
+  });
 
   res.json({ success: true, data: result });
 };
@@ -79,6 +86,9 @@ exports.update = async (req, res) => {
     { new: true, upsert: true, runValidators: true }
   );
 
+  // Bust settings caches on update
+  invalidate('settings:');
+
   res.json({ success: true, data: setting, message: `Settings "${key}" saved` });
 };
 
@@ -92,10 +102,17 @@ exports.updateMany = async (req, res) => {
     },
   }));
   await Settings.bulkWrite(ops);
+
+  // Bust settings caches on batch update
+  invalidate('settings:');
+
   res.json({ success: true, message: 'Settings saved' });
 };
 
 exports.delete = async (req, res) => {
   await Settings.deleteOne({ key: req.params.key });
+
+  invalidate('settings:');
+
   res.json({ success: true, message: 'Setting deleted' });
 };

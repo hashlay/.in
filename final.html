@@ -5334,15 +5334,26 @@
         ? 'http://localhost:5000'
         : window.location.origin, // 🚀 Dynamically uses your live Vercel domain!
 
+      // In-memory response cache to avoid duplicate calls during init
+      _cache: new Map(),
 
-      // Fetch with fallback to local data
-      async get(endpoint, fallback = null) {
+      // Fetch with caching and fallback to local data
+      async get(endpoint, fallback = null, cacheSec = 0) {
+        // Return cached response if still valid
+        if (cacheSec > 0 && this._cache.has(endpoint)) {
+          const cached = this._cache.get(endpoint);
+          if (Date.now() < cached.exp) return cached.data;
+        }
         try {
           const res = await fetch(this.BASE_URL + endpoint, {
             headers: { 'Content-Type': 'application/json' }
           });
           if (!res.ok) throw new Error('API error');
-          return await res.json();
+          const data = await res.json();
+          if (cacheSec > 0) {
+            this._cache.set(endpoint, { data, exp: Date.now() + cacheSec * 1000 });
+          }
+          return data;
         } catch (e) {
           console.warn(`[Hashlay API] ${endpoint} failed, using local data:`, e.message);
           return fallback;
@@ -5592,6 +5603,21 @@
 
     // Start polling after page loads
     SYNC.start();
+
+    /* ══════════════════════════════════════════════════════════════
+       KEEP-ALIVE — Prevent Vercel cold starts (free tier)
+       Pings /api/ping every 4 min while user is on the page.
+       Uses requestIdleCallback so it never blocks the UI.
+    ══════════════════════════════════════════════════════════════ */
+    (function keepAlive() {
+      const PING_INTERVAL = 4 * 60 * 1000; // 4 minutes
+      function ping() {
+        fetch(API.BASE_URL + '/api/ping', { method: 'GET', cache: 'no-store' }).catch(() => {});
+      }
+      // First ping after 30s (warm up immediately after page load)
+      setTimeout(ping, 30000);
+      setInterval(ping, PING_INTERVAL);
+    })();
 
     function applyAdminConfig(config) {
       // Unwrap if called with full settings response

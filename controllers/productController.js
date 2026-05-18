@@ -3,6 +3,7 @@ const { notifyLowStock } = require('../services/notificationService');
 const csv = require('fast-csv');
 const { cloudinary } = require('../config/cloudinary');
 const slugify = require('../utils/slugify');
+const { getOrSet, invalidate } = require('../config/cache');
 
 exports.getProducts = async (req, res) => {
   const { page = 1, limit = 20, search, category, status, featured, sort = '-createdAt' } = req.query;
@@ -15,14 +16,20 @@ exports.getProducts = async (req, res) => {
   else if (status === 'low_stock') { query.stock = { $gt: 0, $lt: 10 }; }
   else if (status === 'out_of_stock') { query.stock = 0; }
 
-  const opts = { page: parseInt(page), limit: parseInt(limit), sort, lean: true };
-  const result = await Product.paginate(query, opts);
+  // Cache product listings for 30s (short TTL so stock changes reflect quickly)
+  const cacheKey = `products:list:${JSON.stringify({ page, limit, search, category, status, featured, sort })}`;
+  const result = await getOrSet(cacheKey, 30, async () => {
+    const opts = { page: parseInt(page), limit: parseInt(limit), sort, lean: true };
+    return Product.paginate(query, opts);
+  });
 
   res.json({ success: true, data: result });
 };
 
 exports.getProduct = async (req, res) => {
-  const product = await Product.findOne({ _id: req.params.id, isActive: true });
+  const product = await getOrSet(`products:id:${req.params.id}`, 60, async () => {
+    return Product.findOne({ _id: req.params.id, isActive: true }).lean();
+  });
   if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
   res.json({ success: true, data: product });
 };
@@ -36,8 +43,11 @@ exports.getProductBySlug = async (req, res) => {
 };
 
 exports.getFeaturedProducts = async (req, res) => {
-  const products = await Product.find({ isFeatured: true, isActive: true, stock: { $gt: 0 } })
-    .sort('-updatedAt').limit(12);
+  // Cache featured products for 60s — these change rarely
+  const products = await getOrSet('products:featured', 60, async () => {
+    return Product.find({ isFeatured: true, isActive: true, stock: { $gt: 0 } })
+      .sort('-updatedAt').limit(12).lean();
+  });
   res.json({ success: true, data: products });
 };
 
@@ -51,6 +61,10 @@ exports.createProduct = async (req, res) => {
 
   const product = await Product.create(data);
   if (product.stock > 0 && product.stock < 10) await notifyLowStock(product);
+
+  // Bust product caches on create
+  invalidate('products:');
+
   res.status(201).json({ success: true, data: product, message: 'Product created' });
 };
 
@@ -69,6 +83,9 @@ exports.updateProduct = async (req, res) => {
 
   if (product.stock > 0 && product.stock < 10) await notifyLowStock(product);
 
+  // Bust product caches on update
+  invalidate('products:');
+
   res.json({ success: true, data: product, message: 'Product updated' });
 };
 
@@ -77,6 +94,10 @@ exports.deleteProduct = async (req, res) => {
   if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
   product.isActive = false;
   await product.save();
+
+  // Bust product caches on delete
+  invalidate('products:');
+
   res.json({ success: true, message: 'Product deleted' });
 };
 
@@ -85,6 +106,9 @@ exports.toggleFeatured = async (req, res) => {
   if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
   product.isFeatured = !product.isFeatured;
   await product.save();
+
+  invalidate('products:');
+
   res.json({ success: true, data: product, message: `Product ${product.isFeatured ? 'featured' : 'unfeatured'}` });
 };
 
@@ -100,11 +124,17 @@ exports.bulkAction = async (req, res) => {
   if (action === 'activate') update = { inStock: true };
 
   await Product.updateMany({ _id: { $in: ids } }, update);
+
+  invalidate('products:');
+
   res.json({ success: true, message: `Bulk action "${action}" applied to ${ids.length} products` });
 };
 
 exports.getCategories = async (req, res) => {
-  const cats = await Product.distinct('category', { isActive: true });
+  // Cache categories for 120s — they change very rarely
+  const cats = await getOrSet('products:categories', 120, async () => {
+    return Product.distinct('category', { isActive: true });
+  });
   res.json({ success: true, data: cats });
 };
 
@@ -152,6 +182,8 @@ exports.importCSV = async (req, res) => {
       imported++;
     } catch (e) { errors.push({ row, error: e.message }); }
   }
+
+  invalidate('products:');
 
   res.json({ success: true, message: `Imported ${imported} products`, errors });
 };

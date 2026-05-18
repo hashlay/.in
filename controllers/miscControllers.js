@@ -9,6 +9,7 @@ const Admin    = require('../models/Admin');
 const { notifyNewReview, notifyGeneral } = require('../services/notificationService');
 const { sendCampaignEmail } = require('../services/emailService');
 const csv = require('fast-csv');
+const { getOrSet, invalidate } = require('../config/cache');
 
 // ── Reviews ─────────────────────────────────────────────────────
 exports.getReviews = async (req, res) => {
@@ -41,6 +42,7 @@ exports.createReview = async (req, res) => {
 
     const review = await Review.create(reviewData);
     await notifyNewReview(review);
+    invalidate('reviews:');
     res.status(201).json({ success:true, data:review, message:'Review submitted for approval' });
   } catch (error) {
     res.status(400).json({ success:false, message:'Review submission failed', error: error.message });
@@ -56,6 +58,7 @@ exports.updateReview = async (req, res) => {
       const avg = reviews.reduce((s,r)=>s+r.rating,0) / reviews.length;
       await Product.findByIdAndUpdate(review.product, { 'ratings.average':+avg.toFixed(1), 'ratings.count':reviews.length });
     }
+    invalidate('reviews:');
     res.json({ success:true, data:review, message:'Review updated' });
   } catch (error) {
     res.status(400).json({ success:false, message:'Update failed', error: error.message });
@@ -65,6 +68,7 @@ exports.updateReview = async (req, res) => {
 exports.deleteReview = async (req, res) => {
   try {
     await Review.findByIdAndDelete(req.params.id);
+    invalidate('reviews:');
     res.json({ success:true, message:'Review deleted' });
   } catch (error) {
     res.status(400).json({ success:false, message:'Delete failed', error: error.message });
@@ -73,7 +77,9 @@ exports.deleteReview = async (req, res) => {
 
 exports.getProductReviews = async (req, res) => {
   try {
-    const reviews = await Review.find({ product:req.params.id, status:'approved' }).sort('-createdAt');
+    const reviews = await getOrSet(`reviews:product:${req.params.id}`, 60, async () => {
+      return Review.find({ product:req.params.id, status:'approved' }).sort('-createdAt').lean();
+    });
     res.json({ success:true, data:reviews });
   } catch (error) {
     res.status(400).json({ success:false, message:'Fetch failed', error: error.message });
@@ -142,8 +148,12 @@ exports.deleteCampaign = async (req, res) => {
 // ── FAQs ─────────────────────────────────────────────────────────
 exports.getFaqs = async (req, res) => {
   try {
-    const q = req.query.active==='true' ? { isActive:true } : {};
-    const faqs = await FAQ.find(q).sort('order -createdAt');
+    const isActive = req.query.active==='true';
+    const cacheKey = `faqs:list:${isActive}`;
+    const faqs = await getOrSet(cacheKey, 120, async () => {
+      const q = isActive ? { isActive:true } : {};
+      return FAQ.find(q).sort('order -createdAt').lean();
+    });
     res.json({ success:true, data:faqs });
   } catch (error) {
     res.status(400).json({ success:false, message:'Fetch failed', error: error.message });
@@ -152,6 +162,7 @@ exports.getFaqs = async (req, res) => {
 exports.createFaq = async (req, res) => {
   try {
     const faq = await FAQ.create(req.body);
+    invalidate('faqs:');
     res.status(201).json({ success:true, data:faq, message:'FAQ created' });
   } catch (error) {
     res.status(400).json({ success:false, message:'Creation failed', error: error.message });
@@ -161,6 +172,7 @@ exports.updateFaq = async (req, res) => {
   try {
     const faq = await FAQ.findByIdAndUpdate(req.params.id, req.body, { new:true });
     if (!faq) return res.status(404).json({ success:false, message:'FAQ not found' });
+    invalidate('faqs:');
     res.json({ success:true, data:faq, message:'FAQ updated' });
   } catch (error) {
     res.status(400).json({ success:false, message:'Update failed', error: error.message });
@@ -169,6 +181,7 @@ exports.updateFaq = async (req, res) => {
 exports.deleteFaq = async (req, res) => {
   try {
     await FAQ.findByIdAndDelete(req.params.id);
+    invalidate('faqs:');
     res.json({ success:true, message:'FAQ deleted' });
   } catch (error) {
     res.status(400).json({ success:false, message:'Delete failed', error: error.message });
@@ -203,7 +216,10 @@ exports.matchChatbot = async (req, res) => {
   const { message } = req.body;
   if (!message) return res.json({ success:true, reply:null });
   const words = message.toLowerCase().split(/\s+/);
-  const rules = await Chatbot.find({ isActive:true }).lean();
+  // Cache chatbot rules for 120s — they rarely change
+  const rules = await getOrSet('chatbot:activeRules', 120, async () => {
+    return Chatbot.find({ isActive:true }).lean();
+  });
   let best = null, bestScore = 0;
   for (const rule of rules) {
     const score = (rule.keywords||[]).filter(k=>words.some(w=>w.includes(k))).length;

@@ -3,26 +3,23 @@ require('express-async-errors');
 
 const express = require('express');
 const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const rateLimit = require('express-rate-limit');
 const path = require('path');
 const compression = require('compression');
-const mongoSanitize = require('express-mongo-sanitize');
-const xssClean = require('xss-clean');
 
 const connectDB = require('./config/db');
-const logger = require('./config/logger');
+const { stats: cacheStats } = require('./config/cache');
 const errorHandler = require('./middleware/errorHandler');
-const { verifyToken } = require('./middleware/auth');
 
 const app = express();
 
 // ── Security & Parsing ───────────────────────────────────────────
+// Lazy-load heavy security middleware only when needed
+const helmet = require('helmet');
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
   contentSecurityPolicy: false
 }));
+
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
@@ -42,10 +39,19 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+const mongoSanitize = require('express-mongo-sanitize');
+const xssClean = require('xss-clean');
 app.use(mongoSanitize());
 app.use(xssClean());
 app.use(compression());
-app.use(morgan('combined', { stream: { write: msg => logger.info(msg.trim()) } }));
+
+// Skip morgan in production serverless — it adds latency and Vercel has its own logging
+if (isDev) {
+  const morgan = require('morgan');
+  const logger = require('./config/logger');
+  app.use(morgan('combined', { stream: { write: msg => logger.info(msg.trim()) } }));
+}
 
 // ── DB Middleware (Serverless-safe) ──────────────────────────────
 app.use(async (req, res, next) => {
@@ -58,6 +64,7 @@ app.use(async (req, res, next) => {
 });
 
 // ── Rate Limiting ────────────────────────────────────────────────
+const rateLimit = require('express-rate-limit');
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
@@ -75,7 +82,10 @@ const orderLimiter = rateLimit({
 });
 
 // ── Static ───────────────────────────────────────────────────────
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  maxAge: '1y',
+  immutable: true,
+}));
 
 // ── Routes ───────────────────────────────────────────────────────
 app.use('/api/auth', authLimiter, require('./routes/auth'));
@@ -100,8 +110,22 @@ app.use('/api/razorpay', apiLimiter, require('./routes/razorpay'));
 app.use('/api/dashboard', apiLimiter, require('./routes/dashboard'));
 app.use('/api/sync', apiLimiter, require('./routes/sync'));
 
-// ── Health check ─────────────────────────────────────────────────
-app.get('/api/health', (req, res) => res.json({ success: true, status: 'OK', timestamp: new Date().toISOString() }));
+// ── Health check (lightweight — no DB, returns cache stats) ─────
+app.get('/api/health', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json({
+    success: true,
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    cache: cacheStats(),
+  });
+});
+
+// ── Keep-alive ping (ultra-lightweight, no middleware) ───────────
+app.get('/api/ping', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.status(200).send('pong');
+});
 
 // ── Serve Frontend HTML ──────────────────────────────────────────
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'final.html')));
@@ -115,6 +139,7 @@ app.use(errorHandler);
 
 // ── Local Dev Server ─────────────────────────────────────────────
 if (process.env.NODE_ENV !== 'production' || process.env.FORCE_LISTEN === 'true') {
+  const logger = require('./config/logger');
   const PORT = process.env.PORT || 5000;
   const server = app.listen(PORT, () => {
     logger.info(`🚀 Hashlay Backend running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
@@ -135,6 +160,7 @@ if (process.env.NODE_ENV !== 'production' || process.env.FORCE_LISTEN === 'true'
 }
 
 process.on('uncaughtException', (err) => {
+  const logger = require('./config/logger');
   logger.error('Uncaught Exception:', err);
   if (process.env.NODE_ENV !== 'production') process.exit(1);
 });
