@@ -112,4 +112,16 @@ const generateInvoiceBuffer = (order) => {
   });
 };
 
-const generateInvoicePDF = async (order, res) => {\n  try {\n    const pdfBuffer = await generateInvoiceBuffer(order);\n    res.setHeader(\'Content-Type\', \'application/pdf\');\n    res.setHeader(\'Content-Disposition\', \ttachment; filename=invoice-.pdf\);\n    res.setHeader(\'Content-Length\', pdfBuffer.length);\n    res.end(pdfBuffer);\n  } catch (err) {\n    res.status(500).json({ success: false, message: \'Error generating invoice\' });\n  }\n};\n\nmodule.exports = { generateInvoicePDF, generateInvoiceBuffer };
+const generateInvoicePDF = async (order, res) => {
+  try {
+    const pdfBuffer = await generateInvoiceBuffer(order);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=invoice-' + order.orderId + '.pdf');
+    res.setHeader('Content-Length', pdfBuffer.length);
+    res.end(pdfBuffer);
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Error generating invoice' });
+  }
+};
+
+module.exports = { generateInvoicePDF, generateInvoiceBuffer };
