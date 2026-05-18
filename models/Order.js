@@ -50,6 +50,8 @@ const orderSchema = new mongoose.Schema({
   invoiceUrl:     { type: String },
   isActive:       { type: Boolean, default: true },
   orderNumber:    { type: String }, // Added to bypass legacy MongoDB unique index
+  source:         { type: String, enum: ['website','whatsapp'], default: 'website' },
+  screenshotUrl:  { type: String },
 }, { timestamps: true });
 
 const { v4: uuidv4 } = require('uuid');

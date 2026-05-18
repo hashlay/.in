@@ -12,6 +12,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
   <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
     /* ── Variables ─────────────────────────────────────────────── */
     :root {
       --black: #000000;
@@ -2374,6 +2375,7 @@
         <div class="nav-item active" onclick="goPage('dashboard',this)"><span class="nav-icon">📊</span>Dashboard</div>
         <div class="nav-item" onclick="goPage('orders',this)"><span class="nav-icon">🛒</span>Orders<span
             class="nav-badge" id="pending-badge">4</span></div>
+        <div class="nav-item" onclick="goPage('waorders',this)"><span class="nav-icon">📱</span>WhatsApp Orders</div>
         <div class="nav-item" onclick="goPage('products',this)"><span class="nav-icon">📦</span>Products</div>
         <div class="nav-item" onclick="goPage('customers',this)"><span class="nav-icon">👥</span>Customers</div>
         <div class="nav-item" onclick="goPage('reviews',this)"><span class="nav-icon">⭐</span>Reviews<span
@@ -2626,6 +2628,214 @@
               </thead>
               <tbody id="orders-tbody"></tbody>
             </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════
+         PAGE: WHATSAPP ORDERS
+    ════════════════════════════════════════════════════ -->
+      <div class="page" id="page-waorders">
+        <div class="section-hdr">
+          <div class="section-hdr-left">
+            <div class="section-hdr-title">📱 WHATSAPP ORDERS</div>
+            <div class="section-hdr-sub">Manage orders received via WhatsApp</div>
+          </div>
+          <div class="section-hdr-right">
+            <button class="btn btn-secondary btn-sm" onclick="openWaScreenshotModal()">📸 Scan Screenshot</button>
+            <button class="btn btn-primary btn-sm" onclick="openWaOrderModal()">+ Add Order</button>
+          </div>
+        </div>
+
+        <div class="filters-row">
+          <div class="filter-tab active" onclick="filterWaOrders('all',this)">All Orders</div>
+          <div class="filter-tab" onclick="filterWaOrders('pending',this)">Pending</div>
+          <div class="filter-tab" onclick="filterWaOrders('confirmed',this)">Confirmed</div>
+          <div class="filter-tab" onclick="filterWaOrders('processing',this)">Processing</div>
+          <div class="filter-tab" onclick="filterWaOrders('shipped',this)">Shipped</div>
+          <div class="filter-tab" onclick="filterWaOrders('delivered',this)">Delivered</div>
+          <div class="filter-tab" onclick="filterWaOrders('cancelled',this)">Cancelled</div>
+          <div style="flex:1;"></div>
+          <input class="filter-search" type="text" placeholder="Search orders…" id="wa-order-search"
+            oninput="searchWaOrders(this.value)" />
+        </div>
+
+        <div class="card">
+          <div class="table-wrap">
+            <table id="wa-orders-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Phone</th>
+                  <th>Products</th>
+                  <th>Amount</th>
+                  <th>Payment</th>
+                  <th>Pay Status</th>
+                  <th>Order Status</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="wa-orders-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- WhatsApp Screenshot Parse Modal -->
+      <div class="modal-overlay" id="modal-wa-screenshot">
+        <div class="modal-box" style="max-width:600px;">
+          <div class="modal-header">
+            <div class="modal-title">📸 Scan WhatsApp Screenshot</div>
+            <button class="modal-close" onclick="closeModal('modal-wa-screenshot')">✕</button>
+          </div>
+          <div class="modal-body">
+            <p style="color:var(--gray-lt);font-size:.85rem;margin-bottom:1rem;">Upload a WhatsApp order/message screenshot. AI will automatically extract the order details for you.</p>
+            <div class="form-group">
+              <label class="form-label">Screenshot Image URL</label>
+              <input class="form-input" type="url" id="wa-screenshot-url" placeholder="Paste Cloudinary/image URL here..." />
+            </div>
+            <div style="text-align:center;margin:1rem 0;">
+              <span style="color:var(--gray);font-size:.8rem;">— OR —</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Upload Screenshot</label>
+              <input class="form-input" type="file" id="wa-screenshot-file" accept="image/*" onchange="handleWaScreenshotUpload(this)" />
+            </div>
+            <div id="wa-screenshot-preview" style="margin-top:1rem;display:none;">
+              <img id="wa-screenshot-img" style="max-width:100%;border-radius:var(--radius);border:1px solid var(--bg-5);" />
+            </div>
+            <div id="wa-parse-status" style="margin-top:1rem;display:none;">
+              <div style="display:flex;align-items:center;gap:.6rem;padding:1rem;background:var(--bg-3);border-radius:var(--radius);">
+                <div class="spinner" style="width:20px;height:20px;border:2px solid var(--blue);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;"></div>
+                <span style="color:var(--gray-lt);font-size:.85rem;">AI is analyzing the screenshot...</span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modal-wa-screenshot')">Cancel</button>
+            <button class="btn btn-primary" id="wa-parse-btn" onclick="parseWaScreenshot()">🤖 Extract Details</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- WhatsApp Add/Edit Order Modal -->
+      <div class="modal-overlay" id="modal-wa-order">
+        <div class="modal-box" style="max-width:700px;max-height:90vh;overflow-y:auto;">
+          <div class="modal-header">
+            <div class="modal-title" id="wa-order-modal-title">Add WhatsApp Order</div>
+            <button class="modal-close" onclick="closeModal('modal-wa-order')">✕</button>
+          </div>
+          <div class="modal-body">
+            <!-- Customer Info -->
+            <div style="margin-bottom:1.2rem;">
+              <div class="fw-600" style="margin-bottom:.6rem;color:var(--blue-lt);">👤 Customer Details</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Customer Name *</label>
+                  <input class="form-input" type="text" id="wa-cust-name" placeholder="Full name" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Phone *</label>
+                  <input class="form-input" type="text" id="wa-cust-phone" placeholder="+91 9876543210" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input class="form-input" type="email" id="wa-cust-email" placeholder="email@example.com" />
+              </div>
+            </div>
+
+            <!-- Address -->
+            <div style="margin-bottom:1.2rem;">
+              <div class="fw-600" style="margin-bottom:.6rem;color:var(--blue-lt);">📍 Shipping Address</div>
+              <div class="form-group">
+                <label class="form-label">Address Line</label>
+                <input class="form-input" type="text" id="wa-addr-line" placeholder="House/Flat, Street" />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">City</label>
+                  <input class="form-input" type="text" id="wa-addr-city" placeholder="Mumbai" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">State</label>
+                  <input class="form-input" type="text" id="wa-addr-state" placeholder="Maharashtra" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Pincode</label>
+                  <input class="form-input" type="text" id="wa-addr-pin" placeholder="400001" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Items -->
+            <div style="margin-bottom:1.2rem;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;">
+                <div class="fw-600" style="color:var(--blue-lt);">📦 Order Items</div>
+                <button class="btn btn-secondary btn-sm" onclick="addWaItem()">+ Add Item</button>
+              </div>
+              <div id="wa-items-list">
+                <!-- Dynamic items will be inserted here -->
+              </div>
+            </div>
+
+            <!-- Payment & Charges -->
+            <div style="margin-bottom:1.2rem;">
+              <div class="fw-600" style="margin-bottom:.6rem;color:var(--blue-lt);">💰 Payment & Charges</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Payment Method</label>
+                  <select class="form-select" id="wa-pay-method">
+                    <option value="upi">UPI</option>
+                    <option value="cod">COD</option>
+                    <option value="online">Online</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Payment Status</label>
+                  <select class="form-select" id="wa-pay-status">
+                    <option value="paid">Paid</option>
+                    <option value="pending">Pending</option>
+                    <option value="failed">Failed</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Delivery Charge (₹)</label>
+                  <input class="form-input" type="number" id="wa-delivery" value="0" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Discount (₹)</label>
+                  <input class="form-input" type="number" id="wa-discount" value="0" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Order Status</label>
+                <select class="form-select" id="wa-order-status">
+                  <option value="confirmed">Confirmed</option>
+                  <option value="pending">Pending</option>
+                  <option value="processing">Processing</option>
+                  <option value="shipped">Shipped</option>
+                  <option value="delivered">Delivered</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Notes & Screenshot -->
+            <div>
+              <div class="fw-600" style="margin-bottom:.6rem;color:var(--blue-lt);">📝 Notes</div>
+              <div class="form-group">
+                <textarea class="form-textarea" id="wa-notes" placeholder="Any additional notes about this order..."></textarea>
+              </div>
+              <input type="hidden" id="wa-screenshot-ref" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modal-wa-order')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveWaOrder()">💾 Save Order</button>
           </div>
         </div>
       </div>
@@ -4468,7 +4678,8 @@
         customers: 'Customers', reviews: 'Reviews', marketing: 'Marketing',
         analytics: 'Analytics', faq: 'FAQ Manager', chatbot: 'AI Chatbot',
         notify: 'Notify List', contact: 'Contact Messages', settings: 'Settings',
-        admins: 'Admin Users', notifications: 'Notifications', activitylog: 'Activity Log'
+        admins: 'Admin Users', notifications: 'Notifications', activitylog: 'Activity Log',
+        waorders: 'WhatsApp Orders'
       };
 
       function goPage(id, el) {
@@ -4488,6 +4699,7 @@
         // Refresh data when navigating to specific pages
         if (id === 'activitylog') loadActivityLogPage();
         if (id === 'notifications') loadNotifications();
+        if (id === 'waorders') loadWaOrders();
       }
 
       function toggleSidebar() {
@@ -4969,6 +5181,7 @@
         if (result && result.success) {
           toast('Order updated successfully', 'success');
           loadOrders();
+          loadWaOrders();
         } else {
           toast('Failed to update order', 'error');
         }
@@ -5433,6 +5646,308 @@
         if (result && result.success) {
           toast('Coupon deleted.', 'info');
           loadCoupons();
+        }
+      }
+      /* ═══════════════════════════════════════════════════
+         WHATSAPP ORDERS — REAL API
+      ═══════════════════════════════════════════════════ */
+      let WA_ORDERS = [];
+      let waItemCounter = 0;
+
+      async function loadWaOrders(filter = 'all', search = '') {
+        let url = '/api/whatsapp-orders?page=1&limit=50';
+        if (filter !== 'all') url += '&status=' + filter;
+        if (search) url += '&search=' + encodeURIComponent(search);
+        const data = await apiGet(url);
+        if (data && data.data && data.data.docs) {
+          WA_ORDERS = data.data.docs;
+          renderWaOrders(filter, search);
+        }
+      }
+
+      function renderWaOrders(filter = 'all', search = '') {
+        let data = [...WA_ORDERS];
+        if (filter !== 'all') data = data.filter(o => o.orderStatus === filter);
+        if (search) {
+          const q = search.toLowerCase();
+          data = data.filter(o =>
+            (o.orderId || '').toLowerCase().includes(q) ||
+            (o.customerName || '').toLowerCase().includes(q) ||
+            (o.customerPhone || '').includes(q)
+          );
+        }
+        const tbody = document.getElementById('wa-orders-tbody');
+        if (!tbody) return;
+        if (!data.length) {
+          tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:2rem;color:var(--gray);">No WhatsApp orders found</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = data.map(o => `
+    <tr>
+      <td class="mono text-blue">#${o.orderId}</td>
+      <td class="fw-600">${o.customerName}</td>
+      <td class="text-muted">${o.customerPhone || ''}</td>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+        ${(o.items || []).map(i => i.name + ' x' + i.quantity).join(', ')}
+      </td>
+      <td class="fw-600">₹${o.total}</td>
+      <td>${o.paymentMethod?.toUpperCase()}</td>
+      <td><span class="badge ${PAY_BADGE[o.paymentStatus] || 'badge-gray'}">${o.paymentStatus}</span></td>
+      <td><span class="badge ${STATUS_BADGE[o.orderStatus] || 'badge-gray'}">${o.orderStatus}</span></td>
+      <td class="text-muted">${new Date(o.createdAt).toLocaleDateString('en-IN')}</td>
+      <td>
+        <div style="display:flex;gap:.3rem;">
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="viewOrder('${o._id}')" title="View">👁</button>
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="openWaStatusModal('${o._id}')" title="Update Status">✏️</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+      }
+
+      function filterWaOrders(filter, el) {
+        document.querySelectorAll('#page-waorders .filter-tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        loadWaOrders(filter, document.getElementById('wa-order-search')?.value || '');
+      }
+
+      function searchWaOrders(q) {
+        const activeFilter = document.querySelector('#page-waorders .filter-tab.active')?.textContent?.toLowerCase()?.trim() || 'all';
+        const filterMap = { 'all orders': 'all', 'pending': 'pending', 'confirmed': 'confirmed', 'processing': 'processing', 'shipped': 'shipped', 'delivered': 'delivered', 'cancelled': 'cancelled' };
+        loadWaOrders(filterMap[activeFilter] || 'all', q);
+      }
+
+      function openWaStatusModal(id) {
+        document.getElementById('status-order-id').value = id;
+        const o = WA_ORDERS.find(x => x._id === id);
+        if (o) {
+          document.getElementById('new-status-select').value = o.orderStatus;
+          document.getElementById('new-payment-select').value = o.paymentStatus || 'pending';
+        }
+        openModal('modal-status');
+      }
+
+      function openWaOrderModal(prefill = null) {
+        waItemCounter = 0;
+        document.getElementById('wa-order-modal-title').textContent = 'Add WhatsApp Order';
+        document.getElementById('wa-cust-name').value = prefill?.customerName || '';
+        document.getElementById('wa-cust-phone').value = prefill?.customerPhone || '';
+        document.getElementById('wa-cust-email').value = prefill?.customerEmail || '';
+        document.getElementById('wa-addr-line').value = prefill?.address?.addressLine1 || '';
+        document.getElementById('wa-addr-city').value = prefill?.address?.city || '';
+        document.getElementById('wa-addr-state').value = prefill?.address?.state || '';
+        document.getElementById('wa-addr-pin').value = prefill?.address?.pincode || '';
+        document.getElementById('wa-pay-method').value = prefill?.paymentMethod || 'upi';
+        document.getElementById('wa-pay-status').value = 'paid';
+        document.getElementById('wa-delivery').value = 0;
+        document.getElementById('wa-discount').value = 0;
+        document.getElementById('wa-order-status').value = 'confirmed';
+        document.getElementById('wa-notes').value = prefill?.notes || '';
+        document.getElementById('wa-screenshot-ref').value = '';
+
+        // Clear and add items
+        const list = document.getElementById('wa-items-list');
+        list.innerHTML = '';
+        if (prefill?.items?.length) {
+          prefill.items.forEach(item => addWaItem(item));
+        } else {
+          addWaItem();
+        }
+
+        openModal('modal-wa-order');
+      }
+
+      function addWaItem(item = null) {
+        waItemCounter++;
+        const idx = waItemCounter;
+        const productOptions = (typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA : []).map(p =>
+          `<option value="${p._id}" data-price="${p.offerPrice || p.price}" ${item?.product === p._id ? 'selected' : ''}>${p.name} — ₹${p.offerPrice || p.price}</option>`
+        ).join('');
+
+        const div = document.createElement('div');
+        div.id = 'wa-item-' + idx;
+        div.style.cssText = 'display:flex;gap:.5rem;align-items:flex-end;margin-bottom:.5rem;flex-wrap:wrap;padding:.8rem;background:var(--bg-3);border-radius:var(--radius);';
+        div.innerHTML = `
+          <div class="form-group" style="flex:2;min-width:150px;margin:0;">
+            <label class="form-label" style="font-size:.7rem;">Product</label>
+            <select class="form-select" id="wa-item-prod-${idx}" onchange="waItemProductChange(${idx})">
+              <option value="">-- Custom Item --</option>
+              ${productOptions}
+            </select>
+          </div>
+          <div class="form-group" style="flex:1.5;min-width:120px;margin:0;">
+            <label class="form-label" style="font-size:.7rem;">Name</label>
+            <input class="form-input" type="text" id="wa-item-name-${idx}" value="${item?.name || ''}" placeholder="Product name" />
+          </div>
+          <div class="form-group" style="flex:.5;min-width:60px;margin:0;">
+            <label class="form-label" style="font-size:.7rem;">Qty</label>
+            <input class="form-input" type="number" id="wa-item-qty-${idx}" value="${item?.quantity || 1}" min="1" />
+          </div>
+          <div class="form-group" style="flex:.7;min-width:80px;margin:0;">
+            <label class="form-label" style="font-size:.7rem;">Price (₹)</label>
+            <input class="form-input" type="number" id="wa-item-price-${idx}" value="${item?.price || ''}" placeholder="0" />
+          </div>
+          <button class="btn btn-danger btn-sm btn-icon" onclick="removeWaItem(${idx})" style="margin-bottom:2px;" title="Remove">✕</button>
+        `;
+        document.getElementById('wa-items-list').appendChild(div);
+
+        // Auto-select product if name matches
+        if (item?.name && !item?.product) {
+          const sel = document.getElementById('wa-item-prod-' + idx);
+          for (const opt of sel.options) {
+            if (opt.text.toLowerCase().includes(item.name.toLowerCase())) {
+              sel.value = opt.value;
+              waItemProductChange(idx);
+              break;
+            }
+          }
+        }
+      }
+
+      function waItemProductChange(idx) {
+        const sel = document.getElementById('wa-item-prod-' + idx);
+        const opt = sel.options[sel.selectedIndex];
+        if (opt.value) {
+          const name = opt.text.split(' — ')[0];
+          const price = opt.dataset.price;
+          document.getElementById('wa-item-name-' + idx).value = name;
+          document.getElementById('wa-item-price-' + idx).value = price;
+        }
+      }
+
+      function removeWaItem(idx) {
+        const el = document.getElementById('wa-item-' + idx);
+        if (el) el.remove();
+      }
+
+      async function saveWaOrder() {
+        const name = document.getElementById('wa-cust-name').value.trim();
+        const phone = document.getElementById('wa-cust-phone').value.trim();
+        if (!name || !phone) {
+          toast('Customer name and phone are required!', 'error');
+          return;
+        }
+
+        // Collect items
+        const items = [];
+        document.querySelectorAll('#wa-items-list > div').forEach(div => {
+          const idx = div.id.replace('wa-item-', '');
+          const product = document.getElementById('wa-item-prod-' + idx)?.value || '';
+          const itemName = document.getElementById('wa-item-name-' + idx)?.value?.trim() || '';
+          const qty = +document.getElementById('wa-item-qty-' + idx)?.value || 1;
+          const price = +document.getElementById('wa-item-price-' + idx)?.value || 0;
+          if (itemName) {
+            items.push({ product: product || undefined, name: itemName, quantity: qty, price, total: price * qty });
+          }
+        });
+
+        if (!items.length) {
+          toast('At least one item is required!', 'error');
+          return;
+        }
+
+        const payload = {
+          customerName: name,
+          customerPhone: phone,
+          customerEmail: document.getElementById('wa-cust-email').value.trim(),
+          address: {
+            addressLine1: document.getElementById('wa-addr-line').value.trim(),
+            city: document.getElementById('wa-addr-city').value.trim(),
+            state: document.getElementById('wa-addr-state').value.trim(),
+            pincode: document.getElementById('wa-addr-pin').value.trim(),
+          },
+          items,
+          paymentMethod: document.getElementById('wa-pay-method').value,
+          paymentStatus: document.getElementById('wa-pay-status').value,
+          deliveryCharge: +document.getElementById('wa-delivery').value || 0,
+          discount: +document.getElementById('wa-discount').value || 0,
+          orderStatus: document.getElementById('wa-order-status').value,
+          notes: document.getElementById('wa-notes').value.trim(),
+          screenshotUrl: document.getElementById('wa-screenshot-ref').value || '',
+        };
+
+        const result = await apiPost('/api/whatsapp-orders', payload);
+        if (result && result.success) {
+          toast('WhatsApp order created! ID: ' + (result.data?.orderId || ''), 'success');
+          closeModal('modal-wa-order');
+          loadWaOrders();
+        } else {
+          toast(result?.message || 'Failed to create order', 'error');
+        }
+      }
+
+      // ── Screenshot AI Parsing ─────────────────────────────
+      function openWaScreenshotModal() {
+        document.getElementById('wa-screenshot-url').value = '';
+        document.getElementById('wa-screenshot-file').value = '';
+        document.getElementById('wa-screenshot-preview').style.display = 'none';
+        document.getElementById('wa-parse-status').style.display = 'none';
+        document.getElementById('wa-parse-btn').disabled = false;
+        openModal('modal-wa-screenshot');
+      }
+
+      async function handleWaScreenshotUpload(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+
+        // Upload to the server's upload endpoint
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+          toast('Uploading screenshot...', 'info');
+          const response = await fetch('/api/upload/image', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            body: formData,
+          });
+          const data = await response.json();
+          if (data.success && data.url) {
+            document.getElementById('wa-screenshot-url').value = data.url;
+            document.getElementById('wa-screenshot-img').src = data.url;
+            document.getElementById('wa-screenshot-preview').style.display = 'block';
+            toast('Screenshot uploaded!', 'success');
+          } else {
+            toast('Upload failed: ' + (data.message || 'Unknown error'), 'error');
+          }
+        } catch (err) {
+          toast('Upload error: ' + err.message, 'error');
+        }
+      }
+
+      async function parseWaScreenshot() {
+        const imageUrl = document.getElementById('wa-screenshot-url').value.trim();
+        if (!imageUrl) {
+          toast('Please provide a screenshot URL or upload one first!', 'error');
+          return;
+        }
+
+        // Show loading state
+        document.getElementById('wa-parse-status').style.display = 'block';
+        document.getElementById('wa-parse-btn').disabled = true;
+
+        try {
+          const result = await apiPost('/api/whatsapp-orders/parse-screenshot', { imageUrl });
+          
+          document.getElementById('wa-parse-status').style.display = 'none';
+          document.getElementById('wa-parse-btn').disabled = false;
+
+          if (result && result.success && result.data) {
+            toast('🎉 AI extracted order details successfully!', 'success');
+            closeModal('modal-wa-screenshot');
+
+            // Open the order form pre-filled with AI-extracted data
+            const extracted = result.data;
+            extracted.screenshotUrl = imageUrl;
+            openWaOrderModal(extracted);
+            document.getElementById('wa-screenshot-ref').value = imageUrl;
+          } else {
+            toast(result?.message || 'AI could not extract details from this screenshot', 'error');
+          }
+        } catch (err) {
+          document.getElementById('wa-parse-status').style.display = 'none';
+          document.getElementById('wa-parse-btn').disabled = false;
+          toast('Error parsing screenshot: ' + err.message, 'error');
         }
       }
 

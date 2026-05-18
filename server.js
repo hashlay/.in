@@ -109,6 +109,7 @@ app.use('/api/invoice', apiLimiter, require('./routes/invoice'));
 app.use('/api/razorpay', apiLimiter, require('./routes/razorpay'));
 app.use('/api/dashboard', apiLimiter, require('./routes/dashboard'));
 app.use('/api/sync', apiLimiter, require('./routes/sync'));
+app.use('/api/whatsapp-orders', apiLimiter, require('./routes/whatsappOrders'));
 
 // ── Health check (lightweight — no DB, returns cache stats) ─────
 app.get('/api/health', (req, res) => {
