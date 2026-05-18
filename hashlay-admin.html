@@ -5334,6 +5334,7 @@
          COUPONS — REAL API
       ═══════════════════════════════════════════════════ */
       let COUPONS = [];
+      let editingCouponId = null;
 
       async function loadCoupons() {
         const data = await apiGet('/api/coupons');
@@ -5357,11 +5358,46 @@
       <td>${c.isActive ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-gray">Inactive</span>'}</td>
       <td>
         <div style="display:flex;gap:.3rem;">
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="editCoupon('${c._id}')" title="Edit">✏️</button>
           <button class="btn btn-danger btn-sm btn-icon" onclick="deleteCoupon('${c._id}','${c.code}')">🗑</button>
         </div>
       </td>
     </tr>
   `).join('');
+      }
+
+      function openAddCoupon() {
+        editingCouponId = null;
+        document.getElementById('c-code').value = '';
+        document.getElementById('c-type').value = 'percent';
+        document.getElementById('c-value').value = '';
+        document.getElementById('c-min').value = '';
+        document.getElementById('c-expiry').value = '';
+        document.getElementById('c-limit').value = '';
+        document.getElementById('c-active').checked = true;
+        openModal('modal-coupon');
+      }
+
+      function editCoupon(id) {
+        const c = COUPONS.find(x => x._id === id);
+        if (!c) return;
+        editingCouponId = id;
+        document.getElementById('c-code').value = c.code || '';
+        document.getElementById('c-type').value = c.type === 'percentage' ? 'percent' : 'flat';
+        document.getElementById('c-value').value = c.value || '';
+        document.getElementById('c-min').value = c.minOrder || '';
+        if (c.expiryDate) {
+          const date = new Date(c.expiryDate);
+          const yyyy = date.getFullYear();
+          const mm = String(date.getMonth() + 1).padStart(2, '0');
+          const dd = String(date.getDate()).padStart(2, '0');
+          document.getElementById('c-expiry').value = `${yyyy}-${mm}-${dd}`;
+        } else {
+          document.getElementById('c-expiry').value = '';
+        }
+        document.getElementById('c-limit').value = c.usageLimit || '';
+        document.getElementById('c-active').checked = !!c.isActive;
+        openModal('modal-coupon');
       }
 
       async function saveCoupon() {
@@ -5376,13 +5412,18 @@
           usageLimit: +document.getElementById('c-limit').value || undefined,
           isActive: document.getElementById('c-active').checked,
         };
-        const result = await apiPost('/api/coupons', payload);
+        let result;
+        if (editingCouponId) {
+          result = await apiPatch('/api/coupons/' + editingCouponId, payload);
+        } else {
+          result = await apiPost('/api/coupons', payload);
+        }
         if (result && result.success) {
-          toast('Coupon ' + code + ' created!', 'success');
+          toast(editingCouponId ? 'Coupon updated!' : 'Coupon created!', 'success');
           closeModal('modal-coupon');
           loadCoupons();
         } else {
-          toast(result?.message || 'Failed to create coupon', 'error');
+          toast(result?.message || 'Failed to save coupon', 'error');
         }
       }
 
