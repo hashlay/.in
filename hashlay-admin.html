@@ -4532,7 +4532,7 @@
         loadCarCareSettings();
         loadActivityLogPage();
         loadNotifications();
-        renderShippingZones();
+        loadShippingZones();
         initCharts();
       }
 
@@ -6547,6 +6547,20 @@
         }).join('');
       }
 
+      async function syncShippingZones() {
+        const result = await apiPatch('/api/settings/shipping', { value: { zones: SHIPPING_ZONES } });
+        if (!result?.success) toast('Failed to sync shipping zones to server', 'error');
+      }
+
+      async function loadShippingZones() {
+        const result = await apiGet('/api/settings/shipping');
+        const v = result?.data?.value || result?.data || null;
+        if (v?.zones?.length) {
+          SHIPPING_ZONES = v.zones;
+        }
+        renderShippingZones();
+      }
+
       function toggleZoneEdit(id) {
         const el = document.getElementById('zedit-' + id);
         if (!el) return;
@@ -6565,6 +6579,7 @@
         if (otherZone) { toast(`"${state}" is already in ${otherZone.name}. Remove it first.`, 'error'); return; }
         zone.states.push(state);
         renderShippingZones();
+        syncShippingZones();
         // Re-open the edit section
         setTimeout(() => { const el = document.getElementById('zedit-' + zoneId); if (el) el.style.display = 'block'; }, 50);
         toast(`${state} added to ${zone.name}!`, 'success');
@@ -6576,6 +6591,7 @@
         if (!zone) return;
         zone.states = zone.states.filter(s => s !== state);
         renderShippingZones();
+        syncShippingZones();
         setTimeout(() => { const el = document.getElementById('zedit-' + zoneId); if (el) el.style.display = 'block'; }, 50);
         toast(`${state} removed from zone.`, 'info');
       }
@@ -6590,6 +6606,7 @@
         zone.charge = charge;
         zone.freeAbove = freeAbove;
         renderShippingZones();
+        syncShippingZones();
         toast(`${zone.name} saved successfully!`, 'success');
         addActivityEntry('system', 'Shipping zone saved', `${zone.name} — Charge: ₹${charge}, Free above: ₹${freeAbove}.`, 'Super Admin', 'success');
       }

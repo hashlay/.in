@@ -47,7 +47,7 @@ exports.get = async (req, res) => {
 exports.getPublic = async (req, res) => {
   // Cache public settings for 90s — called on every page load
   const result = await getOrSet('settings:public', 90, async () => {
-    const keys = ['announcement', 'seo', 'banner', 'delivery', 'store', 'payment'];
+    const keys = ['announcement', 'seo', 'banner', 'delivery', 'store', 'payment', 'shipping'];
     const settings = await Settings.find({ key: { $in: keys } }).lean();
     const data = {};
     for (const s of settings) {

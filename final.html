@@ -5614,11 +5614,25 @@
 
         if (delivery.standardCharge !== undefined) {
           DELIVERY_CONFIG.defaultCharge = delivery.standardCharge;
-          DELIVERY_CONFIG.charges = {}; // Clear state charges to force the flat rate!
         } else if (delivery.charge !== undefined) {
           DELIVERY_CONFIG.defaultCharge = delivery.charge;
-          DELIVERY_CONFIG.charges = {};
         }
+      }
+
+      // Parse dynamic shipping zones for state-based charges
+      DELIVERY_CONFIG.charges = {};
+      DELIVERY_CONFIG.freeAboveOverrides = {};
+      const shipping = cfg.shipping;
+      if (shipping && shipping.zones && Array.isArray(shipping.zones)) {
+        shipping.zones.forEach(z => {
+          if (Array.isArray(z.states)) {
+            z.states.forEach(state => {
+              DELIVERY_CONFIG.charges[state] = z.charge;
+              DELIVERY_CONFIG.freeAboveOverrides[state] = z.freeAbove;
+            });
+          }
+        });
+      }
 
         // Update the "Add X more for free delivery" threshold text
         const noticeEl = document.getElementById('free-delivery-notice');
@@ -6024,10 +6038,13 @@
 
       if (!state) {
         currentDeliveryCharge = 0;
-      } else if (!DELIVERY_CONFIG.enabled || subtotal >= FREE_DELIVERY_THRESHOLD) {
-        currentDeliveryCharge = 0; // Free delivery
       } else {
-        currentDeliveryCharge = DELIVERY_CONFIG.charges[state] || DELIVERY_CONFIG.defaultCharge;
+        const freeAbove = DELIVERY_CONFIG.freeAboveOverrides?.[state] ?? FREE_DELIVERY_THRESHOLD;
+        if (!DELIVERY_CONFIG.enabled || subtotal >= freeAbove) {
+          currentDeliveryCharge = 0; // Free delivery
+        } else {
+          currentDeliveryCharge = DELIVERY_CONFIG.charges[state] ?? DELIVERY_CONFIG.defaultCharge;
+        }
       }
       updateOrderSummary();
     }
