@@ -17,7 +17,7 @@
   <!-- Favicon -->
   <link rel="icon" type="image/jpeg"
     href="https://res.cloudinary.com/drj19ghhl/image/upload/v1777176961/f47e171f-1606-4005-9edd-41239b24ea44_ovi6oo.jpg" />
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://hashlay.in/" />
@@ -2937,15 +2937,17 @@
 
       .popup-details {
         padding: 1.4rem 1.2rem;
-        padding-bottom: 6rem; /* Avoid overlap from sticky footer */
+        padding-bottom: 6rem;
+        /* Avoid overlap from sticky footer */
         overflow-y: visible;
         max-height: none;
       }
-      
+
       .popup-close-btn {
         top: 0.8rem;
         right: 0.8rem;
-        background: rgba(0, 0, 0, 0.6); /* Better visibility over images */
+        background: rgba(0, 0, 0, 0.6);
+        /* Better visibility over images */
       }
 
       .popup-name {
@@ -3020,6 +3022,37 @@
         width: 100%;
         bottom: 0;
         border-radius: 20px 20px 0 0;
+      }
+
+      .social-links {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .social-btn i {
+        font-size: 28px;
+        transition: transform 0.2s ease;
+      }
+
+      .social-btn:hover i {
+        transform: scale(1.2);
+      }
+
+      .social-btn[title="Instagram"] i {
+        color: #E1306C;
+      }
+
+      .social-btn[title="Facebook"] i {
+        color: #1877F2;
+      }
+
+      .social-btn[title="YouTube"] i {
+        color: #FF0000;
+      }
+
+      .social-btn[title="WhatsApp"] i {
+        color: #25D366;
       }
 
       /* Toast */
@@ -4657,19 +4690,20 @@
           </div>
           <p class="footer-tagline">Protect What Moves You. Built in India for your care.</p>
           <div class="social-links">
-            <a href="https://www.instagram.com/hashlay.in?igsh=dmE0ZXF6eDMxeXVj" class="social-btn"
-              title="Instagram"><img
-                src="https://res.cloudinary.com/drj19ghhl/image/upload/v1778926688/15707749_k9ncay.png"
-                alt="Instagram"></a>
-            <a href="https://www.facebook.com/profile.php?id=61589624921558" class="social-btn" title="Facebook"><img
-                src="https://res.cloudinary.com/drj19ghhl/image/upload/v1778926275/5968764_yqahrg.png"
-                alt="Facebook"></a>
-            <a href="#" class="social-btn" title="YouTube"><img
-                src="https://res.cloudinary.com/drj19ghhl/image/upload/v1778926259/youtube_1_xi8gua.png"
-                alt="Youtube"></a>
-            <a href="https://wa.me/917483138340" target="_blank" class="social-btn" title="WhatsApp"><img
-                src="https://res.cloudinary.com/drj19ghhl/image/upload/v1778923962/whatsapp_melg5h.png"
-                alt="WhatsApp"></a>
+            <a href="https://www.instagram.com/hashlay.in?igsh=dmE0ZXF6eDMxeXVj" class="social-btn" target="_blank"
+              title="Instagram">
+              <i class="fa-brands fa-instagram"></i>
+            </a>
+            <a href="https://www.facebook.com/profile.php?id=61589624921558" class="social-btn" target="_blank"
+              title="Facebook">
+              <i class="fa-brands fa-facebook"></i>
+            </a>
+            <a href="#" class="social-btn" target="_blank" title="YouTube">
+              <i class="fa-brands fa-youtube"></i>
+            </a>
+            <a href="https://wa.me/917483138340" class="social-btn" target="_blank" title="WhatsApp">
+              <i class="fa-brands fa-whatsapp"></i>
+            </a>
           </div>
         </div>
         <div class="footer-links-group">
@@ -5641,13 +5675,13 @@
         });
       }
 
-        // Update the "Add X more for free delivery" threshold text
-        const noticeEl = document.getElementById('free-delivery-notice');
-        if (noticeEl) {
-          noticeEl.innerHTML = `🚚 Free delivery on orders above ₹${FREE_DELIVERY_THRESHOLD} <span style="font-size:0.7rem;color:var(--gray-5);">(product value)</span>`;
-        }
+      // Update the "Add X more for free delivery" threshold text
+      const noticeEl = document.getElementById('free-delivery-notice');
+      if (noticeEl) {
+        noticeEl.innerHTML = `🚚 Free delivery on orders above ₹${FREE_DELIVERY_THRESHOLD} <span style="font-size:0.7rem;color:var(--gray-5);">(product value)</span>`;
       }
-      applyPaymentMethodVisibility();
+    }
+    applyPaymentMethodVisibility();
     }
 
     function applyPaymentMethodVisibility() {

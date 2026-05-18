@@ -163,7 +163,9 @@ exports.createOrder = async (req, res) => {
     
     // Trigger Automatic Email
     if (createdOrder.customerEmail) {
-      await sendOrderConfirmation(createdOrder).catch(() => {});
+      const { generateInvoiceBuffer } = require('../services/invoiceService');
+      const invoiceBuffer = await generateInvoiceBuffer(createdOrder).catch(() => null);
+      await sendOrderConfirmation(createdOrder, invoiceBuffer).catch(() => {});
     }
 
     // Trigger Automatic WhatsApp Message

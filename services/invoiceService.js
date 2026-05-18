@@ -2,7 +2,7 @@ const PDFDocument = require('pdfkit');
 
 let cachedLogoBuffer = null;
 
-const generateInvoicePDF = (order, res) => {
+const generateInvoiceBuffer = (order) => {
   return new Promise(async (resolve, reject) => {
     const doc     = new PDFDocument({ margin: 50, size: 'A4' });
     const buffers = [];
@@ -11,11 +11,7 @@ const generateInvoicePDF = (order, res) => {
     doc.on('error', reject);
     doc.on('end', () => {
       const pdfBuffer = Buffer.concat(buffers);
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename=invoice-${order.orderId}.pdf`);
-      res.setHeader('Content-Length', pdfBuffer.length);
-      res.end(pdfBuffer);
-      resolve();
+      resolve(pdfBuffer);
     });
 
     // Fetch and draw logo
@@ -116,4 +112,4 @@ const generateInvoicePDF = (order, res) => {
   });
 };
 
-module.exports = generateInvoicePDF;
+const generateInvoicePDF = async (order, res) => {\n  try {\n    const pdfBuffer = await generateInvoiceBuffer(order);\n    res.setHeader(\'Content-Type\', \'application/pdf\');\n    res.setHeader(\'Content-Disposition\', \ttachment; filename=invoice-.pdf\);\n    res.setHeader(\'Content-Length\', pdfBuffer.length);\n    res.end(pdfBuffer);\n  } catch (err) {\n    res.status(500).json({ success: false, message: \'Error generating invoice\' });\n  }\n};\n\nmodule.exports = { generateInvoicePDF, generateInvoiceBuffer };

@@ -15,11 +15,11 @@ const getTransporter = () => {
   return transporter;
 };
 
-const sendEmail = async ({ to, subject, html, text }) => {
+const sendEmail = async ({ to, subject, html, text, attachments }) => {
   try {
     const info = await getTransporter().sendMail({
       from: `"${process.env.FROM_NAME}" <${process.env.FROM_EMAIL}>`,
-      to, subject, html, text,
+      to, subject, html, text, attachments
     });
     logger.info(`[Email] Sent to ${to}: ${info.messageId}`);
     return { success: true, messageId: info.messageId };
@@ -29,7 +29,7 @@ const sendEmail = async ({ to, subject, html, text }) => {
   }
 };
 
-exports.sendOrderConfirmation = async (order) => {
+exports.sendOrderConfirmation = async (order, invoiceBuffer = null) => {
   const itemsHtml = order.items.map(i =>
     `<tr><td>${i.name}</td><td>×${i.quantity}</td><td>₹${i.price}</td><td>₹${i.total}</td></tr>`
   ).join('');
@@ -52,6 +52,11 @@ exports.sendOrderConfirmation = async (order) => {
         <p><strong>Total: ₹${order.total}</strong></p>
         <p style="color:#6666aa;font-size:.85rem;">Questions? Reply to this email or contact us at contacthashlay@gmail.com</p>
       </div>`,
+    attachments: invoiceBuffer ? [{
+      filename: `Invoice-${order.orderId}.pdf`,
+      content: invoiceBuffer,
+      contentType: 'application/pdf'
+    }] : []
   });
 };
 

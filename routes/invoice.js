@@ -2,7 +2,7 @@ const express = require('express');
 const r = express.Router();
 const { verifyToken } = require('../middleware/auth');
 const Order = require('../models/Order');
-const generateInvoicePDF = require('../services/invoiceService');
+const { generateInvoicePDF } = require('../services/invoiceService');
 
 r.get('/:orderId', verifyToken, async (req, res) => {
   const order = await Order.findOne({
