@@ -3901,7 +3901,7 @@
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label class="form-label">New Status</label>
+            <label class="form-label">Order Status</label>
             <select class="form-select" id="new-status-select">
               <option value="pending">Pending</option>
               <option value="confirmed">Confirmed</option>
@@ -3909,6 +3909,15 @@
               <option value="shipped">Shipped</option>
               <option value="delivered">Delivered</option>
               <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-top: 1rem;">
+            <label class="form-label">Payment Status</label>
+            <select class="form-select" id="new-payment-select">
+              <option value="pending">Pending</option>
+              <option value="paid">Paid</option>
+              <option value="failed">Failed</option>
+              <option value="refunded">Refunded</option>
             </select>
           </div>
           <input type="hidden" id="status-order-id" />
@@ -4942,19 +4951,26 @@
       function openStatusModal(id) {
         document.getElementById('status-order-id').value = id;
         const o = ORDERS.find(x => x._id === id);
-        if (o) document.getElementById('new-status-select').value = o.orderStatus;
+        if (o) {
+          document.getElementById('new-status-select').value = o.orderStatus;
+          document.getElementById('new-payment-select').value = o.paymentStatus || 'pending';
+        }
         openModal('modal-status');
       }
 
       async function confirmStatusUpdate() {
         const id = document.getElementById('status-order-id').value;
         const newStatus = document.getElementById('new-status-select').value;
-        const result = await apiPatch('/api/orders/' + id + '/status', { orderStatus: newStatus });
+        const newPayment = document.getElementById('new-payment-select').value;
+        const result = await apiPatch('/api/orders/' + id + '/status', { 
+          orderStatus: newStatus,
+          paymentStatus: newPayment
+        });
         if (result && result.success) {
-          toast('Order updated to ' + newStatus, 'success');
+          toast('Order updated successfully', 'success');
           loadOrders();
         } else {
-          toast('Failed to update order status', 'error');
+          toast('Failed to update order', 'error');
         }
         closeModal('modal-status');
       }

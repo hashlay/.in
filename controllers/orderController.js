@@ -192,23 +192,37 @@ exports.createOrder = async (req, res) => {
 };
 
 exports.updateOrderStatus = async (req, res) => {
-  const { orderStatus, deliveryStatus, trackingId, notes } = req.body;
+  const { orderStatus, deliveryStatus, trackingId, notes, paymentStatus } = req.body;
   const order = await Order.findById(req.params.id);
   if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
 
-  if (orderStatus)    order.orderStatus    = orderStatus;
+  let updated = false;
+
+  if (orderStatus && order.orderStatus !== orderStatus) {
+    order.orderStatus = orderStatus;
+    updated = true;
+  }
+  if (paymentStatus && order.paymentStatus !== paymentStatus) {
+    order.paymentStatus = paymentStatus;
+    updated = true;
+  }
+
   if (deliveryStatus) order.deliveryStatus = deliveryStatus;
   if (trackingId)     order.trackingId     = trackingId;
   if (notes)          order.notes          = notes;
 
-  order.timeline.push({
-    status: orderStatus || deliveryStatus,
-    message: req.body.message || `Status updated to ${orderStatus || deliveryStatus}`,
-    timestamp: new Date(),
-  });
+  if (updated) {
+    order.timeline.push({
+      status: orderStatus || deliveryStatus || 'Update',
+      message: req.body.message || `Status updated`,
+      timestamp: new Date(),
+    });
+  }
 
   await order.save();
-  await notifyOrderUpdate(order, orderStatus);
+  if (orderStatus) {
+    await notifyOrderUpdate(order, orderStatus);
+  }
   res.json({ success: true, data: order, message: 'Order updated' });
 };
 
