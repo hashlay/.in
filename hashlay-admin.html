@@ -3224,11 +3224,12 @@
               <div class="form-group">
                 <label class="form-label">Before Image</label>
                 <input class="form-input" type="text" id="s-ba-before-img" placeholder="Paste URL or upload below" />
-                <div style="display:flex;gap:.5rem;margin-top:.4rem;align-items:center;">
+                <div style="display:flex;gap:.5rem;margin-top:.4rem;align-items:center;flex-wrap:wrap;">
                   <input type="file" accept="image/*" id="s-ba-before-file"
                     style="font-size:.75rem;color:var(--gray);" />
                   <button class="btn btn-secondary btn-sm"
                     onclick="uploadSettingsImage('s-ba-before-file','s-ba-before-img')">📤 Upload</button>
+                  <button class="btn btn-secondary btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);" onclick="document.getElementById('s-ba-before-img').value=''; document.getElementById('s-ba-before-file').value='';">🗑️ Clear</button>
                 </div>
                 <div style="font-size:.7rem;color:var(--gray);margin-top:.3rem;">Image shown on the left (dirty/old
                   state)</div>
@@ -3236,11 +3237,12 @@
               <div class="form-group">
                 <label class="form-label">After Image</label>
                 <input class="form-input" type="text" id="s-ba-after-img" placeholder="Paste URL or upload below" />
-                <div style="display:flex;gap:.5rem;margin-top:.4rem;align-items:center;">
+                <div style="display:flex;gap:.5rem;margin-top:.4rem;align-items:center;flex-wrap:wrap;">
                   <input type="file" accept="image/*" id="s-ba-after-file"
                     style="font-size:.75rem;color:var(--gray);" />
                   <button class="btn btn-secondary btn-sm"
                     onclick="uploadSettingsImage('s-ba-after-file','s-ba-after-img')">📤 Upload</button>
+                  <button class="btn btn-secondary btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);" onclick="document.getElementById('s-ba-after-img').value=''; document.getElementById('s-ba-after-file').value='';">🗑️ Clear</button>
                 </div>
                 <div style="font-size:.7rem;color:var(--gray);margin-top:.3rem;">Image shown on the right (clean/new
                   state)</div>
@@ -3280,20 +3282,22 @@
                 <label class="form-label">Video URL (YouTube embed or direct link)</label>
                 <input class="form-input" type="text" id="s-vid1-url"
                   placeholder="https://youtube.com/embed/... or direct video URL" />
-                <div style="display:flex;gap:.5rem;margin-top:.4rem;align-items:center;">
+                <div style="display:flex;gap:.5rem;margin-top:.4rem;align-items:center;flex-wrap:wrap;">
                   <input type="file" accept="video/*" id="s-vid1-file" style="font-size:.75rem;color:var(--gray);" />
                   <button class="btn btn-secondary btn-sm" onclick="uploadSettingsVideo('s-vid1-file','s-vid1-url')">📤
                     Upload Video</button>
+                  <button class="btn btn-secondary btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);" onclick="document.getElementById('s-vid1-url').value=''; document.getElementById('s-vid1-file').value='';">🗑️ Clear</button>
                 </div>
               </div>
               <div class="form-group">
                 <label class="form-label">Thumbnail Image</label>
                 <input class="form-input" type="text" id="s-vid1-thumb" placeholder="Paste thumbnail URL or upload" />
-                <div style="display:flex;gap:.5rem;margin-top:.4rem;align-items:center;">
+                <div style="display:flex;gap:.5rem;margin-top:.4rem;align-items:center;flex-wrap:wrap;">
                   <input type="file" accept="image/*" id="s-vid1-thumb-file"
                     style="font-size:.75rem;color:var(--gray);" />
                   <button class="btn btn-secondary btn-sm"
                     onclick="uploadSettingsImage('s-vid1-thumb-file','s-vid1-thumb')">📤 Upload</button>
+                  <button class="btn btn-secondary btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);" onclick="document.getElementById('s-vid1-thumb').value=''; document.getElementById('s-vid1-thumb-file').value='';">🗑️ Clear</button>
                 </div>
               </div>
             </div>
@@ -3312,20 +3316,22 @@
                 <label class="form-label">Video URL (YouTube embed or direct link)</label>
                 <input class="form-input" type="text" id="s-vid2-url"
                   placeholder="https://youtube.com/embed/... or direct video URL" />
-                <div style="display:flex;gap:.5rem;margin-top:.4rem;align-items:center;">
+                <div style="display:flex;gap:.5rem;margin-top:.4rem;align-items:center;flex-wrap:wrap;">
                   <input type="file" accept="video/*" id="s-vid2-file" style="font-size:.75rem;color:var(--gray);" />
                   <button class="btn btn-secondary btn-sm" onclick="uploadSettingsVideo('s-vid2-file','s-vid2-url')">📤
                     Upload Video</button>
+                  <button class="btn btn-secondary btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);" onclick="document.getElementById('s-vid2-url').value=''; document.getElementById('s-vid2-file').value='';">🗑️ Clear</button>
                 </div>
               </div>
               <div class="form-group">
                 <label class="form-label">Thumbnail Image</label>
                 <input class="form-input" type="text" id="s-vid2-thumb" placeholder="Paste thumbnail URL or upload" />
-                <div style="display:flex;gap:.5rem;margin-top:.4rem;align-items:center;">
+                <div style="display:flex;gap:.5rem;margin-top:.4rem;align-items:center;flex-wrap:wrap;">
                   <input type="file" accept="image/*" id="s-vid2-thumb-file"
                     style="font-size:.75rem;color:var(--gray);" />
                   <button class="btn btn-secondary btn-sm"
                     onclick="uploadSettingsImage('s-vid2-thumb-file','s-vid2-thumb')">📤 Upload</button>
+                  <button class="btn btn-secondary btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);" onclick="document.getElementById('s-vid2-thumb').value=''; document.getElementById('s-vid2-thumb-file').value='';">🗑️ Clear</button>
                 </div>
               </div>
             </div>
