@@ -19,13 +19,13 @@ exports.getStats = async (req, res) => {
       Order.countDocuments({ isActive: true }),
       Product.countDocuments({ isActive: true }),
       Customer.countDocuments({ isActive: true }),
-      Order.aggregate([{ $match: { paymentStatus: 'paid' } }, { $group: { _id: null, total: { $sum: '$total' } } }]),
+      Order.aggregate([{ $match: { orderStatus: { $ne: 'cancelled' } } }, { $group: { _id: null, total: { $sum: '$total' } } }]),
       Order.countDocuments({ orderStatus: 'pending' }),
       Order.countDocuments({ orderStatus: { $in: ['confirmed','processing','shipped','out_for_delivery'] } }),
       Order.countDocuments({ orderStatus: 'delivered' }),
       Order.countDocuments({ orderStatus: 'cancelled' }),
       Order.aggregate([
-        { $match: { createdAt: { $gte: today, $lt: tomorrow }, paymentStatus: 'paid' } },
+        { $match: { createdAt: { $gte: today, $lt: tomorrow }, orderStatus: { $ne: 'cancelled' } } },
         { $group: { _id: null, total: { $sum: '$total' } } },
       ]),
       Product.find({ stock: { $gt: 0, $lt: 10 }, isActive: true }).select('name stock category').limit(10).lean(),
@@ -62,7 +62,7 @@ exports.getRevenueChart = async (req, res) => {
   const data = await getOrSet(`dashboard:revenue:${range}`, 120, async () => {
     const from = new Date(); from.setDate(from.getDate() - days); from.setHours(0,0,0,0);
     return Order.aggregate([
-      { $match: { createdAt: { $gte: from }, isActive: true } },
+      { $match: { createdAt: { $gte: from }, isActive: true, orderStatus: { $ne: 'cancelled' } } },
       {
         $group: {
           _id: {
