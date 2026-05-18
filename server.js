@@ -131,6 +131,10 @@ app.get('/api/ping', (req, res) => {
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'final.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'hashlay-admin.html')));
 
+app.get('/:page(privacy|terms|shipping|returns|cookies)(.html)?', (req, res) => {
+  res.sendFile(path.join(__dirname, `${req.params.page}.html`));
+});
+
 // ── 404 ──────────────────────────────────────────────────────────
 app.use('*', (req, res) => res.status(404).json({ success: false, message: 'Route not found' }));
 
