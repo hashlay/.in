@@ -4222,25 +4222,25 @@
           <div class="kit-visual">
             <div class="kit-item" onclick="openProductPopup('sneaker-kit')" title="Sneaker Care Kit includes Foam">
               <div class="kit-icon">
-                <span class="kit-icon-emoji">🧴</span>
+                <span class="kit-icon-emoji"></span>
                 <div class="kit-icon-dot"></div>
               </div>
-              <span class="kit-label">Foam 150ml</span>
+              <span class="kit-label"></span>
             </div>
             <div class="kit-item" onclick="openProductPopup('sneaker-kit')" title="View Full Kit">
               <div class="kit-icon"
                 style="width:92px;height:92px;border-radius:20px;box-shadow:0 12px 32px rgba(0,87,255,0.25);">
-                <span class="kit-icon-emoji" style="font-size:2.8rem;">👟</span>
+                <span class="kit-icon-emoji" style="font-size:2.8rem;"></span>
                 <div class="kit-icon-dot"></div>
               </div>
-              <span class="kit-label">Full Kit</span>
+              <span class="kit-label"></span>
             </div>
             <div class="kit-item" onclick="openProductPopup('sneaker-kit')" title="Sneaker Care Kit includes Brush">
               <div class="kit-icon">
-                <span class="kit-icon-emoji">🪥</span>
+                <span class="kit-icon-emoji"></span>
                 <div class="kit-icon-dot"></div>
               </div>
-              <span class="kit-label">Brush Pro</span>
+              <span class="kit-label"></span>
             </div>
           </div>
           <div class="hero-product-name" id="hero-product-name">SNEAKER CARE KIT</div>
@@ -5334,26 +5334,15 @@
         ? 'http://localhost:5000'
         : window.location.origin, // 🚀 Dynamically uses your live Vercel domain!
 
-      // In-memory response cache to avoid duplicate calls during init
-      _cache: new Map(),
 
-      // Fetch with caching and fallback to local data
-      async get(endpoint, fallback = null, cacheSec = 0) {
-        // Return cached response if still valid
-        if (cacheSec > 0 && this._cache.has(endpoint)) {
-          const cached = this._cache.get(endpoint);
-          if (Date.now() < cached.exp) return cached.data;
-        }
+      // Fetch with fallback to local data
+      async get(endpoint, fallback = null) {
         try {
           const res = await fetch(this.BASE_URL + endpoint, {
             headers: { 'Content-Type': 'application/json' }
           });
           if (!res.ok) throw new Error('API error');
-          const data = await res.json();
-          if (cacheSec > 0) {
-            this._cache.set(endpoint, { data, exp: Date.now() + cacheSec * 1000 });
-          }
-          return data;
+          return await res.json();
         } catch (e) {
           console.warn(`[Hashlay API] ${endpoint} failed, using local data:`, e.message);
           return fallback;
@@ -5603,21 +5592,6 @@
 
     // Start polling after page loads
     SYNC.start();
-
-    /* ══════════════════════════════════════════════════════════════
-       KEEP-ALIVE — Prevent Vercel cold starts (free tier)
-       Pings /api/ping every 4 min while user is on the page.
-       Uses requestIdleCallback so it never blocks the UI.
-    ══════════════════════════════════════════════════════════════ */
-    (function keepAlive() {
-      const PING_INTERVAL = 4 * 60 * 1000; // 4 minutes
-      function ping() {
-        fetch(API.BASE_URL + '/api/ping', { method: 'GET', cache: 'no-store' }).catch(() => {});
-      }
-      // First ping after 30s (warm up immediately after page load)
-      setTimeout(ping, 30000);
-      setInterval(ping, PING_INTERVAL);
-    })();
 
     function applyAdminConfig(config) {
       // Unwrap if called with full settings response

@@ -3956,18 +3956,24 @@
         const pass = document.getElementById('l-pass').value;
         if (!email || !pass) return toast('Enter email and password', 'error');
 
+        let result;
         try {
-          const result = await apiPost('/api/auth/login', { email, password: pass });
-          if (result?.success) {
-            localStorage.setItem('hl_token', result.token);
-            localStorage.setItem('hl_admin', JSON.stringify(result.admin));
-            document.getElementById('login-screen').classList.add('hidden');
-            initApp();
-          } else {
-            toast(result?.message || 'Invalid credentials', 'error');
-          }
+          result = await apiPost('/api/auth/login', { email, password: pass });
         } catch (e) {
-          toast('Login failed — check connection', 'error');
+          return toast('Login failed — check connection', 'error');
+        }
+
+        if (result?.success) {
+          localStorage.setItem('hl_token', result.token);
+          localStorage.setItem('hl_admin', JSON.stringify(result.admin));
+          document.getElementById('login-screen').classList.add('hidden');
+          try {
+            initApp();
+          } catch(err) {
+            console.error('Error during app initialization:', err);
+          }
+        } else {
+          toast(result?.message || 'Invalid credentials', 'error');
         }
       }
 
@@ -4533,6 +4539,22 @@
       function applyRBAC() {
         const currentAdmin = JSON.parse(localStorage.getItem('hl_admin') || '{}');
         const role = currentAdmin.role || 'support_staff';
+
+        // Update sidebar user info
+        const nameEl = document.querySelector('.sidebar-user-name');
+        const emailEl = document.querySelector('.sidebar-user-role');
+        const avatarEl = document.querySelector('.sidebar-avatar');
+        
+        if (currentAdmin.name) {
+          if (nameEl) nameEl.textContent = currentAdmin.name;
+          if (avatarEl) {
+            const initials = currentAdmin.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            avatarEl.textContent = initials || 'AD';
+          }
+        }
+        if (currentAdmin.email && emailEl) {
+          emailEl.textContent = currentAdmin.email;
+        }
 
         let css = '';
 
