@@ -1144,6 +1144,7 @@
     /* ─── Reviews ────────────────────────────────────────── */
     #reviews {
       background: var(--black);
+      overflow: hidden;
     }
 
     .reviews-header {
@@ -1151,24 +1152,131 @@
       margin-bottom: 3.5rem;
     }
 
-    .reviews-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    /* Double horizontal marquee container */
+    .reviews-marquee-container {
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
+      margin-right: calc(-50vw + 50%);
+      position: relative;
+      display: flex;
+      flex-direction: column;
       gap: 1.5rem;
+      overflow: hidden;
+      padding: 1.5rem 0;
+    }
+
+    /* Linear gradients at edges to create elegant fade in/out */
+    .reviews-marquee-container::before,
+    .reviews-marquee-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 20%;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .reviews-marquee-container::before {
+      left: 0;
+      background: linear-gradient(to right, var(--black), transparent);
+    }
+
+    .reviews-marquee-container::after {
+      right: 0;
+      background: linear-gradient(to left, var(--black), transparent);
+    }
+
+    .reviews-marquee-track-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none;  /* IE/Edge */
+    }
+
+    .reviews-marquee-track-wrapper::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+    }
+
+    .reviews-marquee-track {
+      display: flex;
+      gap: 1.5rem;
+      width: max-content;
+      padding: 0.5rem 0;
+      will-change: scroll-position;
+      cursor: grab;
+    }
+
+    .reviews-marquee-track:active {
+      cursor: grabbing;
     }
 
     .review-card {
       background: var(--gray-2);
       border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 20px;
-      padding: 2rem;
-      transition: var(--transition);
+      padding: 2.2rem 2rem;
+      width: 350px;
+      flex-shrink: 0;
+      white-space: normal;
+      box-sizing: border-box;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+
+    @media (max-width: 768px) {
+      .review-card {
+        width: 290px;
+        padding: 1.8rem 1.5rem;
+      }
+      .reviews-marquee-container {
+        gap: 1rem;
+        padding: 1rem 0;
+      }
     }
 
     .review-card:hover {
       border-color: rgba(0, 87, 255, 0.25);
       transform: translateY(-4px);
     }
+
+    /* Auto Scroll Control Button */
+    .btn-toggle-autoscroll {
+      background: var(--gray-3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--white);
+      border-radius: 100px;
+      padding: 0.4rem 1rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all var(--transition);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-left: 0.5rem;
+    }
+
+    .btn-toggle-autoscroll:hover {
+      border-color: var(--blue-1);
+      background: rgba(0, 87, 255, 0.08);
+    }
+
+    .btn-toggle-autoscroll .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 8px #4ade80;
+      transition: all var(--transition);
+    }
+
+    .btn-toggle-autoscroll.paused .status-dot {
+      background: #ff4444;
+      box-shadow: 0 0 8px #ff4444;
+    }
+
 
     .stars {
       color: #ffd700;
@@ -4608,14 +4716,27 @@
       <div class="reviews-header reveal">
         <div class="section-label">Customer Reviews</div>
         <h2 class="section-title">WHAT PEOPLE <em>SAY</em></h2>
-        <div style="display:flex;align-items:center;gap:0.8rem;justify-content:center;margin-top:1rem;">
+        <div style="display:flex;align-items:center;gap:0.8rem;justify-content:center;margin-top:1rem;flex-wrap:wrap;">
           <span style="font-size:1.3rem;color:#ffd700;">★★★★★</span>
           <span style="font-size:1.1rem;font-weight:700;">4.9</span>
-          <span style="color:var(--gray-5);font-size:0.85rem;">/ 5.0 · Based on <span id="review-count">4</span>
-            reviews</span>
+          <span style="color:var(--gray-5);font-size:0.85rem;">/ 5.0 · Based on <span id="review-count">4</span> reviews</span>
+          <button id="btn-toggle-autoscroll" class="btn-toggle-autoscroll" onclick="toggleReviewsAutoscroll()">
+            <span class="status-dot"></span> <span id="autoscroll-btn-text">Autoscroll On</span>
+          </button>
         </div>
       </div>
-      <div class="reviews-grid" id="reviews-grid"></div>
+      
+      <!-- Double Marquee Scroll Tracks -->
+      <div class="reviews-marquee-container" id="reviews-marquee-container">
+        <!-- Track 1: Leftward Scrolling -->
+        <div class="reviews-marquee-track-wrapper" id="reviews-wrapper-1">
+          <div class="reviews-marquee-track" id="reviews-track-1"></div>
+        </div>
+        <!-- Track 2: Rightward Scrolling -->
+        <div class="reviews-marquee-track-wrapper" id="reviews-wrapper-2">
+          <div class="reviews-marquee-track" id="reviews-track-2"></div>
+        </div>
+      </div>
       <!-- Add Review -->
       <div class="add-review-section reveal">
         <div class="add-review-card">
@@ -6010,26 +6131,167 @@
     }
 
     /* ══════════════════════════════════════════════════════════════
-       RENDER REVIEWS
+       RENDER REVIEWS & AUTOSCROLL MARQUEE
+       With touch-swipe, mouse-drag, hover-pause, and hard-toggle
     ══════════════════════════════════════════════════════════════ */
+    let reviewsHardPaused = false;
+    let reviewsSoftPaused = false;
+    let reviewsAutoscrollSpeed = 0.8; // pixels per frame
+    let autoscrollFrameId = null;
+    let softPauseTimeout = null;
+
     function renderReviews() {
-      const grid = document.getElementById('reviews-grid');
-      grid.innerHTML = REVIEWS_DATA.map(r => `
-    <div class="review-card reveal">
-      <div class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
-      <div class="review-text">"${r.text}"</div>
-      <div class="reviewer">
-        <div class="reviewer-avatar">${r.initials}</div>
-        <div>
-          <div class="reviewer-name">${r.name}</div>
-          <div class="reviewer-date">${r.date}</div>
-        </div>
-        <div style="margin-left:auto;"><span class="review-verified">✓ Verified</span></div>
-      </div>
-    </div>
-  `).join('');
+      const track1 = document.getElementById('reviews-track-1');
+      const track2 = document.getElementById('reviews-track-2');
+      if (!track1 || !track2) return;
+
       document.getElementById('review-count').textContent = REVIEWS_DATA.length;
-      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+      // Split reviews into two tracks for a multi-layered parallax effect
+      const oddReviews = REVIEWS_DATA.filter((_, idx) => idx % 2 === 0);
+      const evenReviews = REVIEWS_DATA.filter((_, idx) => idx % 2 !== 0);
+
+      // Helper function to build card HTML
+      const buildCard = r => `
+        <div class="review-card" onclick="toggleReviewsAutoscroll()">
+          <div class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+          <div class="review-text">"${r.text}"</div>
+          <div class="reviewer">
+            <div class="reviewer-avatar">${r.initials}</div>
+            <div>
+              <div class="reviewer-name">${r.name}</div>
+              <div class="reviewer-date">${r.date}</div>
+            </div>
+            <div style="margin-left:auto;"><span class="review-verified">✓ Verified</span></div>
+          </div>
+        </div>
+      `;
+
+      // Render cards
+      const t1Html = oddReviews.map(buildCard).join('');
+      const t2Html = evenReviews.length > 0 ? evenReviews.map(buildCard).join('') : oddReviews.map(buildCard).join('');
+
+      // If reviews set is very small, triple it to ensure enough width
+      track1.innerHTML = t1Html + t1Html + t1Html;
+      track2.innerHTML = t2Html + t2Html + t2Html;
+
+      // Initialize autoscroll loop
+      initReviewsAutoscroll();
+    }
+
+    function initReviewsAutoscroll() {
+      const track1 = document.getElementById('reviews-track-1');
+      const track2 = document.getElementById('reviews-track-2');
+      if (!track1 || !track2) return;
+
+      // Cancel previous loop if running
+      if (autoscrollFrameId) {
+        cancelAnimationFrame(autoscrollFrameId);
+      }
+
+      // Allow DOM to render then set starting points
+      setTimeout(() => {
+        const w1 = track1.scrollWidth / 3;
+        const w2 = track2.scrollWidth / 3;
+        track1.scrollLeft = w1;
+        track2.scrollLeft = w2 * 2; // Start Track 2 further to scroll back
+
+        function updateScroll() {
+          if (!reviewsHardPaused && !reviewsSoftPaused) {
+            // Track 1 moves left (increases scrollLeft)
+            track1.scrollLeft += reviewsAutoscrollSpeed;
+            if (track1.scrollLeft >= w1 * 2) {
+              track1.scrollLeft -= w1;
+            }
+
+            // Track 2 moves right (decreases scrollLeft)
+            track2.scrollLeft -= reviewsAutoscrollSpeed;
+            if (track2.scrollLeft <= w2) {
+              track2.scrollLeft += w2;
+            }
+          }
+          autoscrollFrameId = requestAnimationFrame(updateScroll);
+        }
+        autoscrollFrameId = requestAnimationFrame(updateScroll);
+      }, 100);
+
+      // Make both tracks draggable and swipeable
+      [track1, track2].forEach((track, index) => {
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        // Hover pause
+        track.addEventListener('mouseenter', () => {
+          reviewsSoftPaused = true;
+        });
+        track.addEventListener('mouseleave', () => {
+          if (!isDown) reviewsSoftPaused = false;
+        });
+
+        // Touch swipe pause & resume
+        track.addEventListener('touchstart', () => {
+          reviewsSoftPaused = true;
+          if (softPauseTimeout) clearTimeout(softPauseTimeout);
+        }, { passive: true });
+
+        track.addEventListener('touchend', () => {
+          softPauseTimeout = setTimeout(() => {
+            reviewsSoftPaused = false;
+          }, 1500);
+        }, { passive: true });
+
+        // Mouse Drag-to-Scroll (Desktop)
+        track.addEventListener('mousedown', (e) => {
+          isDown = true;
+          track.classList.add('grabbing');
+          startX = e.pageX - track.offsetLeft;
+          scrollLeft = track.scrollLeft;
+          reviewsSoftPaused = true;
+        });
+
+        window.addEventListener('mouseup', () => {
+          if (isDown) {
+            isDown = false;
+            track.classList.remove('grabbing');
+            reviewsSoftPaused = false;
+          }
+        });
+
+        track.addEventListener('mousemove', (e) => {
+          if (!isDown) return;
+          e.preventDefault();
+          const x = e.pageX - track.offsetLeft;
+          const walk = (x - startX) * 1.5;
+          track.scrollLeft = scrollLeft - walk;
+
+          // Wrap boundaries during manual dragging
+          const w = track.scrollWidth / 3;
+          if (track.scrollLeft >= w * 2) {
+            track.scrollLeft -= w;
+          } else if (track.scrollLeft <= 0) {
+            track.scrollLeft += w;
+          }
+        });
+      });
+    }
+
+    function toggleReviewsAutoscroll() {
+      reviewsHardPaused = !reviewsHardPaused;
+      const btn = document.getElementById('btn-toggle-autoscroll');
+      const text = document.getElementById('autoscroll-btn-text');
+      
+      if (btn && text) {
+        if (reviewsHardPaused) {
+          btn.classList.add('paused');
+          text.textContent = 'Autoscroll Off';
+          showToast('⏸ Reviews autoscroll paused');
+        } else {
+          btn.classList.remove('paused');
+          text.textContent = 'Autoscroll On';
+          showToast('▶ Reviews autoscroll resumed');
+        }
+      }
     }
 
     /* ══════════════════════════════════════════════════════════════
