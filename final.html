@@ -6156,6 +6156,7 @@
     }
     function toggleCart() {
       const drawer = document.getElementById('cart-drawer');
+      const isOpening = !drawer.classList.contains('open');
       drawer.classList.toggle('open');
       document.getElementById('cart-overlay').classList.toggle('open');
       
@@ -6163,28 +6164,41 @@
       if (floatingBtns) {
         floatingBtns.style.display = drawer.classList.contains('open') ? 'none' : '';
       }
+      // Push history state so back button closes cart
+      if (isOpening) {
+        history.pushState({ modal: 'cart' }, '');
+      }
     }
-    function closeCart() {
-      document.getElementById('cart-drawer').classList.remove('open');
+    function closeCart(fromPopstate) {
+      const drawer = document.getElementById('cart-drawer');
+      if (!drawer.classList.contains('open')) return;
+      drawer.classList.remove('open');
       document.getElementById('cart-overlay').classList.remove('open');
       
       const floatingBtns = document.getElementById('floating-btns');
       if (floatingBtns) floatingBtns.style.display = '';
+      // If closed via X button (not back button), clean up the history entry
+      if (!fromPopstate && history.state?.modal === 'cart') history.back();
     }
 
     /* ══════════════════════════════════════════════════════════════
        CHECKOUT (Enhanced — Tasks 5, 6, 7, 8)
     ══════════════════════════════════════════════════════════════ */
     function openCheckout() {
-      closeCart();
+      closeCart(true); // close cart without triggering extra history.back
       resetCheckoutForm();
       document.getElementById('checkout-form-container').style.display = 'block';
       document.getElementById('order-confirm').classList.remove('show');
       document.getElementById('checkout-modal').classList.add('open');
       updateOrderSummary();
+      // Push history state so back button closes checkout
+      history.pushState({ modal: 'checkout' }, '');
     }
-    function closeCheckout() {
-      document.getElementById('checkout-modal').classList.remove('open');
+    function closeCheckout(fromPopstate) {
+      const modal = document.getElementById('checkout-modal');
+      if (!modal.classList.contains('open')) return;
+      modal.classList.remove('open');
+      if (!fromPopstate && history.state?.modal === 'checkout') history.back();
     }
 
     function resetCheckoutForm() {
@@ -6811,12 +6825,17 @@
       const overlay = document.getElementById('product-popup-overlay');
       overlay.classList.add('open');
       document.body.style.overflow = 'hidden';
+      // Push history state so back button closes popup
+      history.pushState({ modal: 'product' }, '');
     }
 
-    function closeProductPopup() {
-      document.getElementById('product-popup-overlay').classList.remove('open');
+    function closeProductPopup(fromPopstate) {
+      const overlay = document.getElementById('product-popup-overlay');
+      if (!overlay.classList.contains('open')) return;
+      overlay.classList.remove('open');
       document.body.style.overflow = '';
       currentPopupProductId = null;
+      if (!fromPopstate && history.state?.modal === 'product') history.back();
     }
 
     function handlePopupOverlayClick(e) {
@@ -7311,6 +7330,25 @@
         closeFaqPopup();
         closePayFailPopup();
         if (aiChatOpen) toggleAiChat();
+      }
+    });
+
+    /* ══════════════════════════════════════════════════════════════
+       BACK BUTTON / SWIPE-BACK HANDLER
+       Intercepts the browser back button so it closes modals
+       instead of navigating away from the page.
+    ══════════════════════════════════════════════════════════════ */
+    window.addEventListener('popstate', function(e) {
+      const state = e.state;
+      // Close whichever modal was open (fromPopstate=true avoids extra history.back)
+      if (document.getElementById('checkout-modal')?.classList.contains('open')) {
+        closeCheckout(true);
+      } else if (document.getElementById('cart-drawer')?.classList.contains('open')) {
+        closeCart(true);
+      } else if (document.getElementById('product-popup-overlay')?.classList.contains('open')) {
+        closeProductPopup(true);
+      } else if (document.getElementById('pay-fail-overlay')?.classList.contains('open')) {
+        closePayFailPopup();
       }
     });
 
