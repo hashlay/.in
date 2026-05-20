@@ -3778,6 +3778,129 @@
       line-height: 1.75;
     }
 
+    /* ─── Payment Failure Popup ─────────────────────────── */
+    #pay-fail-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1500;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(16px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    #pay-fail-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .pay-fail-box {
+      background: var(--gray-1);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 28px;
+      padding: 2.5rem 2rem;
+      width: min(460px, 100%);
+      position: relative;
+      text-align: center;
+      transform: scale(0.93) translateY(20px);
+      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.8), 0 0 40px rgba(239,68,68,0.08);
+    }
+    #pay-fail-overlay.open .pay-fail-box {
+      transform: scale(1) translateY(0);
+    }
+    .pay-fail-top-line {
+      position: absolute;
+      top: 0; left: 15%; right: 15%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #ef4444, transparent);
+      border-radius: 2px;
+    }
+    .pay-fail-icon {
+      font-size: 3.5rem;
+      margin-bottom: 0.8rem;
+      animation: failShake 0.5s ease;
+    }
+    @keyframes failShake {
+      0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)}
+    }
+    .pay-fail-title {
+      font-family: var(--font-display);
+      font-size: 1.9rem;
+      letter-spacing: 0.06em;
+      color: #f87171;
+      margin-bottom: 0.5rem;
+    }
+    .pay-fail-msg {
+      font-size: 0.9rem;
+      color: var(--gray-5);
+      line-height: 1.7;
+      margin-bottom: 1.6rem;
+    }
+    .pay-fail-wa-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      background: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 0.9rem 1.8rem;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      width: 100%;
+      justify-content: center;
+      transition: all 0.25s ease;
+      box-shadow: 0 0 24px rgba(37,211,102,0.3);
+      margin-bottom: 0.8rem;
+    }
+    .pay-fail-wa-btn:hover {
+      background: #1ebe5d;
+      transform: translateY(-2px);
+      box-shadow: 0 0 32px rgba(37,211,102,0.5);
+    }
+    .pay-fail-retry-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      color: var(--white);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 14px;
+      padding: 0.75rem 1.4rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      width: 100%;
+      justify-content: center;
+      transition: all 0.25s ease;
+    }
+    .pay-fail-retry-btn:hover {
+      border-color: rgba(0,87,255,0.5);
+      background: rgba(0,87,255,0.08);
+    }
+    .pay-fail-close {
+      position: absolute;
+      top: 1.1rem; right: 1.1rem;
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--white);
+      font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .pay-fail-close:hover { background: rgba(255,255,255,0.15); }
+    .pay-fail-divider {
+      font-size: 0.75rem;
+      color: var(--gray-5);
+      margin: 0.6rem 0;
+    }
+
     /* ─── Floating Buttons ───────────────────────────────── */
     #floating-btns {
       position: fixed;
@@ -5151,6 +5274,26 @@
     </div>
   </div>
 
+  <!-- ─── PAYMENT FAILURE POPUP ───────────────────────────── -->
+  <div id="pay-fail-overlay" onclick="handlePayFailOverlayClick(event)">
+    <div class="pay-fail-box" id="pay-fail-box">
+      <div class="pay-fail-top-line"></div>
+      <button class="pay-fail-close" onclick="closePayFailPopup()">✕</button>
+      <div class="pay-fail-icon">😔</div>
+      <div class="pay-fail-title">SORRY FOR THE INCONVENIENCE</div>
+      <div class="pay-fail-msg" id="pay-fail-msg">
+        Your payment could not be processed. Don't worry — your cart is safe!<br/><br/>
+        You can place your order directly on WhatsApp or retry the payment below.
+      </div>
+      <button class="pay-fail-wa-btn" onclick="orderViaWhatsApp()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.374 0 0 5.373 0 12c0 2.126.553 4.122 1.523 5.858L0 24l6.335-1.507A11.948 11.948 0 0 0 12 24c6.626 0 12-5.373 12-12S18.626 0 12 0zm0 22c-1.885 0-3.652-.51-5.172-1.398l-.37-.22-3.761.895.946-3.668-.241-.378A9.964 9.964 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+        Order on WhatsApp
+      </button>
+      <div class="pay-fail-divider">— or —</div>
+      <button class="pay-fail-retry-btn" onclick="retryPayment()">↩ Retry Payment</button>
+    </div>
+  </div>
+
   <!-- ─── FAQ POPUP (from floating button) ─────────────────── -->
   <div id="faq-popup-overlay" onclick="handleFaqOverlayClick(event)">
     <div class="faq-popup-box">
@@ -6319,7 +6462,9 @@
       } catch (e) {
         // Re-enable button on unexpected error
         _resetOrderButton(btn);
-        showToast('❌ Something went wrong. Please try again.');
+        showPaymentFailurePopup(
+          `Something went wrong while placing your order.<br/><br/>Don't worry — your cart is safe! You can retry below or reach us directly on <strong style="color:#25D366;">WhatsApp +91 74831 38340</strong> to place your order.`
+        );
       }
     }
 
@@ -6331,6 +6476,37 @@
       btn.style.opacity = '1';
       btn.style.pointerEvents = '';
       if (btn.dataset.originalText) btn.innerHTML = btn.dataset.originalText;
+    }
+
+    /* ── Payment Failure Popup ─────────────────────────────── */
+    const HASHLAY_WA_NUMBER = '917483138340';
+
+    function showPaymentFailurePopup(msg) {
+      const msgEl = document.getElementById('pay-fail-msg');
+      if (msgEl && msg) msgEl.innerHTML = msg;
+      document.getElementById('pay-fail-overlay').classList.add('open');
+    }
+
+    function closePayFailPopup() {
+      document.getElementById('pay-fail-overlay').classList.remove('open');
+    }
+
+    function handlePayFailOverlayClick(e) {
+      if (e.target === document.getElementById('pay-fail-overlay')) closePayFailPopup();
+    }
+
+    function orderViaWhatsApp() {
+      const items = CART.map(i => `${i.name} x${i.qty}`).join(', ');
+      const total = CART.reduce((s, i) => s + i.price * i.qty, 0);
+      const msg = encodeURIComponent(
+        `Hi Hashlay! 👋 I'd like to place an order but faced a payment issue.\n\nItems: ${items || 'from your website'}\nTotal: ₹${total || '—'}\n\nCan you help me complete my order?`
+      );
+      window.open(`https://wa.me/${HASHLAY_WA_NUMBER}?text=${msg}`, '_blank');
+    }
+
+    function retryPayment() {
+      closePayFailPopup();
+      // The checkout form is still open and button is re-enabled — customer can retry
     }
 
     // Server-side Razorpay order creation + client checkout
@@ -6382,23 +6558,29 @@
             if (verification?.success) {
               confirmOrder(orderDetails, response.razorpay_payment_id);
             } else {
-              showToast('❌ Payment verification failed. Contact support.');
               _resetOrderButton(btn);
+              showPaymentFailurePopup(
+                `Payment verification failed. Your money is safe — if any amount was deducted, it will be refunded within 5–7 days.<br/><br/>Please contact us on <strong style="color:#25D366;">WhatsApp +91 74831 38340</strong> for immediate assistance.`
+              );
             }
           },
           modal: {
             ondismiss: function () {
-              showToast('⚠️ Payment cancelled. Try again.');
               _resetOrderButton(btn);
+              showPaymentFailurePopup(
+                `You cancelled the payment. No worries!<br/><br/>You can retry the payment below, or place your order directly via <strong style="color:#25D366;">WhatsApp +91 74831 38340</strong>.`
+              );
             }
           }
         };
         const rzp = new window.Razorpay(options);
         rzp.open();
       } catch (e) {
-        showToast('❌ Payment initialization failed. Try again.');
         console.error('[Razorpay Error]', e);
         _resetOrderButton(btn);
+        showPaymentFailurePopup(
+          `We couldn't initialize the payment gateway. This may be a temporary network issue.<br/><br/>Please try again in a moment or reach us on <strong style="color:#25D366;">WhatsApp +91 74831 38340</strong> to place your order.`
+        );
       }
     }
 
@@ -6471,13 +6653,17 @@
             _orderInProgress = false;
           } else {
             // Backend rejected the order — re-enable button
-            showToast('❌ Checkout Failed: ' + (r?.message || 'Server error'));
             _resetOrderButton();
+            showPaymentFailurePopup(
+              `We couldn't confirm your order: <em>${r?.message || 'Server error'}</em>.<br/><br/>Your cart is safe! Please try again or contact us on <strong style="color:#25D366;">WhatsApp +91 74831 38340</strong>.`
+            );
           }
         })
         .catch(err => {
-          showToast('❌ Network Error: Could not place order');
           _resetOrderButton();
+          showPaymentFailurePopup(
+            `A network error occurred and we couldn't reach our servers.<br/><br/>Please check your internet connection and try again, or order directly via <strong style="color:#25D366;">WhatsApp +91 74831 38340</strong>.`
+          );
         });
 
       // Task 9: WhatsApp confirmation (architecture)
@@ -7123,6 +7309,7 @@
         closeProductPopup();
         closeNotifyMe();
         closeFaqPopup();
+        closePayFailPopup();
         if (aiChatOpen) toggleAiChat();
       }
     });
