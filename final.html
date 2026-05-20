@@ -6012,12 +6012,21 @@
       updateCartUI();
     }
     function toggleCart() {
-      document.getElementById('cart-drawer').classList.toggle('open');
+      const drawer = document.getElementById('cart-drawer');
+      drawer.classList.toggle('open');
       document.getElementById('cart-overlay').classList.toggle('open');
+      
+      const floatingBtns = document.getElementById('floating-btns');
+      if (floatingBtns) {
+        floatingBtns.style.display = drawer.classList.contains('open') ? 'none' : '';
+      }
     }
     function closeCart() {
       document.getElementById('cart-drawer').classList.remove('open');
       document.getElementById('cart-overlay').classList.remove('open');
+      
+      const floatingBtns = document.getElementById('floating-btns');
+      if (floatingBtns) floatingBtns.style.display = '';
     }
 
     /* ══════════════════════════════════════════════════════════════
