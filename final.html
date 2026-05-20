@@ -6056,6 +6056,8 @@
       if (msgEl) { msgEl.className = 'coupon-msg'; msgEl.textContent = ''; }
       // Apply payment method visibility from admin config
       applyPaymentMethodVisibility();
+      
+      _resetOrderButton();
     }
 
     // Task 6: Payment method selection
@@ -6350,8 +6352,7 @@
 
         if (!serverOrder?.success || !serverOrder?.data?.id) {
           showToast('❌ ' + (serverOrder?.message || 'Failed to create payment order'));
-          btn.disabled = false;
-          btn.innerHTML = 'Pay with Razorpay 🔒';
+          _resetOrderButton(btn);
           return;
         }
 
@@ -6382,13 +6383,13 @@
               confirmOrder(orderDetails, response.razorpay_payment_id);
             } else {
               showToast('❌ Payment verification failed. Contact support.');
+              _resetOrderButton(btn);
             }
           },
           modal: {
             ondismiss: function () {
               showToast('⚠️ Payment cancelled. Try again.');
-              btn.disabled = false;
-              btn.innerHTML = 'Pay with Razorpay 🔒';
+              _resetOrderButton(btn);
             }
           }
         };
@@ -6397,9 +6398,8 @@
       } catch (e) {
         showToast('❌ Payment initialization failed. Try again.');
         console.error('[Razorpay Error]', e);
+        _resetOrderButton(btn);
       }
-      btn.disabled = false;
-      btn.innerHTML = 'Pay with Razorpay 🔒';
     }
 
     // Load Razorpay SDK once
