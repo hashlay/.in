@@ -3226,6 +3226,30 @@
          PAGE: CONTACT MESSAGES
     ════════════════════════════════════════════════════ -->
       <div class="page" id="page-contact">
+        <!-- Message Details Modal -->
+        <div class="modal-overlay" id="modal-contact-msg">
+          <div class="modal-box" style="max-width:500px;">
+            <div class="modal-header">
+              <div class="modal-title">Message Details</div>
+              <button class="modal-close" onclick="closeModal('modal-contact-msg')">✕</button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label class="form-label">From</label>
+                <input class="form-input" type="text" id="cm-name" readonly />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input class="form-input" type="text" id="cm-email" readonly />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Message</label>
+                <textarea class="form-textarea" id="cm-msg" readonly style="min-height:150px;"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="section-hdr">
           <div class="section-hdr-left">
             <div class="section-hdr-title">CONTACT MESSAGES</div>
@@ -6210,12 +6234,22 @@
       <td><span class="badge ${ST[c.status] || 'badge-gray'}">${c.status}</span></td>
       <td>
         <div style="display:flex;gap:.3rem;">
+          <button class="btn btn-secondary btn-sm btn-icon" onclick="viewContactMessage('${c._id}')" title="View Message">👁</button>
           ${c.status !== 'resolved' ? `<button class="btn btn-success btn-sm" onclick="resolveContact('${c._id}')">✓ Resolve</button>` : ''}
           <button class="btn btn-danger btn-sm btn-icon" onclick="deleteContact('${c._id}')">🗑</button>
         </div>
       </td>
     </tr>
   `).join('');
+      }
+
+      function viewContactMessage(id) {
+        const c = CONTACTS.find(x => x._id === id);
+        if(!c) return;
+        document.getElementById('cm-name').value = c.name || '';
+        document.getElementById('cm-email').value = c.email || '';
+        document.getElementById('cm-msg').value = c.message || '';
+        openModal('modal-contact-msg');
       }
 
       async function resolveContact(id) {
