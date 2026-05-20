@@ -6193,6 +6193,8 @@
       updateOrderSummary();
       // Push history state so back button closes checkout
       history.pushState({ modal: 'checkout' }, '');
+      // Detect browser autofill — browsers don't fire 'change' on autofilled selects
+      _detectAutofillState();
     }
     function closeCheckout(fromPopstate) {
       const modal = document.getElementById('checkout-modal');
@@ -6256,6 +6258,48 @@
       }
       updateOrderSummary();
     }
+
+    // Detect browser autofill on the state dropdown
+    // Browsers don't fire 'change' on autofilled <select>, so we poll briefly
+    let _autofillCheckTimer = null;
+    function _detectAutofillState() {
+      let checks = 0;
+      clearInterval(_autofillCheckTimer);
+      _autofillCheckTimer = setInterval(() => {
+        checks++;
+        const stateEl = document.getElementById('co-state');
+        if (stateEl && stateEl.value) {
+          updateDeliveryCharge();
+          clearInterval(_autofillCheckTimer);
+        }
+        if (checks >= 15) clearInterval(_autofillCheckTimer); // Stop after 3s
+      }, 200);
+    }
+
+    // Also listen for 'input' and 'change' on the state select (catches some autofill + manual)
+    (function() {
+      const stateEl = document.getElementById('co-state');
+      if (stateEl) {
+        stateEl.addEventListener('input', updateDeliveryCharge);
+        // Some browsers fire 'animationstart' on autofilled inputs — listen on all checkout fields
+        const checkoutFields = document.querySelectorAll('#checkout-form-container input, #checkout-form-container select');
+        checkoutFields.forEach(field => {
+          field.addEventListener('animationstart', (e) => {
+            // Chrome uses an internal animation for autofill detection
+            if (e.animationName === 'onAutoFillStart' || e.animationName) {
+              setTimeout(updateDeliveryCharge, 100);
+            }
+          });
+          // Also catch 'input' events on all fields — if any field gets autofilled, state might too
+          field.addEventListener('input', () => {
+            setTimeout(() => {
+              const s = document.getElementById('co-state');
+              if (s && s.value && currentDeliveryCharge === 0) updateDeliveryCharge();
+            }, 50);
+          });
+        });
+      }
+    })();
 
     /* ══════════════════════════════════════════════════════════════
        COUPON SYSTEM — API Connected
