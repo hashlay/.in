@@ -1152,15 +1152,12 @@
       margin-bottom: 3.5rem;
     }
 
-    /* Double horizontal marquee container */
+    /* Single horizontal marquee container */
     .reviews-marquee-container {
       width: 100vw;
       margin-left: calc(-50vw + 50%);
       margin-right: calc(-50vw + 50%);
       position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
       overflow: hidden;
       padding: 1.5rem 0;
     }
@@ -1192,10 +1189,15 @@
       overflow-x: auto;
       scrollbar-width: none; /* Firefox */
       -ms-overflow-style: none;  /* IE/Edge */
+      cursor: grab;
     }
 
     .reviews-marquee-track-wrapper::-webkit-scrollbar {
       display: none; /* Chrome, Safari, Opera */
+    }
+
+    .reviews-marquee-track-wrapper:active {
+      cursor: grabbing;
     }
 
     .reviews-marquee-track {
@@ -1204,11 +1206,6 @@
       width: max-content;
       padding: 0.5rem 0;
       will-change: scroll-position;
-      cursor: grab;
-    }
-
-    .reviews-marquee-track:active {
-      cursor: grabbing;
     }
 
     .review-card {
@@ -1229,7 +1226,6 @@
         padding: 1.8rem 1.5rem;
       }
       .reviews-marquee-container {
-        gap: 1rem;
         padding: 1rem 0;
       }
     }
@@ -4726,15 +4722,11 @@
         </div>
       </div>
       
-      <!-- Double Marquee Scroll Tracks -->
+      <!-- Single Marquee Scroll Track -->
       <div class="reviews-marquee-container" id="reviews-marquee-container">
         <!-- Track 1: Leftward Scrolling -->
         <div class="reviews-marquee-track-wrapper" id="reviews-wrapper-1">
           <div class="reviews-marquee-track" id="reviews-track-1"></div>
-        </div>
-        <!-- Track 2: Rightward Scrolling -->
-        <div class="reviews-marquee-track-wrapper" id="reviews-wrapper-2">
-          <div class="reviews-marquee-track" id="reviews-track-2"></div>
         </div>
       </div>
       <!-- Add Review -->
@@ -6141,15 +6133,11 @@
     let softPauseTimeout = null;
 
     function renderReviews() {
+      const wrapper1 = document.getElementById('reviews-wrapper-1');
       const track1 = document.getElementById('reviews-track-1');
-      const track2 = document.getElementById('reviews-track-2');
-      if (!track1 || !track2) return;
+      if (!track1 || !wrapper1) return;
 
       document.getElementById('review-count').textContent = REVIEWS_DATA.length;
-
-      // Split reviews into two tracks for a multi-layered parallax effect
-      const oddReviews = REVIEWS_DATA.filter((_, idx) => idx % 2 === 0);
-      const evenReviews = REVIEWS_DATA.filter((_, idx) => idx % 2 !== 0);
 
       // Helper function to build card HTML
       const buildCard = r => `
@@ -6168,21 +6156,19 @@
       `;
 
       // Render cards
-      const t1Html = oddReviews.map(buildCard).join('');
-      const t2Html = evenReviews.length > 0 ? evenReviews.map(buildCard).join('') : oddReviews.map(buildCard).join('');
+      const tHtml = REVIEWS_DATA.map(buildCard).join('');
 
-      // If reviews set is very small, triple it to ensure enough width
-      track1.innerHTML = t1Html + t1Html + t1Html;
-      track2.innerHTML = t2Html + t2Html + t2Html;
+      // Duplicate content multiple times to make it seamless and wider than screen
+      track1.innerHTML = tHtml + tHtml + tHtml;
 
       // Initialize autoscroll loop
       initReviewsAutoscroll();
     }
 
     function initReviewsAutoscroll() {
+      const wrapper1 = document.getElementById('reviews-wrapper-1');
       const track1 = document.getElementById('reviews-track-1');
-      const track2 = document.getElementById('reviews-track-2');
-      if (!track1 || !track2) return;
+      if (!track1 || !wrapper1) return;
 
       // Cancel previous loop if running
       if (autoscrollFrameId) {
@@ -6191,23 +6177,14 @@
 
       // Allow DOM to render then set starting points
       setTimeout(() => {
-        const w1 = track1.scrollWidth / 3;
-        const w2 = track2.scrollWidth / 3;
-        track1.scrollLeft = w1;
-        track2.scrollLeft = w2 * 2; // Start Track 2 further to scroll back
+        const singleSetWidth = track1.scrollWidth / 3;
+        wrapper1.scrollLeft = singleSetWidth;
 
         function updateScroll() {
           if (!reviewsHardPaused && !reviewsSoftPaused) {
-            // Track 1 moves left (increases scrollLeft)
-            track1.scrollLeft += reviewsAutoscrollSpeed;
-            if (track1.scrollLeft >= w1 * 2) {
-              track1.scrollLeft -= w1;
-            }
-
-            // Track 2 moves right (decreases scrollLeft)
-            track2.scrollLeft -= reviewsAutoscrollSpeed;
-            if (track2.scrollLeft <= w2) {
-              track2.scrollLeft += w2;
+            wrapper1.scrollLeft += reviewsAutoscrollSpeed;
+            if (wrapper1.scrollLeft >= singleSetWidth * 2) {
+              wrapper1.scrollLeft -= singleSetWidth;
             }
           }
           autoscrollFrameId = requestAnimationFrame(updateScroll);
@@ -6215,64 +6192,62 @@
         autoscrollFrameId = requestAnimationFrame(updateScroll);
       }, 100);
 
-      // Make both tracks draggable and swipeable
-      [track1, track2].forEach((track, index) => {
-        let isDown = false;
-        let startX;
-        let scrollLeft;
+      // Make track draggable and swipeable
+      let isDown = false;
+      let startX;
+      let scrollLeft;
 
-        // Hover pause
-        track.addEventListener('mouseenter', () => {
-          reviewsSoftPaused = true;
-        });
-        track.addEventListener('mouseleave', () => {
-          if (!isDown) reviewsSoftPaused = false;
-        });
+      // Hover pause
+      wrapper1.addEventListener('mouseenter', () => {
+        reviewsSoftPaused = true;
+      });
+      wrapper1.addEventListener('mouseleave', () => {
+        if (!isDown) reviewsSoftPaused = false;
+      });
 
-        // Touch swipe pause & resume
-        track.addEventListener('touchstart', () => {
-          reviewsSoftPaused = true;
-          if (softPauseTimeout) clearTimeout(softPauseTimeout);
-        }, { passive: true });
+      // Touch swipe pause & resume
+      wrapper1.addEventListener('touchstart', () => {
+        reviewsSoftPaused = true;
+        if (softPauseTimeout) clearTimeout(softPauseTimeout);
+      }, { passive: true });
 
-        track.addEventListener('touchend', () => {
-          softPauseTimeout = setTimeout(() => {
-            reviewsSoftPaused = false;
-          }, 1500);
-        }, { passive: true });
+      wrapper1.addEventListener('touchend', () => {
+        softPauseTimeout = setTimeout(() => {
+          reviewsSoftPaused = false;
+        }, 1500);
+      }, { passive: true });
 
-        // Mouse Drag-to-Scroll (Desktop)
-        track.addEventListener('mousedown', (e) => {
-          isDown = true;
-          track.classList.add('grabbing');
-          startX = e.pageX - track.offsetLeft;
-          scrollLeft = track.scrollLeft;
-          reviewsSoftPaused = true;
-        });
+      // Mouse Drag-to-Scroll (Desktop)
+      wrapper1.addEventListener('mousedown', (e) => {
+        isDown = true;
+        wrapper1.classList.add('grabbing');
+        startX = e.pageX - wrapper1.offsetLeft;
+        scrollLeft = wrapper1.scrollLeft;
+        reviewsSoftPaused = true;
+      });
 
-        window.addEventListener('mouseup', () => {
-          if (isDown) {
-            isDown = false;
-            track.classList.remove('grabbing');
-            reviewsSoftPaused = false;
-          }
-        });
+      window.addEventListener('mouseup', () => {
+        if (isDown) {
+          isDown = false;
+          wrapper1.classList.remove('grabbing');
+          reviewsSoftPaused = false;
+        }
+      });
 
-        track.addEventListener('mousemove', (e) => {
-          if (!isDown) return;
-          e.preventDefault();
-          const x = e.pageX - track.offsetLeft;
-          const walk = (x - startX) * 1.5;
-          track.scrollLeft = scrollLeft - walk;
+      wrapper1.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - wrapper1.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        wrapper1.scrollLeft = scrollLeft - walk;
 
-          // Wrap boundaries during manual dragging
-          const w = track.scrollWidth / 3;
-          if (track.scrollLeft >= w * 2) {
-            track.scrollLeft -= w;
-          } else if (track.scrollLeft <= 0) {
-            track.scrollLeft += w;
-          }
-        });
+        // Wrap boundaries during manual dragging
+        const singleSetWidth = track1.scrollWidth / 3;
+        if (wrapper1.scrollLeft >= singleSetWidth * 2) {
+          wrapper1.scrollLeft -= singleSetWidth;
+        } else if (wrapper1.scrollLeft <= 0) {
+          wrapper1.scrollLeft += singleSetWidth;
+        }
       });
     }
 
