@@ -878,6 +878,45 @@
       border: 1px solid rgba(6, 182, 212, .2);
     }
 
+    select.badge {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      padding: .25rem 1.4rem .25rem .65rem;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='%239999bb' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right .5rem center;
+      cursor: pointer;
+      outline: none;
+      text-align: left;
+    }
+    
+    select.badge-blue {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='%2366aaff' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    }
+    select.badge-green {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='%234ade80' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    }
+    select.badge-yellow {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='%23fbbf24' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    }
+    select.badge-red {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='%23f87171' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    }
+    select.badge-cyan {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='%2322d3ee' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    }
+    select.badge-gray {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='%239999bb' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    }
+
+    select.badge option {
+      background: var(--bg-3);
+      color: var(--white);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
     /* ── Btn Components ─────────────────────────────────────────── */
     .btn {
       border: none;
@@ -3247,6 +3286,9 @@
                 <textarea class="form-textarea" id="cm-msg" readonly style="min-height:150px;"></textarea>
               </div>
             </div>
+            <div class="modal-footer" style="display:flex;justify-content:flex-end;padding:1.2rem 1.8rem;border-top:1px solid rgba(255, 255, 255, .06);">
+              <button class="btn btn-secondary" onclick="closeModal('modal-contact-msg')">Close</button>
+            </div>
           </div>
         </div>
 
@@ -4171,6 +4213,9 @@
       const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:5000'
         : window.location.origin; // 🚀 Dynamically uses your live Vercel domain!
+
+      let CURRENT_ORDERS_FILTER = 'all';
+      let CURRENT_WA_ORDERS_FILTER = 'all';
 
       // ── DEMO DATA ────────────────────────────────────
 
@@ -5160,8 +5205,24 @@
       </td>
       <td class="fw-600">₹${o.total}</td>
       <td>${o.paymentMethod?.toUpperCase()}</td>
-      <td><span class="badge ${PAY_BADGE[o.paymentStatus] || 'badge-gray'}">${o.paymentStatus}</span></td>
-      <td><span class="badge ${STATUS_BADGE[o.orderStatus] || 'badge-gray'}">${o.orderStatus}</span></td>
+      <td>
+        <select class="badge ${PAY_BADGE[o.paymentStatus] || 'badge-gray'}" onchange="updatePaymentStatusInline('${o._id}', this.value)">
+          <option value="pending" ${o.paymentStatus === 'pending' ? 'selected' : ''}>Pending</option>
+          <option value="paid" ${o.paymentStatus === 'paid' ? 'selected' : ''}>Paid</option>
+          <option value="failed" ${o.paymentStatus === 'failed' ? 'selected' : ''}>Failed</option>
+          <option value="refunded" ${o.paymentStatus === 'refunded' ? 'selected' : ''}>Refunded</option>
+        </select>
+      </td>
+      <td>
+        <select class="badge ${STATUS_BADGE[o.orderStatus] || 'badge-gray'}" onchange="updateOrderStatusInline('${o._id}', this.value)">
+          <option value="pending" ${o.orderStatus === 'pending' ? 'selected' : ''}>Pending</option>
+          <option value="confirmed" ${o.orderStatus === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+          <option value="processing" ${o.orderStatus === 'processing' ? 'selected' : ''}>Processing</option>
+          <option value="shipped" ${o.orderStatus === 'shipped' ? 'selected' : ''}>Shipped</option>
+          <option value="delivered" ${o.orderStatus === 'delivered' ? 'selected' : ''}>Delivered</option>
+          <option value="cancelled" ${o.orderStatus === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+        </select>
+      </td>
       <td class="text-muted">${new Date(o.createdAt).toLocaleDateString('en-IN')}</td>
       <td>
         <div style="display:flex;gap:.3rem;">
@@ -5174,14 +5235,14 @@
       }
 
       function filterOrders(filter, el) {
+        CURRENT_ORDERS_FILTER = filter;
         document.querySelectorAll('#page-orders .filter-tab').forEach(t => t.classList.remove('active'));
         el.classList.add('active');
         loadOrders(filter, document.getElementById('order-search')?.value || '');
       }
 
       function searchOrders(q) {
-        const activeFilter = document.querySelector('#page-orders .filter-tab.active')?.dataset?.filter || 'all';
-        loadOrders(activeFilter, q);
+        loadOrders(CURRENT_ORDERS_FILTER, q);
       }
 
       function openStatusModal(id) {
@@ -5204,12 +5265,60 @@
         });
         if (result && result.success) {
           toast('Order updated successfully', 'success');
-          loadOrders();
-          loadWaOrders();
+          loadOrders(CURRENT_ORDERS_FILTER, document.getElementById('order-search')?.value || '');
+          loadWaOrders(CURRENT_WA_ORDERS_FILTER, document.getElementById('wa-order-search')?.value || '');
         } else {
           toast('Failed to update order', 'error');
         }
         closeModal('modal-status');
+      }
+
+      async function updateOrderStatusInline(id, newStatus) {
+        const selectEl = document.querySelector(`select[onchange*="updateOrderStatusInline('${id}'"]`) || event?.target;
+        if (selectEl) {
+          selectEl.disabled = true;
+          selectEl.style.opacity = '0.5';
+        }
+        const result = await apiPatch('/api/orders/' + id + '/status', { 
+          orderStatus: newStatus
+        });
+        if (result && result.success) {
+          toast('Order status updated successfully', 'success');
+          const orderSearch = document.getElementById('order-search')?.value || '';
+          await loadOrders(CURRENT_ORDERS_FILTER, orderSearch);
+          const waOrderSearch = document.getElementById('wa-order-search')?.value || '';
+          await loadWaOrders(CURRENT_WA_ORDERS_FILTER, waOrderSearch);
+        } else {
+          toast('Failed to update order status', 'error');
+          if (selectEl) {
+            selectEl.disabled = false;
+            selectEl.style.opacity = '1';
+          }
+        }
+      }
+
+      async function updatePaymentStatusInline(id, newPayment) {
+        const selectEl = document.querySelector(`select[onchange*="updatePaymentStatusInline('${id}'"]`) || event?.target;
+        if (selectEl) {
+          selectEl.disabled = true;
+          selectEl.style.opacity = '0.5';
+        }
+        const result = await apiPatch('/api/orders/' + id + '/status', { 
+          paymentStatus: newPayment
+        });
+        if (result && result.success) {
+          toast('Payment status updated successfully', 'success');
+          const orderSearch = document.getElementById('order-search')?.value || '';
+          await loadOrders(CURRENT_ORDERS_FILTER, orderSearch);
+          const waOrderSearch = document.getElementById('wa-order-search')?.value || '';
+          await loadWaOrders(CURRENT_WA_ORDERS_FILTER, waOrderSearch);
+        } else {
+          toast('Failed to update payment status', 'error');
+          if (selectEl) {
+            selectEl.disabled = false;
+            selectEl.style.opacity = '1';
+          }
+        }
       }
 
       /* ═══════════════════════════════════════════════════
@@ -5716,8 +5825,24 @@
       </td>
       <td class="fw-600">₹${o.total}</td>
       <td>${o.paymentMethod?.toUpperCase()}</td>
-      <td><span class="badge ${PAY_BADGE[o.paymentStatus] || 'badge-gray'}">${o.paymentStatus}</span></td>
-      <td><span class="badge ${STATUS_BADGE[o.orderStatus] || 'badge-gray'}">${o.orderStatus}</span></td>
+      <td>
+        <select class="badge ${PAY_BADGE[o.paymentStatus] || 'badge-gray'}" onchange="updatePaymentStatusInline('${o._id}', this.value)">
+          <option value="pending" ${o.paymentStatus === 'pending' ? 'selected' : ''}>Pending</option>
+          <option value="paid" ${o.paymentStatus === 'paid' ? 'selected' : ''}>Paid</option>
+          <option value="failed" ${o.paymentStatus === 'failed' ? 'selected' : ''}>Failed</option>
+          <option value="refunded" ${o.paymentStatus === 'refunded' ? 'selected' : ''}>Refunded</option>
+        </select>
+      </td>
+      <td>
+        <select class="badge ${STATUS_BADGE[o.orderStatus] || 'badge-gray'}" onchange="updateOrderStatusInline('${o._id}', this.value)">
+          <option value="pending" ${o.orderStatus === 'pending' ? 'selected' : ''}>Pending</option>
+          <option value="confirmed" ${o.orderStatus === 'confirmed' ? 'selected' : ''}>Confirmed</option>
+          <option value="processing" ${o.orderStatus === 'processing' ? 'selected' : ''}>Processing</option>
+          <option value="shipped" ${o.orderStatus === 'shipped' ? 'selected' : ''}>Shipped</option>
+          <option value="delivered" ${o.orderStatus === 'delivered' ? 'selected' : ''}>Delivered</option>
+          <option value="cancelled" ${o.orderStatus === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+        </select>
+      </td>
       <td class="text-muted">${new Date(o.createdAt).toLocaleDateString('en-IN')}</td>
       <td>
         <div style="display:flex;gap:.3rem;">
@@ -5730,15 +5855,14 @@
       }
 
       function filterWaOrders(filter, el) {
+        CURRENT_WA_ORDERS_FILTER = filter;
         document.querySelectorAll('#page-waorders .filter-tab').forEach(t => t.classList.remove('active'));
         el.classList.add('active');
         loadWaOrders(filter, document.getElementById('wa-order-search')?.value || '');
       }
 
       function searchWaOrders(q) {
-        const activeFilter = document.querySelector('#page-waorders .filter-tab.active')?.textContent?.toLowerCase()?.trim() || 'all';
-        const filterMap = { 'all orders': 'all', 'pending': 'pending', 'confirmed': 'confirmed', 'processing': 'processing', 'shipped': 'shipped', 'delivered': 'delivered', 'cancelled': 'cancelled' };
-        loadWaOrders(filterMap[activeFilter] || 'all', q);
+        loadWaOrders(CURRENT_WA_ORDERS_FILTER, q);
       }
 
       function openWaStatusModal(id) {
@@ -6536,7 +6660,7 @@
         pending: 'badge-yellow', confirmed: 'badge-blue', processing: 'badge-cyan',
         shipped: 'badge-blue', delivered: 'badge-green', cancelled: 'badge-red'
       };
-      const PAY_BADGE = { paid: 'badge-green', pending: 'badge-yellow', failed: 'badge-red' };
+      const PAY_BADGE = { paid: 'badge-green', pending: 'badge-yellow', failed: 'badge-red', refunded: 'badge-gray' };
 
 
       /* ═══════════════════════════════════════════════════
