@@ -7,4 +7,5 @@ r.get('/revenue-chart', verifyToken, c.getRevenueChart);
 r.get('/order-status', verifyToken, c.getOrderStatusChart);
 r.get('/top-products', verifyToken, c.getTopProducts);
 r.get('/customer-growth', verifyToken, c.getCustomerGrowth);
+r.post('/reset-stats', verifyToken, c.resetStats);
 module.exports = r;

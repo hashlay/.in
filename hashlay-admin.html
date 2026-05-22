@@ -728,6 +728,146 @@
       opacity: .3;
     }
 
+    /* ── Stat Card Action Buttons ─────────────────────────────── */
+    .stat-actions {
+      display: flex;
+      gap: .4rem;
+      margin-top: .7rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .stat-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      padding: .3rem .65rem;
+      font-size: .62rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .04);
+      color: var(--gray-lt);
+      cursor: pointer;
+      transition: all var(--tr);
+      backdrop-filter: blur(4px);
+    }
+
+    .stat-btn:hover {
+      border-color: var(--blue);
+      color: var(--blue-lt);
+      background: rgba(0, 87, 255, .1);
+      transform: translateY(-1px);
+    }
+
+    .stat-btn.refreshing {
+      pointer-events: none;
+      opacity: .6;
+    }
+
+    .stat-btn.refreshing .stat-btn-icon {
+      animation: spin 0.8s linear infinite;
+    }
+
+    .stat-btn-reset {
+      border-color: rgba(239, 68, 68, .2);
+      color: #f87171;
+    }
+
+    .stat-btn-reset:hover {
+      border-color: rgba(239, 68, 68, .5);
+      color: #fca5a5;
+      background: rgba(239, 68, 68, .1);
+    }
+
+    /* ── Reset Password Modal ──────────────────────────────────── */
+    .reset-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .7);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn .2s both;
+    }
+
+    .reset-modal-overlay.open {
+      display: flex;
+    }
+
+    .reset-modal-box {
+      background: var(--bg-2);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, .6), 0 0 40px var(--blue-glow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .reset-modal-box::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: 15%;
+      right: 15%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--danger), transparent);
+    }
+
+    .reset-modal-title {
+      font-family: var(--font-d);
+      font-size: 1.3rem;
+      letter-spacing: .08em;
+      margin-bottom: .4rem;
+      color: #f87171;
+    }
+
+    .reset-modal-sub {
+      font-size: .78rem;
+      color: var(--gray);
+      margin-bottom: 1.4rem;
+      line-height: 1.5;
+    }
+
+    .reset-modal-input {
+      width: 100%;
+      background: var(--bg-3);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: var(--radius);
+      padding: .8rem 1rem;
+      color: var(--white);
+      font-size: .88rem;
+      transition: border-color var(--tr);
+      margin-bottom: 1rem;
+    }
+
+    .reset-modal-input:focus {
+      outline: none;
+      border-color: var(--danger);
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, .12);
+    }
+
+    .reset-modal-error {
+      font-size: .72rem;
+      color: #f87171;
+      margin-bottom: .6rem;
+      display: none;
+    }
+
+    .reset-modal-actions {
+      display: flex;
+      gap: .6rem;
+      justify-content: flex-end;
+      margin-top: .5rem;
+    }
+
     /* ── Grid Layouts ───────────────────────────────────────────── */
     .grid-2 {
       display: grid;
@@ -2483,24 +2623,44 @@
               style="background:linear-gradient(135deg,#fff,var(--blue-lt));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
               ₹0</div>
             <div class="stat-change up" id="stat-change-today-revenue">▲</div>
+            <div class="stat-actions">
+              <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
+                <span class="stat-btn-icon">🔄</span> Refresh
+              </button>
+            </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon">🛒</div>
             <div class="stat-label">Today's Orders</div>
             <div class="stat-value" id="stat-today-orders">0</div>
             <div class="stat-change up" id="stat-change-today-orders">▲</div>
+            <div class="stat-actions">
+              <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
+                <span class="stat-btn-icon">🔄</span> Refresh
+              </button>
+            </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon">📦</div>
             <div class="stat-label">Total Products</div>
             <div class="stat-value" id="stat-total-products">0</div>
             <div class="stat-change" style="color:var(--gray);">Products catalog</div>
+            <div class="stat-actions">
+              <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
+                <span class="stat-btn-icon">🔄</span> Refresh
+              </button>
+            </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon">👥</div>
             <div class="stat-label">Total Customers</div>
             <div class="stat-value" id="stat-total-customers">0</div>
             <div class="stat-change up">Total registered</div>
+            <div class="stat-actions">
+              <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
+                <span class="stat-btn-icon">🔄</span> Refresh
+              </button>
+            </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon">📊</div>
@@ -2509,18 +2669,64 @@
               style="background:linear-gradient(135deg,#fff,var(--blue-lt));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
               ₹0</div>
             <div class="stat-change up">Lifetime revenue</div>
+            <div class="stat-actions">
+              <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
+                <span class="stat-btn-icon">🔄</span> Refresh
+              </button>
+              <button class="stat-btn stat-btn-reset" onclick="openResetModal('totalRevenue')" title="Reset to Zero">
+                <span class="stat-btn-icon">⚠️</span> Reset
+              </button>
+            </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon">⏳</div>
             <div class="stat-label">Pending Orders</div>
             <div class="stat-value" id="stat-pending-orders" style="color:var(--warning);">0</div>
             <div class="stat-change" style="color:var(--warning);">Needs attention</div>
+            <div class="stat-actions">
+              <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
+                <span class="stat-btn-icon">🔄</span> Refresh
+              </button>
+              <button class="stat-btn stat-btn-reset" onclick="openResetModal('pendingOrders')" title="Reset to Zero">
+                <span class="stat-btn-icon">⚠️</span> Reset
+              </button>
+            </div>
           </div>
           <div class="stat-card">
             <div class="stat-icon">✅</div>
             <div class="stat-label">Delivered Orders</div>
             <div class="stat-value" id="stat-delivered" style="color:var(--success);">0</div>
             <div class="stat-change up">Successfully delivered</div>
+            <div class="stat-actions">
+              <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
+                <span class="stat-btn-icon">🔄</span> Refresh
+              </button>
+              <button class="stat-btn stat-btn-reset" onclick="openResetModal('deliveredOrders')" title="Reset to Zero">
+                <span class="stat-btn-icon">⚠️</span> Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reset Password Modal -->
+        <div class="reset-modal-overlay" id="reset-modal-overlay" onclick="if(event.target===this)closeResetModal()">
+          <div class="reset-modal-box">
+            <div class="reset-modal-title">⚠️ RESET CONFIRMATION</div>
+            <div class="reset-modal-sub">
+              This action will reset the selected stat to zero. This is <strong style="color:#f87171;">irreversible</strong>. 
+              Enter the secret password to confirm.
+            </div>
+            <div class="reset-modal-error" id="reset-modal-error">❌ Incorrect password. Try again.</div>
+            <input type="password" class="reset-modal-input" id="reset-modal-password" placeholder="Enter secret password..." 
+              onkeydown="if(event.key==='Enter')confirmResetStat()" />
+            <input type="hidden" id="reset-modal-stat-type" value="" />
+            <div class="reset-modal-actions">
+              <button class="btn btn-secondary" onclick="closeResetModal()" style="padding:.55rem 1.2rem;font-size:.78rem;">Cancel</button>
+              <button class="btn" onclick="confirmResetStat()" 
+                style="padding:.55rem 1.2rem;font-size:.78rem;background:var(--danger);color:#fff;border:none;border-radius:var(--radius);">
+                🔒 Reset to Zero
+              </button>
+            </div>
           </div>
         </div>
 
@@ -4958,6 +5164,60 @@
         loadRevenueChart();
         // Order status doughnut chart
         loadOrderStatusChart();
+      }
+
+      /* ── Stat Card Refresh & Reset Functions ─────────────────── */
+      async function refreshDashboardStat(btnEl) {
+        // Add spinning animation
+        btnEl.classList.add('refreshing');
+        try {
+          await loadDashboard();
+          toast('📊 Dashboard stats refreshed!', 'success');
+        } catch (e) {
+          toast('❌ Failed to refresh stats', 'error');
+        }
+        setTimeout(() => btnEl.classList.remove('refreshing'), 600);
+      }
+
+      function openResetModal(statType) {
+        document.getElementById('reset-modal-stat-type').value = statType;
+        document.getElementById('reset-modal-password').value = '';
+        document.getElementById('reset-modal-error').style.display = 'none';
+        document.getElementById('reset-modal-overlay').classList.add('open');
+        setTimeout(() => document.getElementById('reset-modal-password').focus(), 200);
+      }
+
+      function closeResetModal() {
+        document.getElementById('reset-modal-overlay').classList.remove('open');
+        document.getElementById('reset-modal-password').value = '';
+        document.getElementById('reset-modal-error').style.display = 'none';
+      }
+
+      async function confirmResetStat() {
+        const password = document.getElementById('reset-modal-password').value;
+        const statType = document.getElementById('reset-modal-stat-type').value;
+        const errorEl = document.getElementById('reset-modal-error');
+
+        if (!password) {
+          errorEl.textContent = '❌ Please enter the password.';
+          errorEl.style.display = 'block';
+          return;
+        }
+
+        // Send to backend for validation
+        const result = await apiPost('/api/dashboard/reset-stats', { password, statType });
+
+        if (result && result.success) {
+          closeResetModal();
+          toast('✅ ' + (result.message || 'Stat reset successfully!'), 'success');
+          // Refresh dashboard to reflect zero values
+          await loadDashboard();
+        } else {
+          errorEl.textContent = '❌ ' + (result?.message || 'Incorrect password. Try again.');
+          errorEl.style.display = 'block';
+          document.getElementById('reset-modal-password').value = '';
+          document.getElementById('reset-modal-password').focus();
+        }
       }
 
       async function loadRevenueChart() {

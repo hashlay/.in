@@ -117,3 +117,53 @@ exports.getCustomerGrowth = async (req, res) => {
   });
   res.json({ success: true, data });
 };
+
+exports.resetStats = async (req, res) => {
+  try {
+    const { password, statType } = req.body;
+    const RESET_PASSWORD = 'hashlay@2026';
+
+    if (password !== RESET_PASSWORD) {
+      return res.status(403).json({ success: false, message: 'Invalid reset password' });
+    }
+
+    const validTypes = ['totalRevenue', 'pendingOrders', 'deliveredOrders'];
+    if (!validTypes.includes(statType)) {
+      return res.status(400).json({ success: false, message: 'Invalid stat type' });
+    }
+
+    let result;
+    if (statType === 'totalRevenue') {
+      // Mark all non-cancelled orders as inactive so they won't count in revenue
+      result = await Order.updateMany(
+        { isActive: true, orderStatus: { $ne: 'cancelled' } },
+        { $set: { isActive: false } }
+      );
+    } else if (statType === 'pendingOrders') {
+      // Mark all pending orders as cancelled
+      result = await Order.updateMany(
+        { orderStatus: 'pending', isActive: true },
+        { $set: { orderStatus: 'cancelled', isActive: false } }
+      );
+    } else if (statType === 'deliveredOrders') {
+      // Mark all delivered orders as inactive (archived)
+      result = await Order.updateMany(
+        { orderStatus: 'delivered', isActive: true },
+        { $set: { isActive: false } }
+      );
+    }
+
+    // Clear dashboard cache
+    const { invalidate } = require('../config/cache');
+    invalidate('dashboard:stats');
+    invalidate('dashboard:revenue:7d');
+    invalidate('dashboard:revenue:30d');
+    invalidate('dashboard:revenue:3m');
+    invalidate('dashboard:orderStatus');
+
+    res.json({ success: true, message: `${statType} has been reset successfully`, modified: result?.modifiedCount || 0 });
+  } catch (err) {
+    console.error('[Dashboard] Reset stats error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
