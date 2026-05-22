@@ -11,6 +11,7 @@
     rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
     @keyframes spin { to { transform: rotate(360deg); } }
     /* ── Variables ─────────────────────────────────────────────── */
@@ -2617,7 +2618,7 @@
       <div class="page active" id="page-dashboard">
         <div class="stats-grid">
           <div class="stat-card">
-            <div class="stat-icon">💰</div>
+            <div class="stat-icon"><i class="ph ph-money"></i></div>
             <div class="stat-label">Today's Revenue</div>
             <div class="stat-value" id="stat-today-revenue"
               style="background:linear-gradient(135deg,#fff,var(--blue-lt));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
@@ -2625,45 +2626,45 @@
             <div class="stat-change up" id="stat-change-today-revenue">▲</div>
             <div class="stat-actions">
               <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
-                <span class="stat-btn-icon">🔄</span> Refresh
+                <span class="stat-btn-icon"><i class="ph ph-arrows-clockwise"></i></span> Refresh
               </button>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">🛒</div>
+            <div class="stat-icon"><i class="ph ph-shopping-cart"></i></div>
             <div class="stat-label">Today's Orders</div>
             <div class="stat-value" id="stat-today-orders">0</div>
             <div class="stat-change up" id="stat-change-today-orders">▲</div>
             <div class="stat-actions">
               <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
-                <span class="stat-btn-icon">🔄</span> Refresh
+                <span class="stat-btn-icon"><i class="ph ph-arrows-clockwise"></i></span> Refresh
               </button>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">📦</div>
+            <div class="stat-icon"><i class="ph ph-package"></i></div>
             <div class="stat-label">Total Products</div>
             <div class="stat-value" id="stat-total-products">0</div>
             <div class="stat-change" style="color:var(--gray);">Products catalog</div>
             <div class="stat-actions">
               <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
-                <span class="stat-btn-icon">🔄</span> Refresh
+                <span class="stat-btn-icon"><i class="ph ph-arrows-clockwise"></i></span> Refresh
               </button>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">👥</div>
+            <div class="stat-icon"><i class="ph ph-users"></i></div>
             <div class="stat-label">Total Customers</div>
             <div class="stat-value" id="stat-total-customers">0</div>
             <div class="stat-change up">Total registered</div>
             <div class="stat-actions">
               <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
-                <span class="stat-btn-icon">🔄</span> Refresh
+                <span class="stat-btn-icon"><i class="ph ph-arrows-clockwise"></i></span> Refresh
               </button>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">📊</div>
+            <div class="stat-icon"><i class="ph ph-chart-bar"></i></div>
             <div class="stat-label">Total Revenue</div>
             <div class="stat-value" id="stat-total-revenue"
               style="background:linear-gradient(135deg,#fff,var(--blue-lt));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
@@ -2671,38 +2672,38 @@
             <div class="stat-change up">Lifetime revenue</div>
             <div class="stat-actions">
               <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
-                <span class="stat-btn-icon">🔄</span> Refresh
+                <span class="stat-btn-icon"><i class="ph ph-arrows-clockwise"></i></span> Refresh
               </button>
               <button class="stat-btn stat-btn-reset" onclick="openResetModal('totalRevenue')" title="Reset to Zero">
-                <span class="stat-btn-icon">⚠️</span> Reset
+                <span class="stat-btn-icon"><i class="ph ph-warning"></i></span> Reset
               </button>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">⏳</div>
+            <div class="stat-icon"><i class="ph ph-hourglass"></i></div>
             <div class="stat-label">Pending Orders</div>
             <div class="stat-value" id="stat-pending-orders" style="color:var(--warning);">0</div>
             <div class="stat-change" style="color:var(--warning);">Needs attention</div>
             <div class="stat-actions">
               <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
-                <span class="stat-btn-icon">🔄</span> Refresh
+                <span class="stat-btn-icon"><i class="ph ph-arrows-clockwise"></i></span> Refresh
               </button>
               <button class="stat-btn stat-btn-reset" onclick="openResetModal('pendingOrders')" title="Reset to Zero">
-                <span class="stat-btn-icon">⚠️</span> Reset
+                <span class="stat-btn-icon"><i class="ph ph-warning"></i></span> Reset
               </button>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">✅</div>
+            <div class="stat-icon"><i class="ph ph-check-circle"></i></div>
             <div class="stat-label">Delivered Orders</div>
             <div class="stat-value" id="stat-delivered" style="color:var(--success);">0</div>
             <div class="stat-change up">Successfully delivered</div>
             <div class="stat-actions">
               <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
-                <span class="stat-btn-icon">🔄</span> Refresh
+                <span class="stat-btn-icon"><i class="ph ph-arrows-clockwise"></i></span> Refresh
               </button>
               <button class="stat-btn stat-btn-reset" onclick="openResetModal('deliveredOrders')" title="Reset to Zero">
-                <span class="stat-btn-icon">⚠️</span> Reset
+                <span class="stat-btn-icon"><i class="ph ph-warning"></i></span> Reset
               </button>
             </div>
           </div>

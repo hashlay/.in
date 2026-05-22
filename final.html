@@ -17,6 +17,7 @@
   <!-- Favicon -->
   <link rel="icon" type="image/jpeg"
     href="https://res.cloudinary.com/drj19ghhl/image/upload/v1777176961/f47e171f-1606-4005-9edd-41239b24ea44_ovi6oo.jpg" />
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
@@ -4406,7 +4407,7 @@
     </div>
     <div class="nav-actions">
       <button class="nav-cart-btn" onclick="toggleCart()" aria-label="Cart">
-        🛒
+        <i class="ph ph-shopping-cart"></i>
         <span class="cart-count" id="cart-count">0</span>
       </button>
       <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
@@ -4418,7 +4419,7 @@
   <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobile-menu">
     <button onclick="toggleMobileMenu()"
-      style="position:absolute;top:2rem;right:2rem;background:none;border:none;color:white;font-size:2rem;">✕</button>
+      style="position:absolute;top:2rem;right:2rem;background:none;border:none;color:white;font-size:2rem;"><i class="ph ph-x"></i></button>
     <a href="#products" onclick="toggleMobileMenu()">Shop</a>
     <a href="#story" onclick="toggleMobileMenu()">Story</a>
     <a href="#reviews" onclick="toggleMobileMenu()">Reviews</a>
@@ -4448,29 +4449,28 @@
       <div class="hero-visual">
         <div class="hero-product-card">
           <!-- Task 2B: Replaced emoji icons with premium glassmorphism product preview cards -->
-          <!-- Kit items — showcase only, click goes to Sneaker Care Kit -->
           <div class="kit-visual">
             <div class="kit-item" onclick="openProductPopup('sneaker-kit')" title="Sneaker Care Kit includes Foam">
               <div class="kit-icon">
-                <span class="kit-icon-emoji"></span>
+                <span class="kit-icon-emoji"><i class="ph ph-drop"></i></span>
                 <div class="kit-icon-dot"></div>
               </div>
-              <span class="kit-label"></span>
+              <span class="kit-label">Foam</span>
             </div>
             <div class="kit-item" onclick="openProductPopup('sneaker-kit')" title="View Full Kit">
               <div class="kit-icon"
                 style="width:92px;height:92px;border-radius:20px;box-shadow:0 12px 32px rgba(0,87,255,0.25);">
-                <span class="kit-icon-emoji" style="font-size:2.8rem;"></span>
+                <span class="kit-icon-emoji" style="font-size:2.8rem;"><i class="ph ph-sparkle"></i></span>
                 <div class="kit-icon-dot"></div>
               </div>
-              <span class="kit-label"></span>
+              <span class="kit-label">Kit</span>
             </div>
             <div class="kit-item" onclick="openProductPopup('sneaker-kit')" title="Sneaker Care Kit includes Brush">
               <div class="kit-icon">
-                <span class="kit-icon-emoji"></span>
+                <span class="kit-icon-emoji"><i class="ph ph-broom"></i></span>
                 <div class="kit-icon-dot"></div>
               </div>
-              <span class="kit-label"></span>
+              <span class="kit-label">Brush</span>
             </div>
           </div>
           <div class="hero-product-name" id="hero-product-name">SNEAKER CARE KIT</div>
@@ -5390,19 +5390,19 @@
   <div id="floating-btns">
     <!-- FAQ Button -->
     <button class="float-btn float-faq" onclick="openFaqPopup()" title="FAQ">
-      ❓
+      <i class="ph-bold ph-question"></i>
       <span class="float-btn-tooltip">FAQ</span>
     </button>
     <!-- AI Chat Button -->
     <button class="float-btn float-ai" onclick="toggleAiChat()" title="AI Assistant" id="ai-chat-toggle-btn">
-      🤖
+      <i class="ph-bold ph-robot"></i>
       <span class="float-btn-tooltip">AI Help</span>
     </button>
     <!-- WhatsApp Button -->
     <a class="float-btn float-wa"
       href="https://wa.me/917483138340?text=Hi%20Hashlay!%20I%20have%20a%20question%20about%20your%20products."
       target="_blank" title="WhatsApp">
-      💬
+      <i class="ph-bold ph-chat-circle-text"></i>
       <span class="float-btn-tooltip">WhatsApp</span>
     </a>
   </div>
@@ -5410,15 +5410,15 @@
   <!-- ─── AI CHAT POPUP (Task 10) ──────────────────────────── -->
   <div id="ai-chat-popup">
     <div class="chat-header">
-      <div class="chat-avatar">🤖</div>
+      <div class="chat-avatar"><i class="ph-bold ph-robot"></i></div>
       <div class="chat-header-info">
         <h4>Hashlay Assistant</h4>
         <span>● Online · Replies instantly</span>
       </div>
-      <button class="chat-header-close" onclick="toggleAiChat()">✕</button>
+      <button class="chat-header-close" onclick="toggleAiChat()"><i class="ph ph-x"></i></button>
     </div>
     <div class="chat-messages" id="chat-messages">
-      <div class="chat-msg bot">Hey! 👋 I'm the Hashlay AI assistant. How can I help you today? Ask me anything about
+      <div class="chat-msg bot">Hey! <i class="ph-fill ph-hand-waving"></i> I'm the Hashlay AI assistant. How can I help you today? Ask me anything about
         our products!</div>
     </div>
     <div class="chat-suggestions" id="chat-suggestions-container">
