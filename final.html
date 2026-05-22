@@ -7172,19 +7172,161 @@
     }
 
     function openFullscreenImage(src) {
+      // Use the full images array from the product popup for slideshow
+      const images = popupImagesArray && popupImagesArray.length > 0 ? popupImagesArray : [src];
+      let fsIndex = images.indexOf(src);
+      if (fsIndex === -1) fsIndex = popupCurrentImgIndex || 0;
+
+      // Create overlay
       const overlay = document.createElement('div');
-      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:999999;display:flex;align-items:center;justify-content:center;cursor:pointer;';
-      overlay.onclick = () => overlay.remove();
-      const img = document.createElement('img');
-      img.src = src;
-      img.style.cssText = 'max-width:95vw;max-height:95vh;object-fit:contain;border-radius:8px;';
-      overlay.appendChild(img);
+      overlay.id = 'fs-gallery-overlay';
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:999999;display:flex;align-items:center;justify-content:center;flex-direction:column;user-select:none;';
+
+      // Close on background click (not on image/buttons)
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) destroyFsGallery();
+      });
+
+      // Close button
       const closeBtn = document.createElement('div');
-      closeBtn.textContent = '✕';
-      closeBtn.style.cssText = 'position:absolute;top:15px;right:20px;color:#fff;font-size:2rem;cursor:pointer;z-index:1000000;';
-      closeBtn.onclick = () => overlay.remove();
+      closeBtn.innerHTML = '✕';
+      closeBtn.style.cssText = 'position:absolute;top:18px;right:22px;color:#fff;font-size:1.8rem;cursor:pointer;z-index:1000002;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);transition:all 0.25s;';
+      closeBtn.onmouseenter = () => closeBtn.style.background = 'rgba(255,255,255,0.2)';
+      closeBtn.onmouseleave = () => closeBtn.style.background = 'rgba(255,255,255,0.1)';
+      closeBtn.onclick = (e) => { e.stopPropagation(); destroyFsGallery(); };
       overlay.appendChild(closeBtn);
+
+      // Image container
+      const imgContainer = document.createElement('div');
+      imgContainer.style.cssText = 'position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;';
+      overlay.appendChild(imgContainer);
+
+      // The main fullscreen image
+      const fsImg = document.createElement('img');
+      fsImg.id = 'fs-gallery-img';
+      fsImg.src = images[fsIndex];
+      fsImg.style.cssText = 'max-width:92vw;max-height:85vh;object-fit:contain;border-radius:8px;transition:opacity 0.25s ease, transform 0.25s ease;pointer-events:none;';
+      imgContainer.appendChild(fsImg);
+
+      // Counter (e.g. "1 / 4")
+      const counter = document.createElement('div');
+      counter.id = 'fs-gallery-counter';
+      counter.style.cssText = 'position:absolute;bottom:24px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.7);font-size:0.85rem;font-weight:500;letter-spacing:0.12em;font-family:var(--font-body);z-index:1000001;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);padding:6px 18px;border-radius:100px;';
+      counter.textContent = `${fsIndex + 1} / ${images.length}`;
+      overlay.appendChild(counter);
+
+      // Only show arrows/counter if multiple images
+      if (images.length > 1) {
+        // Left arrow
+        const prevBtn = document.createElement('div');
+        prevBtn.innerHTML = '‹';
+        prevBtn.style.cssText = 'position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#fff;font-size:2.8rem;cursor:pointer;z-index:1000001;width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,0.08);backdrop-filter:blur(8px);transition:all 0.25s;line-height:1;';
+        prevBtn.onmouseenter = () => { prevBtn.style.background = 'rgba(0,87,255,0.35)'; prevBtn.style.transform = 'translateY(-50%) scale(1.1)'; };
+        prevBtn.onmouseleave = () => { prevBtn.style.background = 'rgba(255,255,255,0.08)'; prevBtn.style.transform = 'translateY(-50%)'; };
+        prevBtn.onclick = (e) => { e.stopPropagation(); navigateFs(-1); };
+        overlay.appendChild(prevBtn);
+
+        // Right arrow
+        const nextBtn = document.createElement('div');
+        nextBtn.innerHTML = '›';
+        nextBtn.style.cssText = 'position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#fff;font-size:2.8rem;cursor:pointer;z-index:1000001;width:52px;height:52px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(255,255,255,0.08);backdrop-filter:blur(8px);transition:all 0.25s;line-height:1;';
+        nextBtn.onmouseenter = () => { nextBtn.style.background = 'rgba(0,87,255,0.35)'; nextBtn.style.transform = 'translateY(-50%) scale(1.1)'; };
+        nextBtn.onmouseleave = () => { nextBtn.style.background = 'rgba(255,255,255,0.08)'; nextBtn.style.transform = 'translateY(-50%)'; };
+        nextBtn.onclick = (e) => { e.stopPropagation(); navigateFs(1); };
+        overlay.appendChild(nextBtn);
+
+        // Dot indicators
+        const dotsContainer = document.createElement('div');
+        dotsContainer.id = 'fs-gallery-dots';
+        dotsContainer.style.cssText = 'position:absolute;bottom:60px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:1000001;';
+        images.forEach((_, i) => {
+          const dot = document.createElement('div');
+          dot.style.cssText = `width:${i === fsIndex ? '24px' : '8px'};height:8px;border-radius:100px;background:${i === fsIndex ? 'var(--blue-1)' : 'rgba(255,255,255,0.3)'};transition:all 0.3s;cursor:pointer;`;
+          dot.onclick = (e) => { e.stopPropagation(); fsIndex = i; updateFsImage(); };
+          dotsContainer.appendChild(dot);
+        });
+        overlay.appendChild(dotsContainer);
+      }
+
+      // Navigate function
+      function navigateFs(dir) {
+        fsIndex = (fsIndex + dir + images.length) % images.length;
+        updateFsImage();
+      }
+
+      // Update image with smooth transition
+      function updateFsImage() {
+        const img = document.getElementById('fs-gallery-img');
+        const ctr = document.getElementById('fs-gallery-counter');
+        const dots = document.getElementById('fs-gallery-dots');
+        if (!img) return;
+
+        // Fade out
+        img.style.opacity = '0';
+        img.style.transform = 'scale(0.96)';
+
+        setTimeout(() => {
+          img.src = images[fsIndex];
+          img.onload = () => {
+            img.style.opacity = '1';
+            img.style.transform = 'scale(1)';
+          };
+          // Update counter
+          if (ctr) ctr.textContent = `${fsIndex + 1} / ${images.length}`;
+          // Update dots
+          if (dots) {
+            Array.from(dots.children).forEach((dot, i) => {
+              dot.style.width = i === fsIndex ? '24px' : '8px';
+              dot.style.background = i === fsIndex ? 'var(--blue-1)' : 'rgba(255,255,255,0.3)';
+            });
+          }
+          // Also sync the popup thumbnail below
+          popupCurrentImgIndex = fsIndex;
+          setPopupMainImage(fsIndex);
+        }, 150);
+      }
+
+      // Keyboard navigation
+      function fsKeyHandler(e) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); navigateFs(1); }
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); navigateFs(-1); }
+        else if (e.key === 'Escape') { destroyFsGallery(); }
+      }
+      document.addEventListener('keydown', fsKeyHandler);
+
+      // Touch/swipe support for mobile
+      let fsTouchStartX = 0;
+      let fsTouchStartY = 0;
+      imgContainer.addEventListener('touchstart', function(e) {
+        fsTouchStartX = e.touches[0].clientX;
+        fsTouchStartY = e.touches[0].clientY;
+      }, { passive: true });
+
+      imgContainer.addEventListener('touchend', function(e) {
+        if (images.length <= 1) return;
+        const diffX = fsTouchStartX - e.changedTouches[0].clientX;
+        const diffY = fsTouchStartY - e.changedTouches[0].clientY;
+        // Only swipe horizontally (ignore vertical scrolls)
+        if (Math.abs(diffX) < 40 || Math.abs(diffY) > Math.abs(diffX)) return;
+        navigateFs(diffX > 0 ? 1 : -1);
+      }, { passive: true });
+
+      // Cleanup function
+      function destroyFsGallery() {
+        document.removeEventListener('keydown', fsKeyHandler);
+        const el = document.getElementById('fs-gallery-overlay');
+        if (el) {
+          el.style.opacity = '0';
+          el.style.transition = 'opacity 0.2s';
+          setTimeout(() => el.remove(), 200);
+        }
+      }
+
+      // Animate in
+      overlay.style.opacity = '0';
+      overlay.style.transition = 'opacity 0.25s';
       document.body.appendChild(overlay);
+      requestAnimationFrame(() => { overlay.style.opacity = '1'; });
     }
 
     // Buy Now — add to cart then open checkout
