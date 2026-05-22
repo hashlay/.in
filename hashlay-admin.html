@@ -2762,10 +2762,10 @@
                 <div class="card-title">Revenue Overview</div>
                 <div class="card-sub">Last 7 days performance</div>
               </div>
-              <select class="form-select" style="width:auto;padding:.3rem .7rem;font-size:.72rem;">
-                <option>Last 7 Days</option>
-                <option>Last 30 Days</option>
-                <option>Last 3 Months</option>
+              <select id="revenue-range-select" class="form-select" style="width:auto;padding:.3rem .7rem;font-size:.72rem;" onchange="handleRevenueRangeChange(this.value)">
+                <option value="7d">Last 7 Days</option>
+                <option value="30d">Last 30 Days</option>
+                <option value="3m">Last 3 Months</option>
               </select>
             </div>
             <div class="chart-container">
@@ -5220,9 +5220,23 @@
         }
       }
 
-      async function loadRevenueChart() {
+      function handleRevenueRangeChange(range) {
+        let subText = 'Last 7 days performance';
+        if (range === '30d') subText = 'Last 30 days performance';
+        else if (range === '3m') subText = 'Last 3 months performance';
+        
+        // Find the card-sub element and update it
+        const cardSub = document.querySelector('#revenue-range-select').parentElement.querySelector('.card-sub');
+        if (cardSub) {
+          cardSub.textContent = subText;
+        }
+
+        loadRevenueChart(range);
+      }
+
+      async function loadRevenueChart(range = '7d') {
         if (typeof Chart === 'undefined') return;
-        const data = await apiGet('/api/dashboard/revenue-chart?range=7d');
+        const data = await apiGet(`/api/dashboard/revenue-chart?range=${range}`);
         if (!data || !data.success) return;
         const labels = data.data.map(d => d._id);
         const revenues = data.data.map(d => d.revenue);
