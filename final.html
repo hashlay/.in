@@ -4406,7 +4406,7 @@
     </div>
     <div class="nav-actions">
       <button class="nav-cart-btn" onclick="toggleCart()" aria-label="Cart">
-        🛒
+        <i class="fa-solid fa-cart-shopping"></i>
         <span class="cart-count" id="cart-count">0</span>
       </button>
       <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
@@ -4481,7 +4481,7 @@
           </div>
           <!-- Hero Add to Cart + Buy Now -->
           <div class="hero-btn-row">
-            <button class="hero-add-cart" onclick="heroAddToCart()">Add to Cart 🛒</button>
+            <button class="hero-add-cart" onclick="heroAddToCart()">Add to Cart <i class="fa-solid fa-cart-shopping"></i></button>
             <button class="hero-buy-now" onclick="heroBuyNow()">Buy Now →</button>
           </div>
           <div class="trust-row">
@@ -4831,21 +4831,21 @@
           <p class="section-sub">Have questions? Want to collaborate? We're always happy to hear from our community.</p>
           <div style="margin-top:2.5rem;">
             <div class="contact-info-item">
-              <div class="contact-icon">📧</div>
+              <div class="contact-icon"><i class="fa-solid fa-envelope"></i></div>
               <div>
                 <div class="contact-label">Email</div>
                 <div class="contact-value">contacthashlay@gmail.com</div>
               </div>
             </div>
             <div class="contact-info-item">
-              <div class="contact-icon">📱</div>
+              <div class="contact-icon"><i class="fa-solid fa-phone"></i></div>
               <div>
                 <div class="contact-label">WhatsApp</div>
                 <div class="contact-value">+91 74831 38340</div>
               </div>
             </div>
             <div class="contact-info-item">
-              <div class="contact-icon">📍</div>
+              <div class="contact-icon"><i class="fa-solid fa-location-dot"></i></div>
               <div>
                 <div class="contact-label">Location</div>
                 <div class="contact-value">India 🇮🇳</div>
@@ -5120,7 +5120,7 @@
 
       <!-- Order Success -->
       <div class="order-confirm" id="order-confirm">
-        <div class="confirm-icon">🎉</div>
+        <div class="confirm-icon"><i class="fa-solid fa-party-horn"></i></div>
         <div class="confirm-title">ORDER PLACED!</div>
         <div class="confirm-sub">Thank you for your Hashlay order! You'll receive a confirmation on WhatsApp & email
           shortly. Estimated delivery: 3–5 business days.</div>
@@ -5143,7 +5143,7 @@
           style="width:100%;display:flex;align-items:center;justify-content:center;padding:3rem;">
           <div style="max-width:360px;width:100%;text-align:center;">
             <div style="font-size:3rem;margin-bottom:1rem;">🔐</div>
-            <div class="admin-login-title">ADMIN LOGIN</div>
+            <div class="admin-login-title"><i class="fa-solid fa-lock"></i> ADMIN LOGIN</div>
             <div class="form-group" style="text-align:left;">
               <label>Username</label>
               <input type="text" class="form-input" id="admin-user" placeholder="admin" />
@@ -5159,16 +5159,15 @@
         </div>
         <div id="admin-dashboard" style="display:none;width:100%;overflow:hidden;flex:1;">
           <div class="admin-sidebar">
-            <button class="admin-nav-item active" onclick="switchAdminTab('products', this)">📦 Products</button>
-            <button class="admin-nav-item" onclick="switchAdminTab('orders', this)">🛒 Orders</button>
-            <button class="admin-nav-item" onclick="switchAdminTab('reviews', this)">⭐ Reviews</button>
-            <button class="admin-nav-item" onclick="switchAdminTab('users', this)">👤 Users</button>
-            <button class="admin-nav-item" style="margin-top:auto;color:#ff6666;" onclick="adminLogout()">🚪
-              Logout</button>
+            <button class="admin-nav-item active" onclick="switchAdminTab('products', this)"><i class="fa-solid fa-box"></i> Products</button>
+            <button class="admin-nav-item" onclick="switchAdminTab('orders', this)"><i class="fa-solid fa-cart-shopping"></i> Orders</button>
+            <button class="admin-nav-item" onclick="switchAdminTab('reviews', this)"><i class="fa-solid fa-star"></i> Reviews</button>
+            <button class="admin-nav-item" onclick="switchAdminTab('users', this)"><i class="fa-solid fa-users"></i> Users</button>
+            <button class="admin-nav-item" style="margin-top:auto;color:#ff6666;" onclick="adminLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
           </div>
           <div class="admin-content">
             <div class="admin-panel active" id="admin-products">
-              <h4>MANAGE PRODUCTS</h4>
+              <h4><i class="fa-solid fa-box"></i> MANAGE PRODUCTS</h4>
               <table class="admin-table">
                 <thead>
                   <tr>
@@ -5182,7 +5181,7 @@
               </table>
             </div>
             <div class="admin-panel" id="admin-orders">
-              <h4>MANAGE ORDERS</h4>
+              <h4><i class="fa-solid fa-cart-shopping"></i> MANAGE ORDERS</h4>
               <table class="admin-table">
                 <thead>
                   <tr>
@@ -5196,11 +5195,11 @@
               </table>
             </div>
             <div class="admin-panel" id="admin-reviews">
-              <h4>MANAGE REVIEWS</h4>
+              <h4><i class="fa-solid fa-star"></i> MANAGE REVIEWS</h4>
               <div id="admin-reviews-list"></div>
             </div>
             <div class="admin-panel" id="admin-users">
-              <h4>REGISTERED USERS</h4>
+              <h4><i class="fa-solid fa-users"></i> REGISTERED USERS</h4>
               <table class="admin-table">
                 <thead>
                   <tr>
@@ -5313,7 +5312,7 @@
 
       <!-- Form -->
       <div id="notify-form-content">
-        <div class="notify-icon">🚗</div>
+        <div class="notify-icon"><i class="fa-solid fa-car"></i></div>
         <div class="notify-title">CAR CARE LINE</div>
         <div class="notify-sub">Be the first to know when our premium Car Care line launches. We'll notify you the
           moment it's live!</div>
@@ -5336,13 +5335,13 @@
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-top:1.2rem;">
           <button class="btn-outline" onclick="closeNotifyMe()">Close</button>
-          <button class="btn-primary" onclick="submitNotifyMe()">Notify Me 🔔</button>
+          <button class="btn-primary" onclick="submitNotifyMe()">Notify Me <i class="fa-solid fa-bell"></i></button>
         </div>
       </div>
 
       <!-- Success State -->
       <div class="notify-success" id="notify-success">
-        <div class="notify-success-icon">🎉</div>
+        <div class="notify-success-icon"><i class="fa-solid fa-party-horn"></i></div>
         <div class="notify-success-title">YOU'RE ON THE LIST!</div>
         <div class="notify-success-sub">Thank you! We'll notify you when the car care line launches. Stay tuned!</div>
         <button class="btn-primary" style="margin-top:1.5rem;width:100%;" onclick="closeNotifyMe()">Done</button>
@@ -5355,7 +5354,7 @@
     <div class="pay-fail-box" id="pay-fail-box">
       <div class="pay-fail-top-line"></div>
       <button class="pay-fail-close" onclick="closePayFailPopup()">✕</button>
-      <div class="pay-fail-icon">😔</div>
+      <div class="pay-fail-icon"><i class="fa-solid fa-face-frown"></i></div>
       <div class="pay-fail-title">SORRY FOR THE INCONVENIENCE</div>
       <div class="pay-fail-msg" id="pay-fail-msg">
         Your payment could not be processed. Don't worry — your cart is safe!<br/><br/>
@@ -5390,19 +5389,19 @@
   <div id="floating-btns">
     <!-- FAQ Button -->
     <button class="float-btn float-faq" onclick="openFaqPopup()" title="FAQ">
-      ❓
+      <i class="fa-solid fa-question"></i>
       <span class="float-btn-tooltip">FAQ</span>
     </button>
     <!-- AI Chat Button -->
     <button class="float-btn float-ai" onclick="toggleAiChat()" title="AI Assistant" id="ai-chat-toggle-btn">
-      🤖
+      <i class="fa-solid fa-robot"></i>
       <span class="float-btn-tooltip">AI Help</span>
     </button>
     <!-- WhatsApp Button -->
     <a class="float-btn float-wa"
       href="https://wa.me/917483138340?text=Hi%20Hashlay!%20I%20have%20a%20question%20about%20your%20products."
       target="_blank" title="WhatsApp">
-      💬
+      <i class="fa-brands fa-whatsapp"></i>
       <span class="float-btn-tooltip">WhatsApp</span>
     </a>
   </div>
@@ -5410,7 +5409,7 @@
   <!-- ─── AI CHAT POPUP (Task 10) ──────────────────────────── -->
   <div id="ai-chat-popup">
     <div class="chat-header">
-      <div class="chat-avatar">🤖</div>
+      <div class="chat-avatar"><i class="fa-solid fa-robot"></i></div>
       <div class="chat-header-info">
         <h4>Hashlay Assistant</h4>
         <span>● Online · Replies instantly</span>

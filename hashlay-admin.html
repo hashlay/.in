@@ -2501,6 +2501,7 @@
       color: var(--white);
     }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
 <body>
@@ -2551,32 +2552,32 @@
 
       <nav class="sidebar-nav">
         <div class="sidebar-section-label">Main</div>
-        <div class="nav-item active" onclick="goPage('dashboard',this)"><span class="nav-icon">📊</span>Dashboard</div>
-        <div class="nav-item" onclick="goPage('orders',this)"><span class="nav-icon">🛒</span>Orders<span
+        <div class="nav-item active" onclick="goPage('dashboard',this)"><i class="nav-icon fa-solid fa-chart-line"></i>Dashboard</div>
+        <div class="nav-item" onclick="goPage('orders',this)"><i class="nav-icon fa-solid fa-cart-shopping"></i>Orders<span
             class="nav-badge" id="pending-badge">4</span></div>
-        <div class="nav-item" onclick="goPage('waorders',this)"><span class="nav-icon">📱</span>WhatsApp Orders</div>
-        <div class="nav-item" onclick="goPage('products',this)"><span class="nav-icon">📦</span>Products</div>
-        <div class="nav-item" onclick="goPage('customers',this)"><span class="nav-icon">👥</span>Customers</div>
-        <div class="nav-item" onclick="goPage('reviews',this)"><span class="nav-icon">⭐</span>Reviews<span
+        <div class="nav-item" onclick="goPage('waorders',this)"><i class="nav-icon fa-brands fa-whatsapp"></i>WhatsApp Orders</div>
+        <div class="nav-item" onclick="goPage('products',this)"><i class="nav-icon fa-solid fa-box"></i>Products</div>
+        <div class="nav-item" onclick="goPage('customers',this)"><i class="nav-icon fa-solid fa-users"></i>Customers</div>
+        <div class="nav-item" onclick="goPage('reviews',this)"><i class="nav-icon fa-solid fa-star"></i>Reviews<span
             class="nav-badge" id="review-badge">3</span></div>
 
         <div class="sidebar-section-label" style="margin-top:.6rem;">Growth</div>
-        <div class="nav-item" onclick="goPage('marketing',this)"><span class="nav-icon">🎯</span>Marketing</div>
-        <div class="nav-item" onclick="goPage('analytics',this)"><span class="nav-icon">📈</span>Analytics</div>
+        <div class="nav-item" onclick="goPage('marketing',this)"><i class="nav-icon fa-solid fa-bullseye"></i>Marketing</div>
+        <div class="nav-item" onclick="goPage('analytics',this)"><i class="nav-icon fa-solid fa-chart-pie"></i>Analytics</div>
 
         <div class="sidebar-section-label" style="margin-top:.6rem;">Content</div>
-        <div class="nav-item" onclick="goPage('faq',this)"><span class="nav-icon">❓</span>FAQ Manager</div>
-        <div class="nav-item" onclick="goPage('chatbot',this)"><span class="nav-icon">🤖</span>AI Chatbot</div>
-        <div class="nav-item" onclick="goPage('notify',this)"><span class="nav-icon">🔔</span>Notify List</div>
-        <div class="nav-item" onclick="goPage('contact',this)"><span class="nav-icon">✉️</span>Messages</div>
+        <div class="nav-item" onclick="goPage('faq',this)"><i class="nav-icon fa-solid fa-circle-question"></i>FAQ Manager</div>
+        <div class="nav-item" onclick="goPage('chatbot',this)"><i class="nav-icon fa-solid fa-robot"></i>AI Chatbot</div>
+        <div class="nav-item" onclick="goPage('notify',this)"><i class="nav-icon fa-solid fa-bell"></i>Notify List</div>
+        <div class="nav-item" onclick="goPage('contact',this)"><i class="nav-icon fa-solid fa-envelope"></i>Messages</div>
 
         <div class="sidebar-section-label" style="margin-top:.6rem;">System</div>
-        <div class="nav-item" onclick="goPage('notifications',this)"><span class="nav-icon">🔔</span>Notifications<span
+        <div class="nav-item" onclick="goPage('notifications',this)"><i class="nav-icon fa-solid fa-bell"></i>Notifications<span
             class="nav-badge" id="notif-nav-badge" style="display:none;">0</span></div>
-        <div class="nav-item" onclick="goPage('activitylog',this)"><span class="nav-icon">📋</span>Activity Log</div>
-        <div class="nav-item" onclick="goPage('settings',this)"><span class="nav-icon">⚙️</span>Settings</div>
-        <div class="nav-item" onclick="goPage('admins',this)"><span class="nav-icon">👤</span>Admin Users</div>
-        <div class="nav-item danger" onclick="doLogout()"><span class="nav-icon">🚪</span>Logout</div>
+        <div class="nav-item" onclick="goPage('activitylog',this)"><i class="nav-icon fa-solid fa-clipboard-list"></i>Activity Log</div>
+        <div class="nav-item" onclick="goPage('settings',this)"><i class="nav-icon fa-solid fa-gear"></i>Settings</div>
+        <div class="nav-item" onclick="goPage('admins',this)"><i class="nav-icon fa-solid fa-user-shield"></i>Admin Users</div>
+        <div class="nav-item danger" onclick="doLogout()"><i class="nav-icon fa-solid fa-arrow-right-from-bracket"></i>Logout</div>
       </nav>
 
       <div class="sidebar-footer">
@@ -2606,7 +2607,7 @@
             <input class="topbar-search" type="text" placeholder="Global search…" />
           </div>
           <button class="notif-btn" onclick="goPage('notifications',null)" title="Notifications"
-            style="position:relative;">🔔<span class="notif-count" id="notif-count-badge">0</span></button>
+            style="position:relative;"><i class="fa-solid fa-bell"></i><span class="notif-count" id="notif-count-badge">0</span></button>
           <button class="topbar-btn primary" onclick="goPage('products',null);openAddProduct()">+ Add Product</button>
         </div>
       </div>
@@ -2617,7 +2618,7 @@
       <div class="page active" id="page-dashboard">
         <div class="stats-grid">
           <div class="stat-card">
-            <div class="stat-icon">💰</div>
+            <div class="stat-icon"><i class="fa-solid fa-wallet"></i></div>
             <div class="stat-label">Today's Revenue</div>
             <div class="stat-value" id="stat-today-revenue"
               style="background:linear-gradient(135deg,#fff,var(--blue-lt));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
@@ -2625,45 +2626,45 @@
             <div class="stat-change up" id="stat-change-today-revenue">▲</div>
             <div class="stat-actions">
               <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
-                <span class="stat-btn-icon">🔄</span> Refresh
+                <i class="stat-btn-icon fa-solid fa-rotate-right"></i> Refresh
               </button>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">🛒</div>
+            <div class="stat-icon"><i class="fa-solid fa-cart-shopping"></i></div>
             <div class="stat-label">Today's Orders</div>
             <div class="stat-value" id="stat-today-orders">0</div>
             <div class="stat-change up" id="stat-change-today-orders">▲</div>
             <div class="stat-actions">
               <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
-                <span class="stat-btn-icon">🔄</span> Refresh
+                <i class="stat-btn-icon fa-solid fa-rotate-right"></i> Refresh
               </button>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">📦</div>
+            <div class="stat-icon"><i class="fa-solid fa-box-open"></i></div>
             <div class="stat-label">Total Products</div>
             <div class="stat-value" id="stat-total-products">0</div>
             <div class="stat-change" style="color:var(--gray);">Products catalog</div>
             <div class="stat-actions">
               <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
-                <span class="stat-btn-icon">🔄</span> Refresh
+                <i class="stat-btn-icon fa-solid fa-rotate-right"></i> Refresh
               </button>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">👥</div>
+            <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
             <div class="stat-label">Total Customers</div>
             <div class="stat-value" id="stat-total-customers">0</div>
             <div class="stat-change up">Total registered</div>
             <div class="stat-actions">
               <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
-                <span class="stat-btn-icon">🔄</span> Refresh
+                <i class="stat-btn-icon fa-solid fa-rotate-right"></i> Refresh
               </button>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">📊</div>
+            <div class="stat-icon"><i class="fa-solid fa-chart-line"></i></div>
             <div class="stat-label">Total Revenue</div>
             <div class="stat-value" id="stat-total-revenue"
               style="background:linear-gradient(135deg,#fff,var(--blue-lt));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
@@ -2671,38 +2672,38 @@
             <div class="stat-change up">Lifetime revenue</div>
             <div class="stat-actions">
               <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
-                <span class="stat-btn-icon">🔄</span> Refresh
+                <i class="stat-btn-icon fa-solid fa-rotate-right"></i> Refresh
               </button>
               <button class="stat-btn stat-btn-reset" onclick="openResetModal('totalRevenue')" title="Reset to Zero">
-                <span class="stat-btn-icon">⚠️</span> Reset
+                <i class="stat-btn-icon fa-solid fa-triangle-exclamation"></i> Reset
               </button>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">⏳</div>
+            <div class="stat-icon"><i class="fa-solid fa-hourglass-half"></i></div>
             <div class="stat-label">Pending Orders</div>
             <div class="stat-value" id="stat-pending-orders" style="color:var(--warning);">0</div>
             <div class="stat-change" style="color:var(--warning);">Needs attention</div>
             <div class="stat-actions">
               <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
-                <span class="stat-btn-icon">🔄</span> Refresh
+                <i class="stat-btn-icon fa-solid fa-rotate-right"></i> Refresh
               </button>
               <button class="stat-btn stat-btn-reset" onclick="openResetModal('pendingOrders')" title="Reset to Zero">
-                <span class="stat-btn-icon">⚠️</span> Reset
+                <i class="stat-btn-icon fa-solid fa-triangle-exclamation"></i> Reset
               </button>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">✅</div>
+            <div class="stat-icon"><i class="fa-solid fa-circle-check"></i></div>
             <div class="stat-label">Delivered Orders</div>
             <div class="stat-value" id="stat-delivered" style="color:var(--success);">0</div>
             <div class="stat-change up">Successfully delivered</div>
             <div class="stat-actions">
               <button class="stat-btn" onclick="refreshDashboardStat(this)" title="Refresh">
-                <span class="stat-btn-icon">🔄</span> Refresh
+                <i class="stat-btn-icon fa-solid fa-rotate-right"></i> Refresh
               </button>
               <button class="stat-btn stat-btn-reset" onclick="openResetModal('deliveredOrders')" title="Reset to Zero">
-                <span class="stat-btn-icon">⚠️</span> Reset
+                <i class="stat-btn-icon fa-solid fa-triangle-exclamation"></i> Reset
               </button>
             </div>
           </div>
@@ -2733,22 +2734,22 @@
         <!-- Quick Actions -->
         <div class="quick-actions">
           <div class="qa-card" onclick="goPage('products',null);openAddProduct()">
-            <div class="qa-icon">➕</div>
+            <div class="qa-icon"><i class="fa-solid fa-plus"></i></div>
             <div class="qa-label">Add Product</div>
             <div class="qa-sub">Upload new item to store</div>
           </div>
           <div class="qa-card" onclick="goPage('marketing',null);openAddCoupon()">
-            <div class="qa-icon">🎟</div>
+            <div class="qa-icon"><i class="fa-solid fa-ticket"></i></div>
             <div class="qa-label">Create Coupon</div>
             <div class="qa-sub">Launch discount codes</div>
           </div>
           <div class="qa-card" onclick="goPage('marketing',null)">
-            <div class="qa-icon">📣</div>
+            <div class="qa-icon"><i class="fa-solid fa-bullhorn"></i></div>
             <div class="qa-label">Send Campaign</div>
             <div class="qa-sub">Reach your customers</div>
           </div>
           <div class="qa-card" onclick="goPage('orders',null)">
-            <div class="qa-icon">📋</div>
+            <div class="qa-icon"><i class="fa-solid fa-clipboard-list"></i></div>
             <div class="qa-label">Manage Orders</div>
             <div class="qa-sub">Update order statuses</div>
           </div>
@@ -2835,8 +2836,8 @@
             <div class="section-hdr-sub">Manage and track all customer orders</div>
           </div>
           <div class="section-hdr-right">
-            <button class="btn btn-secondary btn-sm" onclick="openExportModal('orders','csv')">📥 Export CSV</button>
-            <button class="btn btn-secondary btn-sm" onclick="openExportModal('orders','excel')">📊 Export
+            <button class="btn btn-secondary btn-sm" onclick="openExportModal('orders','csv')"><i class="fa-solid fa-download"></i> Export CSV</button>
+            <button class="btn btn-secondary btn-sm" onclick="openExportModal('orders','excel')"><i class="fa-solid fa-file-excel"></i> Export
               Excel</button>
           </div>
         </div>
@@ -2883,11 +2884,11 @@
       <div class="page" id="page-waorders">
         <div class="section-hdr">
           <div class="section-hdr-left">
-            <div class="section-hdr-title">📱 WHATSAPP ORDERS</div>
+            <div class="section-hdr-title"><i class="fa-brands fa-whatsapp"></i> WHATSAPP ORDERS</div>
             <div class="section-hdr-sub">Manage orders received via WhatsApp</div>
           </div>
           <div class="section-hdr-right">
-            <button class="btn btn-secondary btn-sm" onclick="openWaScreenshotModal()">📸 Scan Screenshot</button>
+            <button class="btn btn-secondary btn-sm" onclick="openWaScreenshotModal()"><i class="fa-solid fa-camera"></i> Scan Screenshot</button>
             <button class="btn btn-primary btn-sm" onclick="openWaOrderModal()">+ Add Order</button>
           </div>
         </div>
@@ -2960,7 +2961,7 @@
           </div>
           <div class="modal-footer">
             <button class="btn btn-secondary" onclick="closeModal('modal-wa-screenshot')">Cancel</button>
-            <button class="btn btn-primary" id="wa-parse-btn" onclick="parseWaScreenshot()">🤖 Extract Details</button>
+            <button class="btn btn-primary" id="wa-parse-btn" onclick="parseWaScreenshot()"><i class="fa-solid fa-robot"></i> Extract Details</button>
           </div>
         </div>
       </div>
@@ -3145,7 +3146,7 @@
             <div class="section-hdr-sub">Your customer database</div>
           </div>
           <div class="section-hdr-right">
-            <button class="btn btn-secondary btn-sm" onclick="openExportModal('customers','csv')">📥 Export CSV</button>
+            <button class="btn btn-secondary btn-sm" onclick="openExportModal('customers','csv')"><i class="fa-solid fa-download"></i> Export CSV</button>
           </div>
         </div>
         <div class="filters-row">
@@ -3283,7 +3284,7 @@
             <div class="stat-change up">Based on total customers</div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">🛒</div>
+            <div class="stat-icon"><i class="fa-solid fa-cart-shopping"></i></div>
             <div class="stat-label">Cart Abandonment</div>
             <div class="stat-value" id="analytics-cart-abandon">62%</div>
             <div class="stat-change down">▼ needs work</div>
@@ -3424,7 +3425,7 @@
           <div class="section-hdr-title">CAR CARE NOTIFY LIST</div>
           <div class="section-hdr-sub">Customers waiting for Car Care product launch</div>
           <div class="section-hdr-right">
-            <button class="btn btn-secondary btn-sm" onclick="openExportModal('notify','csv')">📥 Export CSV</button>
+            <button class="btn btn-secondary btn-sm" onclick="openExportModal('notify','csv')"><i class="fa-solid fa-download"></i> Export CSV</button>
           </div>
         </div>
         <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.5rem;">
@@ -3504,7 +3505,7 @@
             <div class="section-hdr-sub">Customer inquiries from the website</div>
           </div>
           <div class="section-hdr-right">
-            <button class="btn btn-secondary btn-sm" onclick="openExportModal('contacts','csv')">📥 Export CSV</button>
+            <button class="btn btn-secondary btn-sm" onclick="openExportModal('contacts','csv')"><i class="fa-solid fa-download"></i> Export CSV</button>
           </div>
         </div>
         <div class="card">
