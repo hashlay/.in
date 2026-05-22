@@ -110,6 +110,8 @@ app.use('/api/razorpay', apiLimiter, require('./routes/razorpay'));
 app.use('/api/dashboard', apiLimiter, require('./routes/dashboard'));
 app.use('/api/sync', apiLimiter, require('./routes/sync'));
 app.use('/api/whatsapp-orders', apiLimiter, require('./routes/whatsappOrders'));
+app.use('/api/customer-auth', authLimiter, require('./routes/customerAuth'));
+app.use('/api/chat', apiLimiter, require('./routes/chat'));
 
 // ── Health check (lightweight — no DB, returns cache stats) ─────
 app.get('/api/health', (req, res) => {
@@ -131,6 +133,7 @@ app.get('/api/ping', (req, res) => {
 // ── Serve Frontend HTML ──────────────────────────────────────────
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'final.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'hashlay-admin.html')));
+app.get('/portal', (req, res) => res.sendFile(path.join(__dirname, 'portal.html')));
 
 app.get('/:page(privacy|terms|shipping|returns|cookies)(.html)?', (req, res) => {
   res.sendFile(path.join(__dirname, `${req.params.page}.html`));
