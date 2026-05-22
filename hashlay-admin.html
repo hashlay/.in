@@ -5502,6 +5502,7 @@
         <div style="display:flex;gap:.3rem;">
           <button class="btn btn-secondary btn-sm btn-icon" onclick="viewOrder('${o._id}')" title="View">👁</button>
           <button class="btn btn-secondary btn-sm btn-icon" onclick="openStatusModal('${o._id}')" title="Update Status">✏️</button>
+          <button class="btn btn-secondary btn-sm btn-icon" style="color:var(--danger);border-color:rgba(239,68,68,0.2);" onclick="deleteOrder('${o._id}')" title="Delete">🗑️</button>
         </div>
       </td>
     </tr>
@@ -5545,6 +5546,17 @@
           toast('Failed to update order', 'error');
         }
         closeModal('modal-status');
+      }
+
+      async function deleteOrder(id) {
+        if (!confirm('Are you sure you want to delete this order?')) return;
+        const result = await apiDelete('/api/orders/' + id);
+        if (result && result.success) {
+          toast('Order deleted successfully', 'success');
+          loadOrders(CURRENT_ORDERS_FILTER, document.getElementById('order-search')?.value || '');
+        } else {
+          toast('Failed to delete order', 'error');
+        }
       }
 
       async function updateOrderStatusInline(id, newStatus) {
@@ -5861,7 +5873,10 @@
       </span></td>
       <td class="text-muted">${new Date(c.createdAt).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}</td>
       <td>
-        <button class="btn btn-secondary btn-sm" onclick="viewCustomerOrders('${c.phone || c.email}')">View Orders</button>
+        <div style="display:flex;gap:.3rem;">
+          <button class="btn btn-secondary btn-sm" onclick="viewCustomerOrders('${c.phone || c.email}')">View Orders</button>
+          <button class="btn btn-secondary btn-sm btn-icon" style="color:var(--danger);border-color:rgba(239,68,68,0.2);" onclick="deleteCustomer('${c._id}')" title="Delete">🗑️</button>
+        </div>
       </td>
     </tr>
   `).join('') : `<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--gray);">No customers found</td></tr>`;
@@ -5871,6 +5886,20 @@
         document.querySelectorAll('#page-customers .filter-tab').forEach(t => t.classList.remove('active'));
         if (el) el.classList.add('active');
         loadCustomers(filter);
+      }
+
+      async function deleteCustomer(id) {
+        if (!confirm('Are you sure you want to delete this customer?')) return;
+        const result = await apiDelete('/api/customers/' + id);
+        if (result && result.success) {
+          toast('Customer deleted successfully', 'success');
+          // Find the active filter and reload
+          const activeTab = document.querySelector('#page-customers .filter-tab.active');
+          const filter = activeTab ? activeTab.getAttribute('onclick').match(/'([^']+)'/)?.[1] : null;
+          loadCustomers(filter || null);
+        } else {
+          toast('Failed to delete customer', 'error');
+        }
       }
 
       /* ═══════════════════════════════════════════════════
@@ -6122,6 +6151,7 @@
         <div style="display:flex;gap:.3rem;">
           <button class="btn btn-secondary btn-sm btn-icon" onclick="viewOrder('${o._id}')" title="View">👁</button>
           <button class="btn btn-secondary btn-sm btn-icon" onclick="openWaStatusModal('${o._id}')" title="Update Status">✏️</button>
+          <button class="btn btn-secondary btn-sm btn-icon" style="color:var(--danger);border-color:rgba(239,68,68,0.2);" onclick="deleteWaOrder('${o._id}')" title="Delete">🗑️</button>
         </div>
       </td>
     </tr>
@@ -6137,6 +6167,17 @@
 
       function searchWaOrders(q) {
         loadWaOrders(CURRENT_WA_ORDERS_FILTER, q);
+      }
+
+      async function deleteWaOrder(id) {
+        if (!confirm('Are you sure you want to delete this WhatsApp order?')) return;
+        const result = await apiDelete('/api/orders/' + id);
+        if (result && result.success) {
+          toast('WhatsApp order deleted successfully', 'success');
+          loadWaOrders(CURRENT_WA_ORDERS_FILTER, document.getElementById('wa-order-search')?.value || '');
+        } else {
+          toast('Failed to delete WhatsApp order', 'error');
+        }
       }
 
       function openWaStatusModal(id) {
