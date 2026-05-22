@@ -40,10 +40,6 @@
       "dest": "/$0"
     },
     {
-      "src": "/portal",
-      "dest": "/portal.html"
-    },
-    {
       "src": "/",
       "dest": "/final.html"
     },
