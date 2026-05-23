@@ -191,7 +191,7 @@ let _timerInterval = null, _timerEnd = 0, _resendReady = false;
 (async function init(){
   // Check if already logged in
   try {
-    const r = await fetch(API+'/api/customer/auth/me',{credentials:'include'});
+    const r = await fetch(API+'/api/customer/auth/me?t=' + Date.now(),{credentials:'include'});
     const d = await r.json();
     if(d.loggedIn) return location.href='/?openAccount=1';
   } catch{}

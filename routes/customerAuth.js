@@ -461,6 +461,10 @@ router.post('/logout', customerAuth, async (req, res) => {
 // ═══════════════════════════════════════════════════════════════════
 
 router.get('/me', async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  
   const token = req.cookies?.customer_token;
 
   if (!token) {

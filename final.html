@@ -8060,7 +8060,7 @@
 
     async function checkPortalAuth() {
       try {
-        const r = await fetch(API_BASE + '/api/customer/auth/me', {credentials: 'include'});
+        const r = await fetch(API_BASE + '/api/customer/auth/me?t=' + Date.now(), {credentials: 'include'});
         const d = await r.json();
         if(!d.loggedIn) return false;
         portalCustomer = d.customer;
