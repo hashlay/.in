@@ -1,10 +1,11 @@
 require('dotenv').config();
 require('express-async-errors');
 
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const compression = require('compression');
+const express      = require('express');
+const cors         = require('cors');
+const path         = require('path');
+const compression  = require('compression');
+const cookieParser = require('cookie-parser');
 
 const connectDB = require('./config/db');
 const { stats: cacheStats } = require('./config/cache');
@@ -23,6 +24,7 @@ app.use(helmet({
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
+  process.env.CLIENT_URL,
   'https://hashlay-in.vercel.app',
 ].filter(Boolean);
 const isDev = process.env.NODE_ENV !== 'production';
@@ -45,6 +47,7 @@ const xssClean = require('xss-clean');
 app.use(mongoSanitize());
 app.use(xssClean());
 app.use(compression());
+app.use(cookieParser());
 
 // Skip morgan in production serverless — it adds latency and Vercel has its own logging
 if (isDev) {
@@ -111,6 +114,12 @@ app.use('/api/dashboard', apiLimiter, require('./routes/dashboard'));
 app.use('/api/sync', apiLimiter, require('./routes/sync'));
 app.use('/api/whatsapp-orders', apiLimiter, require('./routes/whatsappOrders'));
 
+// ── Customer Auth Portal ─────────────────────────────────────────
+app.use('/api/customer/auth', require('./routes/customerAuth'));
+app.use('/api/admin/auth-settings', apiLimiter, require('./routes/adminAuthSettings'));
+app.use('/api/customer/portal', apiLimiter, require('./routes/customerPortal'));
+app.use('/api/admin/chat', apiLimiter, require('./routes/adminChat'));
+
 // ── Health check (lightweight — no DB, returns cache stats) ─────
 app.get('/api/health', (req, res) => {
   res.set('Cache-Control', 'no-store');
@@ -131,6 +140,8 @@ app.get('/api/ping', (req, res) => {
 // ── Serve Frontend HTML ──────────────────────────────────────────
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'final.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'hashlay-admin.html')));
+app.get('/auth', (req, res) => res.sendFile(path.join(__dirname, 'auth.html')));
+app.get('/portal', (req, res) => res.sendFile(path.join(__dirname, 'portal.html')));
 
 app.get('/:page(privacy|terms|shipping|returns|cookies)(.html)?', (req, res) => {
   res.sendFile(path.join(__dirname, `${req.params.page}.html`));
@@ -145,8 +156,41 @@ app.use(errorHandler);
 // ── Local Dev Server ─────────────────────────────────────────────
 if (process.env.NODE_ENV !== 'production' || process.env.FORCE_LISTEN === 'true') {
   const logger = require('./config/logger');
+  const http = require('http');
+  const { Server: SocketServer } = require('socket.io');
   const PORT = process.env.PORT || 5000;
-  const server = app.listen(PORT, () => {
+
+  const server = http.createServer(app);
+
+  // ── Socket.io Setup ──────────────────────────────────────────
+  const io = new SocketServer(server, {
+    cors: { origin: '*', methods: ['GET', 'POST'] },
+  });
+  app.set('io', io);
+
+  io.on('connection', (socket) => {
+    // Customers join their own room
+    socket.on('join_customer', (customerId) => {
+      socket.join('customer_' + customerId);
+    });
+    // Admins join the admin inbox room
+    socket.on('join_admin', () => {
+      socket.join('admin_inbox');
+    });
+    // Admin sends a message to a customer
+    socket.on('admin_message', (data) => {
+      io.to('customer_' + data.customerId).emit('admin_message', data);
+    });
+    // Typing indicators
+    socket.on('customer_typing', (data) => {
+      io.to('admin_inbox').emit('customer_typing', data);
+    });
+    socket.on('admin_typing', (data) => {
+      io.to('customer_' + data.customerId).emit('admin_typing', data);
+    });
+  });
+
+  server.listen(PORT, () => {
     logger.info(`🚀 Hashlay Backend running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
   });
 

@@ -2570,11 +2570,13 @@
         <div class="nav-item" onclick="goPage('chatbot',this)"><i class="nav-icon fa-solid fa-robot"></i>AI Chatbot</div>
         <div class="nav-item" onclick="goPage('notify',this)"><i class="nav-icon fa-solid fa-bell"></i>Notify List</div>
         <div class="nav-item" onclick="goPage('contact',this)"><i class="nav-icon fa-solid fa-envelope"></i>Messages</div>
+        <div class="nav-item" onclick="goPage('supportinbox',this)"><i class="nav-icon fa-solid fa-headset"></i>Support Inbox<span class="nav-badge" id="chat-nav-badge" style="display:none;">0</span></div>
 
         <div class="sidebar-section-label" style="margin-top:.6rem;">System</div>
         <div class="nav-item" onclick="goPage('notifications',this)"><i class="nav-icon fa-solid fa-bell"></i>Notifications<span
             class="nav-badge" id="notif-nav-badge" style="display:none;">0</span></div>
         <div class="nav-item" onclick="goPage('activitylog',this)"><i class="nav-icon fa-solid fa-clipboard-list"></i>Activity Log</div>
+        <div class="nav-item" onclick="goPage('custauth',this)"><i class="nav-icon fa-solid fa-user-lock"></i>Customer Auth</div>
         <div class="nav-item" onclick="goPage('settings',this)"><i class="nav-icon fa-solid fa-gear"></i>Settings</div>
         <div class="nav-item" onclick="goPage('admins',this)"><i class="nav-icon fa-solid fa-user-shield"></i>Admin Users</div>
         <div class="nav-item danger" onclick="doLogout()"><i class="nav-icon fa-solid fa-arrow-right-from-bracket"></i>Logout</div>
@@ -4412,7 +4414,140 @@
       </div>
     </div>
 
+
+    <!-- ── Support Inbox Page ──────────────────────────────────── -->
+    <div class="page" id="page-supportinbox">
+      <div class="section-hdr"><div class="section-hdr-title">SUPPORT INBOX</div><div class="section-hdr-sub">Live chat with customers</div></div>
+      <div id="si-wrap" style="display:flex;gap:1rem;height:calc(100vh - 180px);min-height:400px;">
+        <!-- Left: Conversations -->
+        <div id="si-left" style="width:340px;min-width:280px;background:var(--bg-2);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-lg);display:flex;flex-direction:column;overflow:hidden;">
+          <div style="padding:.8rem;border-bottom:1px solid rgba(255,255,255,.06);">
+            <div style="display:flex;gap:.4rem;margin-bottom:.6rem;">
+              <button class="btn btn-sm si-filter active" data-f="all" onclick="filterSessions('all',this)" style="flex:1;padding:.4rem;font-size:.68rem;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:var(--blue);color:#fff;cursor:pointer;">All</button>
+              <button class="btn btn-sm si-filter" data-f="open" onclick="filterSessions('open',this)" style="flex:1;padding:.4rem;font-size:.68rem;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:transparent;color:var(--gray-lt);cursor:pointer;">Open</button>
+              <button class="btn btn-sm si-filter" data-f="resolved" onclick="filterSessions('resolved',this)" style="flex:1;padding:.4rem;font-size:.68rem;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:transparent;color:var(--gray-lt);cursor:pointer;">Resolved</button>
+            </div>
+            <input class="form-input" type="text" id="si-search" placeholder="Search by email..." oninput="filterSessionSearch()" style="font-size:.78rem;padding:.5rem .7rem;">
+          </div>
+          <div id="si-list" style="flex:1;overflow-y:auto;"></div>
+        </div>
+        <!-- Right: Chat thread -->
+        <div id="si-right" style="flex:1;background:var(--bg-2);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-lg);display:flex;flex-direction:column;overflow:hidden;">
+          <div id="si-thread-hdr" style="padding:.8rem 1rem;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;min-height:52px;">
+            <div id="si-thread-info" style="font-size:.82rem;color:var(--gray);">Select a conversation</div>
+            <div id="si-thread-actions" style="display:none;">
+              <select class="form-select" id="si-status-sel" onchange="changeSessionStatus()" style="font-size:.72rem;padding:.3rem .5rem;border-radius:6px;"></select>
+            </div>
+          </div>
+          <div id="si-msgs" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.4rem;"></div>
+          <div id="si-typing" style="padding:0 1rem;font-size:.7rem;color:var(--gray);font-style:italic;min-height:1.2rem;"></div>
+          <div id="si-input-bar" style="display:none;padding:.6rem;border-top:1px solid rgba(255,255,255,.06);">
+            <div style="display:flex;gap:.4rem;">
+              <textarea id="si-input" rows="1" class="form-input" placeholder="Type a reply..." style="flex:1;resize:none;font-size:.82rem;padding:.6rem;min-height:38px;max-height:100px;"></textarea>
+              <button class="btn btn-primary" onclick="sendAdminReply()" style="padding:.5rem 1rem;white-space:nowrap;"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Customer Auth Settings Page ──────────────────────────── -->
+    <div class="page" id="page-custauth">
+      <div class="section-hdr">
+        <div class="section-hdr-title">CUSTOMER AUTH SETTINGS</div>
+        <div class="section-hdr-sub">Configure customer login, SMTP, SMS gateway & portal features</div>
+      </div>
+
+      <!-- Warning Banners -->
+      <div id="ca-warnings"></div>
+
+      <!-- Login Method Toggles -->
+      <div class="card" style="margin-bottom:1.2rem;">
+        <div class="card-header">
+          <div><div class="card-title"><i class="fa-solid fa-right-to-bracket" style="margin-right:.5rem;color:var(--blue-lt);"></i>Login Methods</div>
+          <div class="card-sub">Control how customers can log in</div></div>
+        </div>
+        <div id="ca-toggle-error" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:.6rem 1rem;font-size:.78rem;color:#f87171;margin-bottom:.8rem;"></div>
+        <div style="display:flex;flex-wrap:wrap;gap:2rem;">
+          <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="ca-email-login" onchange="saveCaToggles()"><span class="toggle-slider"></span></label><span class="toggle-label">Allow Email Login</span></div>
+          <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="ca-phone-login" onchange="saveCaToggles()"><span class="toggle-slider"></span></label><span class="toggle-label">Allow Phone Number Login</span></div>
+        </div>
+        <div id="ca-toggles-updated" style="font-size:.68rem;color:var(--gray);margin-top:.6rem;"></div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:1.2rem;">
+        <!-- SMTP Config -->
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title"><i class="fa-solid fa-envelope" style="margin-right:.5rem;color:var(--blue-lt);"></i>Customer Auth SMTP</div>
+            <div class="card-sub">Email gateway for OTP delivery</div></div>
+          </div>
+          <div class="form-group"><label class="form-label">SMTP Host</label><input class="form-input" type="text" id="ca-smtp-host" placeholder="smtp.gmail.com"></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Port</label><input class="form-input" type="number" id="ca-smtp-port" placeholder="587" value="587"></div>
+            <div class="form-group"><label class="form-label">Encryption</label><select class="form-select" id="ca-smtp-enc"><option value="TLS">TLS</option><option value="SSL">SSL</option></select></div>
+          </div>
+          <div class="form-group"><label class="form-label">Username</label><input class="form-input" type="text" id="ca-smtp-user" placeholder="you@example.com"></div>
+          <div class="form-group"><label class="form-label">Password</label>
+            <div style="position:relative;"><input class="form-input" type="password" id="ca-smtp-pass" placeholder="••••••" style="padding-right:3rem;">
+            <button type="button" onclick="togglePassVis('ca-smtp-pass',this)" style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-lt);font-size:.8rem;cursor:pointer;"><i class="fa-solid fa-eye"></i></button></div>
+            <div id="ca-smtp-pass-hint" style="font-size:.68rem;color:var(--gray);margin-top:.2rem;display:none;">Leave blank to keep existing password</div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">From Name</label><input class="form-input" type="text" id="ca-smtp-fname" placeholder="Hashlay"></div>
+            <div class="form-group"><label class="form-label">From Email</label><input class="form-input" type="email" id="ca-smtp-femail" placeholder="noreply@hashlay.in"></div>
+          </div>
+          <div style="display:flex;gap:.6rem;margin-top:.4rem;">
+            <button class="btn btn-primary" id="ca-smtp-save-btn" onclick="saveCaSmtp()">Save SMTP</button>
+            <button class="btn btn-secondary" id="ca-smtp-test-btn" onclick="testCaSmtp()"><i class="fa-solid fa-paper-plane" style="margin-right:.3rem;"></i>Test Connection</button>
+          </div>
+          <div id="ca-smtp-result" style="font-size:.78rem;margin-top:.6rem;display:none;border-radius:8px;padding:.5rem .8rem;"></div>
+        </div>
+
+        <!-- SMS Config -->
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title"><i class="fa-solid fa-comment-sms" style="margin-right:.5rem;color:var(--blue-lt);"></i>SMS Gateway</div>
+            <div class="card-sub">Fast2SMS or compatible gateway for OTP</div></div>
+          </div>
+          <div class="form-group"><label class="form-label">API Key</label>
+            <div style="position:relative;"><input class="form-input" type="password" id="ca-sms-key" placeholder="••••••" style="padding-right:3rem;">
+            <button type="button" onclick="togglePassVis('ca-sms-key',this)" style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-lt);font-size:.8rem;cursor:pointer;"><i class="fa-solid fa-eye"></i></button></div>
+            <div id="ca-sms-key-hint" style="font-size:.68rem;color:var(--gray);margin-top:.2rem;display:none;">Leave blank to keep existing key</div>
+          </div>
+          <div class="form-group"><label class="form-label">Sender ID</label><input class="form-input" type="text" id="ca-sms-sender" placeholder="FSTSMS"></div>
+          <div class="form-group"><label class="form-label">Gateway URL</label><input class="form-input" type="text" id="ca-sms-url" placeholder="https://www.fast2sms.com/dev/bulkV2"></div>
+          <div class="form-group"><label class="form-label">Route / Template ID</label><input class="form-input" type="text" id="ca-sms-route" placeholder="v3"></div>
+          <div style="display:flex;gap:.6rem;margin-top:.4rem;">
+            <button class="btn btn-primary" id="ca-sms-save-btn" onclick="saveCaSms()">Save SMS</button>
+            <button class="btn btn-secondary" id="ca-sms-test-btn" onclick="showSmsTest()"><i class="fa-solid fa-paper-plane" style="margin-right:.3rem;"></i>Send Test SMS</button>
+          </div>
+          <div id="ca-sms-test-row" style="display:none;margin-top:.6rem;">
+            <div style="display:flex;gap:.5rem;">
+              <input class="form-input" type="tel" id="ca-sms-test-phone" placeholder="+91XXXXXXXXXX" style="flex:1;margin-bottom:0;">
+              <button class="btn btn-primary" id="ca-sms-send-btn" onclick="testCaSms()">Send</button>
+            </div>
+          </div>
+          <div id="ca-sms-result" style="font-size:.78rem;margin-top:.6rem;display:none;border-radius:8px;padding:.5rem .8rem;"></div>
+        </div>
+      </div>
+
+      <!-- Portal Feature Toggles -->
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title"><i class="fa-solid fa-puzzle-piece" style="margin-right:.5rem;color:var(--blue-lt);"></i>Portal Features</div>
+          <div class="card-sub">Enable or disable customer portal sections</div></div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:2rem;">
+          <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="ca-feat-orders" onchange="saveCaToggles()"><span class="toggle-slider"></span></label><span class="toggle-label">My Orders</span></div>
+          <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="ca-feat-track" onchange="saveCaToggles()"><span class="toggle-slider"></span></label><span class="toggle-label">Track Order</span></div>
+          <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="ca-feat-chat" onchange="saveCaToggles()"><span class="toggle-slider"></span></label><span class="toggle-label">Live Support Chat</span></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ─────────────────────────────────────────────────── SCRIPT -->
+    <script src="/socket.io/socket.io.js"></script>
     <script>
       /* ═══════════════════════════════════════════════════
          CONFIG & STATE
@@ -4955,7 +5090,7 @@
         analytics: 'Analytics', faq: 'FAQ Manager', chatbot: 'AI Chatbot',
         notify: 'Notify List', contact: 'Contact Messages', settings: 'Settings',
         admins: 'Admin Users', notifications: 'Notifications', activitylog: 'Activity Log',
-        waorders: 'WhatsApp Orders'
+        waorders: 'WhatsApp Orders', custauth: 'Customer Auth', supportinbox: 'Support Inbox'
       };
 
       function goPage(id, el) {
@@ -4976,6 +5111,8 @@
         if (id === 'activitylog') loadActivityLogPage();
         if (id === 'notifications') loadNotifications();
         if (id === 'waorders') loadWaOrders();
+        if (id === 'custauth') loadCustAuthSettings();
+        if (id === 'supportinbox') loadSupportInbox();
       }
 
       function toggleSidebar() {
@@ -8101,6 +8238,305 @@
           return null;
         }
       }
+
+      /* ═══════════════════════════════════════════════════
+         CUSTOMER AUTH SETTINGS
+      ═══════════════════════════════════════════════════ */
+      let _caData = null;
+
+      async function loadCustAuthSettings() {
+        const r = await apiGet('/api/admin/auth-settings');
+        if (!r?.data) { toast('Failed to load auth settings', 'error'); return; }
+        _caData = r.data;
+        const d = _caData;
+        document.getElementById('ca-email-login').checked = !!d.emailLoginEnabled;
+        document.getElementById('ca-phone-login').checked = !!d.phoneLoginEnabled;
+        document.getElementById('ca-feat-orders').checked = !!d.featureOrdersEnabled;
+        document.getElementById('ca-feat-track').checked  = !!d.featureTrackEnabled;
+        document.getElementById('ca-feat-chat').checked   = !!d.featureChatEnabled;
+        if (d.updatedAt) document.getElementById('ca-toggles-updated').textContent = 'Last updated: ' + new Date(d.updatedAt).toLocaleString();
+        // SMTP
+        if (d.smtpHost) document.getElementById('ca-smtp-host').value = d.smtpHost;
+        if (d.smtpPort) document.getElementById('ca-smtp-port').value = d.smtpPort;
+        if (d.smtpUser) document.getElementById('ca-smtp-user').value = d.smtpUser;
+        if (d.smtpEncryption) document.getElementById('ca-smtp-enc').value = d.smtpEncryption;
+        if (d.smtpFromName) document.getElementById('ca-smtp-fname').value = d.smtpFromName;
+        if (d.smtpFromEmail) document.getElementById('ca-smtp-femail').value = d.smtpFromEmail;
+        document.getElementById('ca-smtp-pass').value = '';
+        document.getElementById('ca-smtp-pass').placeholder = d.smtpPassMasked || '••••••';
+        document.getElementById('ca-smtp-pass-hint').style.display = d.smtpPassMasked ? 'block' : 'none';
+        // SMS
+        document.getElementById('ca-sms-key').value = '';
+        document.getElementById('ca-sms-key').placeholder = d.smsApiKeyMasked || '••••••';
+        document.getElementById('ca-sms-key-hint').style.display = d.smsApiKeyMasked ? 'block' : 'none';
+        if (d.smsSenderId) document.getElementById('ca-sms-sender').value = d.smsSenderId;
+        if (d.smsGatewayUrl) document.getElementById('ca-sms-url').value = d.smsGatewayUrl;
+        if (d.smsRoute) document.getElementById('ca-sms-route').value = d.smsRoute;
+        renderCaWarnings(d);
+      }
+
+      function renderCaWarnings(d) {
+        let html = '';
+        if (d.emailLoginEnabled && !d.smtpConfigured) html += '<div style="background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:.7rem 1rem;font-size:.8rem;color:#fbbf24;margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem;"><i class="fa-solid fa-triangle-exclamation"></i> Customer auth SMTP not configured — email OTP delivery will fail.</div>';
+        if (d.phoneLoginEnabled && !d.smsConfigured) html += '<div style="background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:.7rem 1rem;font-size:.8rem;color:#fbbf24;margin-bottom:.8rem;display:flex;align-items:center;gap:.5rem;"><i class="fa-solid fa-triangle-exclamation"></i> SMS gateway not configured — phone OTP delivery will fail.</div>';
+        document.getElementById('ca-warnings').innerHTML = html;
+      }
+
+      async function saveCaToggles() {
+        const email = document.getElementById('ca-email-login').checked;
+        const phone = document.getElementById('ca-phone-login').checked;
+        if (!email && !phone) {
+          document.getElementById('ca-toggle-error').textContent = 'At least one login method must be enabled.';
+          document.getElementById('ca-toggle-error').style.display = 'block';
+          // revert the toggle that was just changed
+          if (!email) document.getElementById('ca-email-login').checked = true;
+          else document.getElementById('ca-phone-login').checked = true;
+          setTimeout(() => { document.getElementById('ca-toggle-error').style.display = 'none'; }, 3000);
+          return;
+        }
+        document.getElementById('ca-toggle-error').style.display = 'none';
+        const r = await apiPost('/api/admin/auth-settings/toggles', {
+          emailLoginEnabled: email, phoneLoginEnabled: phone,
+          featureOrdersEnabled: document.getElementById('ca-feat-orders').checked,
+          featureTrackEnabled: document.getElementById('ca-feat-track').checked,
+          featureChatEnabled: document.getElementById('ca-feat-chat').checked,
+        });
+        if (r?.success) { toast('Toggles updated', 'success'); if (r.data) { _caData = Object.assign(_caData || {}, r.data); renderCaWarnings(_caData); } }
+        else toast(r?.message || 'Failed to save', 'error');
+      }
+
+      function setBtnLoading(id, loading) {
+        const b = document.getElementById(id);
+        if (!b) return;
+        if (loading) { b.dataset.origText = b.innerHTML; b.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:.3rem;"></i>Saving...'; b.disabled = true; }
+        else { b.innerHTML = b.dataset.origText || b.innerHTML; b.disabled = false; }
+      }
+
+      async function saveCaSmtp() {
+        setBtnLoading('ca-smtp-save-btn', true);
+        const data = {
+          smtpHost: document.getElementById('ca-smtp-host').value.trim(),
+          smtpPort: parseInt(document.getElementById('ca-smtp-port').value) || 587,
+          smtpUser: document.getElementById('ca-smtp-user').value.trim(),
+          smtpFromName: document.getElementById('ca-smtp-fname').value.trim(),
+          smtpFromEmail: document.getElementById('ca-smtp-femail').value.trim(),
+          smtpEncryption: document.getElementById('ca-smtp-enc').value,
+        };
+        const pass = document.getElementById('ca-smtp-pass').value;
+        if (pass) data.smtpPass = pass;
+        const r = await apiPost('/api/admin/auth-settings/smtp', data);
+        setBtnLoading('ca-smtp-save-btn', false);
+        if (r?.success) { toast('SMTP settings saved', 'success'); loadCustAuthSettings(); }
+        else toast(r?.message || 'Failed to save SMTP', 'error');
+      }
+
+      async function testCaSmtp() {
+        setBtnLoading('ca-smtp-test-btn', true);
+        const el = document.getElementById('ca-smtp-result');
+        el.style.display = 'none';
+        const r = await apiPost('/api/admin/auth-settings/smtp/test', {});
+        setBtnLoading('ca-smtp-test-btn', false);
+        el.style.display = 'block';
+        if (r?.success) { el.style.background = 'rgba(34,197,94,.12)'; el.style.color = '#4ade80'; el.textContent = '✅ ' + r.message; }
+        else { el.style.background = 'rgba(239,68,68,.12)'; el.style.color = '#f87171'; el.textContent = '❌ ' + (r?.message || 'Test failed'); }
+      }
+
+      async function saveCaSms() {
+        setBtnLoading('ca-sms-save-btn', true);
+        const data = {
+          smsSenderId: document.getElementById('ca-sms-sender').value.trim(),
+          smsGatewayUrl: document.getElementById('ca-sms-url').value.trim(),
+          smsRoute: document.getElementById('ca-sms-route').value.trim(),
+        };
+        const key = document.getElementById('ca-sms-key').value;
+        if (key) data.smsApiKey = key;
+        const r = await apiPost('/api/admin/auth-settings/sms', data);
+        setBtnLoading('ca-sms-save-btn', false);
+        if (r?.success) { toast('SMS settings saved', 'success'); loadCustAuthSettings(); }
+        else toast(r?.message || 'Failed to save SMS', 'error');
+      }
+
+      function showSmsTest() { document.getElementById('ca-sms-test-row').style.display = document.getElementById('ca-sms-test-row').style.display === 'none' ? 'block' : 'none'; }
+
+      async function testCaSms() {
+        const phone = document.getElementById('ca-sms-test-phone').value.trim();
+        if (!phone) { toast('Enter a phone number', 'error'); return; }
+        setBtnLoading('ca-sms-send-btn', true);
+        const el = document.getElementById('ca-sms-result');
+        el.style.display = 'none';
+        const r = await apiPost('/api/admin/auth-settings/sms/test', { phone });
+        setBtnLoading('ca-sms-send-btn', false);
+        el.style.display = 'block';
+        if (r?.success) { el.style.background = 'rgba(34,197,94,.12)'; el.style.color = '#4ade80'; el.textContent = '✅ ' + r.message; }
+        else { el.style.background = 'rgba(239,68,68,.12)'; el.style.color = '#f87171'; el.textContent = '❌ ' + (r?.message || 'Test failed'); }
+      }
+
+      function togglePassVis(inputId, btn) {
+        const inp = document.getElementById(inputId);
+        const isPass = inp.type === 'password';
+        inp.type = isPass ? 'text' : 'password';
+        btn.innerHTML = isPass ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
+      }
+
+      /* ═══════════════════════════════════════════════════
+         SUPPORT INBOX
+      ═══════════════════════════════════════════════════ */
+      let _siSessions=[], _siFilter='all', _siActiveId=null, _siSocket=null, _siTypingTmr=null;
+
+      // Beep using Web Audio API
+      function playBeep(){try{const c=new(window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.value=0.15;o.start();o.stop(c.currentTime+0.12);}catch{}}
+
+      async function loadSupportInbox(){
+        await loadSiSessions();
+        initSiSocket();
+        if(Notification.permission==='default')Notification.requestPermission();
+      }
+
+      async function loadSiSessions(){
+        const url=_siFilter==='all'?'/api/admin/chat/sessions':'/api/admin/chat/sessions?status='+_siFilter;
+        const r=await apiGet(url);
+        if(!r?.success)return;
+        _siSessions=r.sessions||[];
+        renderSiList();
+      }
+
+      function renderSiList(){
+        const q=(document.getElementById('si-search')?.value||'').toLowerCase();
+        const filtered=_siSessions.filter(s=>{
+          const e=(s.customer?.email||s.customer?.phone||s.customer?.name||'').toLowerCase();
+          return !q||e.includes(q);
+        });
+        const el=document.getElementById('si-list');
+        if(!filtered.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--gray);font-size:.82rem;">No conversations</div>';return;}
+        el.innerHTML=filtered.map(s=>{
+          const name=s.customer?.name||s.customer?.email||s.customer?.phone||'Unknown';
+          const preview=s.lastMessage?s.lastMessage.text.slice(0,60)+(s.lastMessage.text.length>60?'...':''):'No messages';
+          const ago=timeAgo(s.lastMessage?.at||s.updatedAt);
+          const active=s._id===_siActiveId?' style="background:rgba(0,87,255,.08);"':'';
+          const badge=s.unread?'<span style="background:var(--blue);color:#fff;font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:99px;min-width:18px;text-align:center;">'+s.unread+'</span>':'';
+          const dot=s.status==='open'?'<span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px;"></span>':'';
+          return '<div onclick="openSiThread(\''+s._id+'\')" style="padding:.7rem .9rem;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s;"'+active+'><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:600;font-size:.8rem;">'+dot+name+'</span>'+badge+'</div><div style="font-size:.72rem;color:var(--gray);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+preview+'</div><div style="font-size:.62rem;color:var(--gray);margin-top:2px;">'+ago+'</div></div>';
+        }).join('');
+      }
+
+      function filterSessions(f,btn){
+        _siFilter=f;
+        document.querySelectorAll('.si-filter').forEach(b=>{b.style.background='transparent';b.style.color='var(--gray-lt)';});
+        if(btn){btn.style.background='var(--blue)';btn.style.color='#fff';}
+        loadSiSessions();
+      }
+      function filterSessionSearch(){renderSiList();}
+
+      async function openSiThread(sid){
+        _siActiveId=sid;
+        renderSiList();
+        const r=await apiGet('/api/admin/chat/sessions/'+sid+'/messages');
+        if(!r?.success)return;
+        const s=_siSessions.find(x=>x._id===sid);
+        const name=s?.customer?.name||s?.customer?.email||s?.customer?.phone||'Customer';
+        document.getElementById('si-thread-info').innerHTML='<strong>'+name+'</strong> <span style="font-size:.7rem;color:var(--gray);margin-left:.4rem;">'+(s?.customer?.email||'')+'</span>';
+        document.getElementById('si-thread-actions').style.display='block';
+        const sel=document.getElementById('si-status-sel');
+        sel.innerHTML='<option value="open"'+(s?.status==='open'?' selected':'')+'>Open</option><option value="resolved"'+(s?.status==='resolved'?' selected':'')+'>Resolved</option>';
+        document.getElementById('si-input-bar').style.display='block';
+        renderSiMsgs(r.messages||[]);
+        // Update unread in list
+        if(s)s.unread=0;
+        renderSiList();
+        refreshChatBadge();
+      }
+
+      function renderSiMsgs(msgs){
+        const el=document.getElementById('si-msgs');
+        if(!msgs.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--gray);font-size:.82rem;">No messages yet</div>';return;}
+        el.innerHTML=msgs.map(m=>{
+          const isAdmin=m.senderRole==='admin';
+          const align=isAdmin?'flex-start':'flex-end';
+          const bg=isAdmin?'rgba(255,255,255,.06)':'rgba(0,87,255,.15)';
+          const t=new Date(m.createdAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+          return '<div style="align-self:'+align+';max-width:75%;padding:.55rem .8rem;border-radius:10px;background:'+bg+';font-size:.82rem;line-height:1.45;word-wrap:break-word;">'+m.message+'<div style="font-size:.58rem;color:var(--gray);margin-top:3px;text-align:'+(isAdmin?'left':'right')+';">'+t+'</div></div>';
+        }).join('');
+        el.scrollTop=el.scrollHeight;
+      }
+
+      async function sendAdminReply(){
+        const inp=document.getElementById('si-input');
+        const msg=inp.value.trim();if(!msg||!_siActiveId)return;
+        inp.value='';
+        const r=await apiPost('/api/admin/chat/sessions/'+_siActiveId+'/reply',{message:msg});
+        if(!r?.success){toast('Failed to send','error');return;}
+        // Append locally
+        const el=document.getElementById('si-msgs');
+        const empty=el.querySelector('div[style*="text-align:center"]');if(empty)empty.remove();
+        const d=document.createElement('div');
+        d.style.cssText='align-self:flex-start;max-width:75%;padding:.55rem .8rem;border-radius:10px;background:rgba(255,255,255,.06);font-size:.82rem;line-height:1.45;';
+        d.innerHTML=msg+'<div style="font-size:.58rem;color:var(--gray);margin-top:3px;">Just now</div>';
+        el.appendChild(d);el.scrollTop=el.scrollHeight;
+        // Emit typing stop
+        if(_siSocket){const s=_siSessions.find(x=>x._id===_siActiveId);if(s)_siSocket.emit('admin_typing',{customerId:s.customer?._id||''});}
+        loadSiSessions();
+      }
+
+      async function changeSessionStatus(){
+        const st=document.getElementById('si-status-sel').value;
+        await apiPatch('/api/admin/chat/sessions/'+_siActiveId+'/status',{status:st});
+        toast('Status updated','success');
+        loadSiSessions();
+      }
+
+      function initSiSocket(){
+        if(_siSocket)return;
+        _siSocket=io(API_BASE);
+        _siSocket.emit('join_admin');
+        _siSocket.on('customer_message',data=>{
+          // Update session list
+          loadSiSessions();
+          // If this session is open, append message
+          if(data.sessionId===_siActiveId){
+            const el=document.getElementById('si-msgs');
+            const d=document.createElement('div');
+            d.style.cssText='align-self:flex-end;max-width:75%;padding:.55rem .8rem;border-radius:10px;background:rgba(0,87,255,.15);font-size:.82rem;line-height:1.45;';
+            d.innerHTML=data.message+'<div style="font-size:.58rem;color:var(--gray);margin-top:3px;">Just now</div>';
+            el.appendChild(d);el.scrollTop=el.scrollHeight;
+          }
+          // Browser notification
+          if(document.hidden&&Notification.permission==='granted'){
+            new Notification('New message from '+(data.customerEmail||'Customer'),{body:data.message?.slice(0,80),icon:'https://res.cloudinary.com/drj19ghhl/image/upload/v1777176961/f47e171f-1606-4005-9edd-41239b24ea44_ovi6oo.jpg'});
+          }
+          playBeep();
+          refreshChatBadge();
+        });
+        _siSocket.on('customer_typing',data=>{
+          if(data.sessionId===_siActiveId||data.customerId){
+            document.getElementById('si-typing').textContent='Customer is typing...';
+            clearTimeout(_siTypingTmr);
+            _siTypingTmr=setTimeout(()=>{document.getElementById('si-typing').textContent='';},2000);
+          }
+        });
+        // Enter to send (shift+enter for newline)
+        document.getElementById('si-input').addEventListener('keydown',e=>{
+          if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAdminReply();}
+        });
+      }
+
+      function timeAgo(d){
+        if(!d)return '';
+        const s=Math.floor((Date.now()-new Date(d))/1000);
+        if(s<60)return 'Just now';if(s<3600)return Math.floor(s/60)+' min ago';
+        if(s<86400)return Math.floor(s/3600)+' hr ago';return Math.floor(s/86400)+' day ago';
+      }
+
+      // Nav badge
+      async function refreshChatBadge(){
+        const r=await apiGet('/api/admin/chat/unread-count');
+        const b=document.getElementById('chat-nav-badge');
+        if(!b||!r)return;
+        if(r.count>0){b.textContent=r.count;b.style.display='inline-flex';}
+        else b.style.display='none';
+      }
+      refreshChatBadge();
+      setInterval(refreshChatBadge,60000);
+
     </script>
 </body>
 

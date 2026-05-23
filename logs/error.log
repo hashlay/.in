@@ -713,3 +713,5 @@ MongooseError: Cannot call `chatbots.find()` before initial connection is comple
     at model.Query.exec (C:\Users\Lenovo\Downloads\final website\hashlay-backend\node_modules\mongoose\lib\query.js:4627:80)
     at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
     at async exports.getChatbotRules (C:\Users\Lenovo\Downloads\final website\hashlay-backend\controllers\miscControllers.js:180:17)
+2026-05-23 22:26:16 [ERROR]: ❌ MongoDB connection error:
+2026-05-23 22:26:21 [ERROR]: ❌ MongoDB connection error:

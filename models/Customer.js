@@ -20,6 +20,10 @@ const customerSchema = new mongoose.Schema({
   emailOptIn:   { type: Boolean, default: true },
   smsOptIn:     { type: Boolean, default: true },
   source:       { type: String, default: 'website' },
+
+  // ── Customer Auth Portal (additive – do not remove existing fields) ──
+  passwordHash: { type: String, default: null },
+  lastLoginAt:  { type: Date, default: null },
 }, { timestamps: true });
 
 customerSchema.pre('save', async function (next) {

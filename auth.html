@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — Hashlay</title>
+  <meta name="description" content="Sign in or create your Hashlay account to track orders, get support, and more.">
+  <link rel="icon" type="image/jpeg" href="https://res.cloudinary.com/drj19ghhl/image/upload/v1777176961/f47e171f-1606-4005-9edd-41239b24ea44_ovi6oo.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--blue:#0057ff;--blue-dk:#0033cc;--blue-glow:rgba(0,87,255,.25);--black:#000;--white:#fff;--gray-bg:#f5f5f8;--gray-1:#f0f0f4;--gray-2:#e2e2ea;--gray-3:#9999aa;--gray-4:#6b6b80;--gray-5:#3a3a4a;--radius:12px;--tr:.3s cubic-bezier(.4,0,.2,1);--font:'DM Sans',sans-serif;--font-d:'Bebas Neue',sans-serif}
+    html{font-size:16px}
+    body{font-family:var(--font);background:var(--gray-bg);color:var(--gray-5);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+
+    /* ── Shell ── */
+    .auth-shell{width:100%;max-width:420px;position:relative;overflow:hidden;min-height:460px}
+    .auth-logo{text-align:center;margin-bottom:1.8rem}
+    .auth-logo-text{font-family:var(--font-d);font-size:2rem;letter-spacing:.14em;background:linear-gradient(135deg,var(--gray-5),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .auth-card{background:var(--white);border-radius:20px;padding:2.4rem 2rem;box-shadow:0 4px 24px rgba(0,0,0,.06),0 0 0 1px rgba(0,0,0,.04);position:relative;overflow:hidden}
+    .auth-card::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent)}
+
+    /* ── Views ── */
+    .view{position:absolute;top:0;left:0;width:100%;opacity:0;transform:translateX(40px);transition:opacity var(--tr),transform var(--tr);pointer-events:none;padding:2.4rem 2rem}
+    .view.active{position:relative;opacity:1;transform:none;pointer-events:auto}
+    .view.exit-left{transform:translateX(-40px);opacity:0}
+
+    /* ── Typography ── */
+    .auth-h{font-family:var(--font-d);font-size:1.6rem;letter-spacing:.06em;color:var(--gray-5);margin-bottom:.3rem}
+    .auth-sub{font-size:.85rem;color:var(--gray-3);margin-bottom:1.6rem;line-height:1.5}
+    .auth-sub a{color:var(--blue);cursor:pointer;text-decoration:none;font-weight:500}
+    .auth-sub a:hover{text-decoration:underline}
+
+    /* ── Form ── */
+    .field{margin-bottom:1.1rem}
+    .field-label{display:block;font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-4);margin-bottom:.4rem}
+    .field-input{width:100%;background:var(--gray-1);border:1.5px solid var(--gray-2);border-radius:var(--radius);padding:.85rem 1rem;font-size:.92rem;color:var(--gray-5);font-family:var(--font);transition:border-color var(--tr),box-shadow var(--tr);outline:none}
+    .field-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+    .field-input.error{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.15)}
+    .field-row{display:flex;gap:.5rem;align-items:stretch}
+    .field-prefix{background:var(--gray-1);border:1.5px solid var(--gray-2);border-radius:var(--radius);padding:.85rem .7rem;font-size:.92rem;color:var(--gray-4);font-weight:500;display:flex;align-items:center;white-space:nowrap}
+
+    /* ── Password ── */
+    .pass-wrap{position:relative}
+    .pass-wrap .field-input{padding-right:3rem}
+    .pass-toggle{position:absolute;right:.8rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-3);font-size:.9rem;cursor:pointer;padding:.2rem}
+    .pass-toggle:hover{color:var(--blue)}
+
+    /* ── Buttons ── */
+    .btn{width:100%;padding:.95rem;border:none;border-radius:var(--radius);font-family:var(--font);font-size:.88rem;font-weight:600;letter-spacing:.06em;cursor:pointer;transition:all var(--tr);position:relative;overflow:hidden}
+    .btn-primary{background:var(--blue);color:#fff;box-shadow:0 4px 16px var(--blue-glow)}
+    .btn-primary:hover{background:var(--blue-dk);transform:translateY(-1px);box-shadow:0 6px 24px var(--blue-glow)}
+    .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .btn-spinner{display:none;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;margin:0 auto}
+    .btn.loading .btn-text{display:none}
+    .btn.loading .btn-spinner{display:inline-block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ── Error ── */
+    .err-msg{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:.55rem .8rem;font-size:.78rem;color:#dc2626;margin-bottom:.8rem;display:none;animation:fadeIn .2s}
+    .err-msg.show{display:block}
+
+    /* ── OTP boxes ── */
+    .otp-row{display:flex;gap:.5rem;justify-content:center;margin:1.2rem 0 1.4rem}
+    .otp-box{width:48px;height:56px;border:1.5px solid var(--gray-2);border-radius:var(--radius);text-align:center;font-size:1.4rem;font-weight:700;color:var(--gray-5);background:var(--gray-1);font-family:var(--font);outline:none;transition:border-color var(--tr),box-shadow var(--tr);caret-color:var(--blue)}
+    .otp-box:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+    .otp-box.error{border-color:#ef4444;animation:shake .4s}
+    @keyframes shake{0%,100%{transform:none}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+    /* ── Timer / Resend ── */
+    .otp-meta{text-align:center;font-size:.78rem;color:var(--gray-3);margin-bottom:1.2rem}
+    .otp-meta .timer{font-weight:600;color:var(--gray-4);font-family:var(--font)}
+    .otp-meta .expired{color:#dc2626;font-weight:500}
+    .resend-link{color:var(--gray-3);font-size:.78rem;text-align:center;display:block;margin-top:.8rem;cursor:pointer;text-decoration:none;transition:color var(--tr)}
+    .resend-link.active{color:var(--blue);font-weight:500}
+    .resend-link.active:hover{text-decoration:underline}
+
+    /* ── Strength bar ── */
+    .strength{margin-bottom:1rem}
+    .strength-bar{height:4px;border-radius:4px;background:var(--gray-2);overflow:hidden;margin-top:.4rem}
+    .strength-fill{height:100%;border-radius:4px;width:0;transition:width .3s,background .3s}
+    .strength-label{font-size:.7rem;margin-top:.3rem;font-weight:500}
+    .str-weak .strength-fill{width:33%;background:#ef4444}
+    .str-weak .strength-label{color:#ef4444}
+    .str-medium .strength-fill{width:66%;background:#f59e0b}
+    .str-medium .strength-label{color:#f59e0b}
+    .str-strong .strength-fill{width:100%;background:#22c55e}
+    .str-strong .strength-label{color:#22c55e}
+
+    /* ── Switch link ── */
+    .switch-link{text-align:center;margin-top:1rem;font-size:.78rem;color:var(--gray-3)}
+    .switch-link a{color:var(--blue);cursor:pointer;text-decoration:none;font-weight:500}
+    .switch-link a:hover{text-decoration:underline}
+
+    /* ── Footer ── */
+    .auth-footer{text-align:center;margin-top:1.4rem;font-size:.72rem;color:var(--gray-3)}
+    .auth-footer a{color:var(--gray-4);text-decoration:none}
+    .auth-footer a:hover{text-decoration:underline}
+
+    /* ── Responsive ── */
+    @media(max-width:480px){
+      body{padding:.5rem;align-items:flex-start;padding-top:2rem}
+      .auth-card{padding:2rem 1.4rem;border-radius:16px}
+      .view{padding:2rem 1.4rem}
+      .otp-box{width:42px;height:50px;font-size:1.2rem}
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-shell">
+  <div class="auth-logo"><div class="auth-logo-text">HASHLAY</div></div>
+
+  <div class="auth-card">
+
+    <!-- ═══ VIEW 1: Identifier ═══ -->
+    <div class="view active" id="v-ident">
+      <div class="auth-h">SIGN IN OR CREATE ACCOUNT</div>
+      <div class="auth-sub">Enter your email to get started.</div>
+      <div id="v1-err" class="err-msg"></div>
+      <div class="field">
+        <label class="field-label" id="ident-label">Email address</label>
+        <div id="ident-wrap">
+          <input class="field-input" type="email" id="ident-input" placeholder="Enter your email" autocomplete="email" autofocus>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-continue" onclick="submitIdentifier()">
+        <span class="btn-text">Continue</span><span class="btn-spinner"></span>
+      </button>
+      <div class="switch-link" id="phone-switch" style="display:none"><a onclick="toggleIdentMode()">Use phone number instead</a></div>
+    </div>
+
+    <!-- ═══ VIEW 2: OTP ═══ -->
+    <div class="view" id="v-otp">
+      <div class="auth-h">ENTER VERIFICATION CODE</div>
+      <div class="auth-sub">Sent to <strong id="otp-dest"></strong>. <a onclick="goView('v-ident')">Change</a></div>
+      <div id="v2-err" class="err-msg"></div>
+      <div class="otp-row" id="otp-row"></div>
+      <div class="otp-meta"><span id="otp-timer"></span></div>
+      <button class="btn btn-primary" id="btn-verify" onclick="submitOtp()">
+        <span class="btn-text">Verify</span><span class="btn-spinner"></span>
+      </button>
+      <a class="resend-link" id="resend-link" onclick="resendOtp()">Resend OTP</a>
+    </div>
+
+    <!-- ═══ VIEW 3: Set Password ═══ -->
+    <div class="view" id="v-pass">
+      <div class="auth-h">CREATE YOUR PASSWORD</div>
+      <div class="auth-sub">You're almost in. Set a password for future logins.</div>
+      <div id="v3-err" class="err-msg"></div>
+      <div class="field">
+        <label class="field-label">Password</label>
+        <div class="pass-wrap">
+          <input class="field-input" type="password" id="pass1" placeholder="Min. 8 characters" oninput="updateStrength()">
+          <button type="button" class="pass-toggle" onclick="togPass('pass1',this)">👁</button>
+        </div>
+      </div>
+      <div class="strength" id="str-wrap">
+        <div class="strength-bar"><div class="strength-fill"></div></div>
+        <div class="strength-label" id="str-label"></div>
+      </div>
+      <div class="field">
+        <label class="field-label">Confirm Password</label>
+        <div class="pass-wrap">
+          <input class="field-input" type="password" id="pass2" placeholder="Re-enter password">
+          <button type="button" class="pass-toggle" onclick="togPass('pass2',this)">👁</button>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-create" onclick="submitPassword()">
+        <span class="btn-text">Create Account & Sign In</span><span class="btn-spinner"></span>
+      </button>
+    </div>
+
+  </div>
+
+  <div class="auth-footer">
+    <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · &copy; Hashlay 2026
+  </div>
+</div>
+
+<script>
+const API = location.hostname==='localhost'||location.hostname==='127.0.0.1'
+  ? 'http://localhost:5000' : location.origin;
+
+let _ident = '', _identMode = 'email', _phoneEnabled = false, _tempToken = null;
+let _timerInterval = null, _timerEnd = 0, _resendReady = false;
+
+/* ══ INIT ══ */
+(async function init(){
+  // Check if already logged in
+  try {
+    const r = await fetch(API+'/api/customer/auth/me',{credentials:'include'});
+    const d = await r.json();
+    if(d.loggedIn) return location.href='/portal';
+  } catch{}
+  // Load settings
+  try {
+    const r = await fetch(API+'/api/customer/auth/settings');
+    const d = await r.json();
+    if(d.phoneLoginEnabled){ _phoneEnabled=true; document.getElementById('phone-switch').style.display='block'; }
+  } catch{}
+})();
+
+/* ══ VIEW TRANSITIONS ══ */
+function goView(id){
+  document.querySelectorAll('.view').forEach(v=>{
+    if(v.classList.contains('active')) v.classList.add('exit-left');
+    v.classList.remove('active');
+  });
+  setTimeout(()=>{
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('exit-left'));
+    document.getElementById(id).classList.add('active');
+    const fi = document.querySelector('#'+id+' input');
+    if(fi) setTimeout(()=>fi.focus(),100);
+  },150);
+}
+
+/* ══ TOGGLE EMAIL/PHONE ══ */
+function toggleIdentMode(){
+  const lbl=document.getElementById('ident-label');
+  const wrap=document.getElementById('ident-wrap');
+  const sw=document.querySelector('#phone-switch a');
+  if(_identMode==='email'){
+    _identMode='phone';
+    lbl.textContent='Phone number';
+    wrap.innerHTML='<div class="field-row"><span class="field-prefix">+91</span><input class="field-input" type="tel" id="ident-input" placeholder="Enter phone number" autocomplete="tel"></div>';
+    sw.textContent='Use email instead';
+  } else {
+    _identMode='email';
+    lbl.textContent='Email address';
+    wrap.innerHTML='<input class="field-input" type="email" id="ident-input" placeholder="Enter your email" autocomplete="email">';
+    sw.textContent='Use phone number instead';
+  }
+  document.getElementById('ident-input').focus();
+}
+
+/* ══ SUBMIT IDENTIFIER ══ */
+async function submitIdentifier(){
+  hideErr('v1-err');
+  const inp=document.getElementById('ident-input');
+  let val=inp.value.trim();
+  if(!val){ showErr('v1-err','Please enter your '+(_identMode==='email'?'email':'phone number')); inp.classList.add('error'); return; }
+  if(_identMode==='phone') val='+91'+val.replace(/^\+91/,'').replace(/\D/g,'');
+  inp.classList.remove('error');
+  _ident=val;
+
+  setLoading('btn-continue',true);
+  try{
+    const r=await fetch(API+'/api/customer/auth/send-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({identifier:_ident}),credentials:'include'});
+    const d=await r.json();
+    setLoading('btn-continue',false);
+    if(!r.ok||!d.success){ showErr('v1-err',d.message||'Something went wrong'); return; }
+    document.getElementById('otp-dest').textContent=_ident;
+    buildOtpBoxes();
+    startTimer();
+    goView('v-otp');
+  }catch(e){ setLoading('btn-continue',false); showErr('v1-err','Network error. Try again.'); }
+}
+
+/* ══ OTP BOXES ══ */
+function buildOtpBoxes(){
+  const row=document.getElementById('otp-row');
+  row.innerHTML='';
+  for(let i=0;i<6;i++){
+    const b=document.createElement('input');
+    b.className='otp-box'; b.type='text'; b.inputMode='numeric'; b.maxLength=1; b.autocomplete='one-time-code';
+    b.dataset.idx=i;
+    b.addEventListener('input',otpInput);
+    b.addEventListener('keydown',otpKeydown);
+    b.addEventListener('paste',otpPaste);
+    row.appendChild(b);
+  }
+  setTimeout(()=>row.children[0]?.focus(),200);
+}
+function otpInput(e){
+  const v=e.target.value.replace(/\D/g,'');
+  e.target.value=v.slice(0,1);
+  if(v&&e.target.nextElementSibling) e.target.nextElementSibling.focus();
+}
+function otpKeydown(e){
+  if(e.key==='Backspace'&&!e.target.value&&e.target.previousElementSibling){
+    e.target.previousElementSibling.focus();
+    e.target.previousElementSibling.value='';
+  }
+  if(e.key==='Enter') submitOtp();
+}
+function otpPaste(e){
+  e.preventDefault();
+  const txt=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+  const boxes=document.querySelectorAll('.otp-box');
+  for(let i=0;i<txt.length&&i<6;i++) boxes[i].value=txt[i];
+  if(txt.length>=6) boxes[5].focus();
+  else if(boxes[txt.length]) boxes[txt.length].focus();
+}
+function getOtp(){ return Array.from(document.querySelectorAll('.otp-box')).map(b=>b.value).join(''); }
+
+/* ══ TIMER ══ */
+function startTimer(){
+  _timerEnd=Date.now()+10*60*1000;
+  _resendReady=false;
+  const rl=document.getElementById('resend-link');
+  rl.classList.remove('active'); rl.textContent='Resend OTP (wait 30s)';
+  setTimeout(()=>{ _resendReady=true; rl.classList.add('active'); rl.textContent='Resend OTP'; },30000);
+  clearInterval(_timerInterval);
+  _timerInterval=setInterval(tickTimer,1000);
+  tickTimer();
+}
+function tickTimer(){
+  const left=Math.max(0,_timerEnd-Date.now());
+  const el=document.getElementById('otp-timer');
+  if(left<=0){ clearInterval(_timerInterval); el.innerHTML='<span class="expired">Code expired. Request a new one.</span>'; return; }
+  const m=Math.floor(left/60000), s=Math.floor((left%60000)/1000);
+  el.innerHTML='Code expires in <span class="timer">'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'</span>';
+}
+
+/* ══ RESEND ══ */
+async function resendOtp(){
+  if(!_resendReady) return;
+  _resendReady=false;
+  document.getElementById('resend-link').classList.remove('active');
+  document.getElementById('resend-link').textContent='Sending...';
+  try{
+    await fetch(API+'/api/customer/auth/send-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({identifier:_ident}),credentials:'include'});
+    startTimer();
+    hideErr('v2-err');
+  }catch{}
+}
+
+/* ══ SUBMIT OTP ══ */
+async function submitOtp(){
+  hideErr('v2-err');
+  const otp=getOtp();
+  if(otp.length<6){ showErr('v2-err','Enter all 6 digits'); shakeOtp(); return; }
+  setLoading('btn-verify',true);
+  try{
+    const r=await fetch(API+'/api/customer/auth/verify-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({identifier:_ident,otp}),credentials:'include'});
+    const d=await r.json();
+    setLoading('btn-verify',false);
+    if(!r.ok||!d.success){ showErr('v2-err',d.message||'Incorrect code'); shakeOtp(); return; }
+    clearInterval(_timerInterval);
+    if(d.isNewUser){ _tempToken=d.tempToken; goView('v-pass'); }
+    else location.href='/portal';
+  }catch(e){ setLoading('btn-verify',false); showErr('v2-err','Network error.'); }
+}
+function shakeOtp(){ document.querySelectorAll('.otp-box').forEach(b=>{b.classList.add('error');setTimeout(()=>b.classList.remove('error'),500);}); }
+
+/* ══ PASSWORD STRENGTH ══ */
+function updateStrength(){
+  const v=document.getElementById('pass1').value;
+  const w=document.getElementById('str-wrap');
+  const l=document.getElementById('str-label');
+  w.className='strength';
+  if(!v){l.textContent='';return;}
+  let score=0;
+  if(v.length>=8)score++;if(v.length>=12)score++;if(/[A-Z]/.test(v))score++;if(/[0-9]/.test(v))score++;if(/[^A-Za-z0-9]/.test(v))score++;
+  if(score<=2){w.classList.add('str-weak');l.textContent='Weak';}
+  else if(score<=3){w.classList.add('str-medium');l.textContent='Medium';}
+  else{w.classList.add('str-strong');l.textContent='Strong';}
+}
+
+/* ══ SUBMIT PASSWORD ══ */
+async function submitPassword(){
+  hideErr('v3-err');
+  const p1=document.getElementById('pass1').value, p2=document.getElementById('pass2').value;
+  if(p1.length<8){showErr('v3-err','Password must be at least 8 characters');return;}
+  if(!/[A-Z]/.test(p1)){showErr('v3-err','Password must contain an uppercase letter');return;}
+  if(!/[0-9]/.test(p1)){showErr('v3-err','Password must contain a number');return;}
+  if(p1!==p2){showErr('v3-err','Passwords do not match');return;}
+  setLoading('btn-create',true);
+  try{
+    const r=await fetch(API+'/api/customer/auth/set-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tempToken:_tempToken,password:p1,confirmPassword:p2}),credentials:'include'});
+    const d=await r.json();
+    setLoading('btn-create',false);
+    if(!r.ok||!d.success){showErr('v3-err',d.message||'Something went wrong');return;}
+    location.href='/portal';
+  }catch(e){setLoading('btn-create',false);showErr('v3-err','Network error.');}
+}
+
+/* ══ HELPERS ══ */
+function setLoading(id,on){const b=document.getElementById(id);if(on)b.classList.add('loading');else b.classList.remove('loading');b.disabled=on;}
+function showErr(id,msg){const e=document.getElementById(id);e.textContent=msg;e.classList.add('show');}
+function hideErr(id){document.getElementById(id).classList.remove('show');}
+function togPass(id,btn){const i=document.getElementById(id);const on=i.type==='password';i.type=on?'text':'password';btn.textContent=on?'🙈':'👁';}
+
+/* ══ ENTER KEY ══ */
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  const a=document.querySelector('.view.active');
+  if(!a)return;
+  if(a.id==='v-ident')submitIdentifier();
+  else if(a.id==='v-pass')submitPassword();
+});
+</script>
+</body>
+</html>

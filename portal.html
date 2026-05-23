@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>My Account — Hashlay</title>
+<meta name="description" content="Manage your Hashlay orders, track shipments, and get support.">
+<link rel="icon" type="image/jpeg" href="https://res.cloudinary.com/drj19ghhl/image/upload/v1777176961/f47e171f-1606-4005-9edd-41239b24ea44_ovi6oo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#0057ff;--blue-dk:#0033cc;--blue-glow:rgba(0,87,255,.18);--black:#0a0a0f;--white:#fff;--bg:#f5f5f8;--bg2:#fff;--gray1:#f0f0f4;--gray2:#e2e2ea;--gray3:#9999aa;--gray4:#6b6b80;--gray5:#3a3a4a;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--purple:#8b5cf6;--r:12px;--tr:.3s cubic-bezier(.4,0,.2,1);--font:'DM Sans',sans-serif;--fontd:'Bebas Neue',sans-serif}
+html{font-size:16px}body{font-family:var(--font);background:var(--bg);color:var(--gray5);min-height:100vh;display:flex}
+a{color:var(--blue);text-decoration:none;cursor:pointer}a:hover{text-decoration:underline}
+
+/* Sidebar desktop */
+.sidebar{width:220px;background:var(--black);color:var(--white);display:flex;flex-direction:column;min-height:100vh;position:fixed;left:0;top:0;z-index:50}
+.sb-logo{padding:1.5rem;border-bottom:1px solid rgba(255,255,255,.08);text-align:center}
+.sb-logo-t{font-family:var(--fontd);font-size:1.6rem;letter-spacing:.12em;background:linear-gradient(135deg,#fff,var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sb-logo-s{font-size:.65rem;color:var(--gray3);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+.sb-nav{flex:1;padding:1rem 0}
+.sb-item{display:flex;align-items:center;gap:.7rem;padding:.75rem 1.4rem;font-size:.85rem;color:rgba(255,255,255,.55);cursor:pointer;transition:all var(--tr);border-left:3px solid transparent}
+.sb-item:hover{color:#fff;background:rgba(255,255,255,.04)}
+.sb-item.active{color:#fff;background:rgba(0,87,255,.12);border-left-color:var(--blue)}
+.sb-item i{width:18px;text-align:center;font-size:.9rem}
+.sb-user{padding:1rem 1.4rem;border-top:1px solid rgba(255,255,255,.08);font-size:.78rem;color:var(--gray3)}
+.sb-user strong{color:#fff;display:block;margin-bottom:2px}
+
+/* Main */
+.main{flex:1;margin-left:220px;min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--gray2);padding:1rem 1.8rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40}
+.topbar-title{font-family:var(--fontd);font-size:1.3rem;letter-spacing:.06em}
+.content{flex:1;padding:1.5rem 1.8rem;max-width:900px;width:100%}
+
+/* Tab panels */
+.tab{display:none}.tab.active{display:block;animation:fadeUp .3s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* Cards */
+.card{background:var(--bg2);border:1px solid var(--gray2);border-radius:var(--r);padding:1.2rem;margin-bottom:.8rem;transition:box-shadow var(--tr);cursor:pointer}
+.card:hover{box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.card-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.4rem}
+.card-id{font-weight:700;font-size:.88rem}.card-date{font-size:.72rem;color:var(--gray3)}
+.card-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:.5rem}
+.card-total{font-weight:700;font-size:1rem}.card-items{font-size:.72rem;color:var(--gray3)}
+
+/* Badges */
+.badge{display:inline-block;font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.25rem .6rem;border-radius:100px}
+.badge-pending{background:rgba(245,158,11,.12);color:#d97706}.badge-confirmed{background:rgba(0,87,255,.1);color:var(--blue)}
+.badge-processing{background:rgba(0,87,255,.1);color:var(--blue)}.badge-shipped{background:rgba(139,92,246,.1);color:var(--purple)}
+.badge-out_for_delivery{background:rgba(139,92,246,.1);color:var(--purple)}.badge-delivered{background:rgba(34,197,94,.1);color:var(--green)}
+.badge-cancelled{background:rgba(239,68,68,.1);color:var(--red)}.badge-returned{background:rgba(239,68,68,.1);color:var(--red)}
+
+/* Order detail expand */
+.card-detail{display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gray2);font-size:.82rem;animation:fadeUp .25s}
+.card-detail.show{display:block}
+.detail-items{margin-bottom:.8rem}.detail-item{display:flex;justify-content:space-between;padding:.3rem 0;border-bottom:1px dashed var(--gray1)}
+.detail-section{margin-bottom:.6rem}.detail-label{font-size:.68rem;color:var(--gray3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.2rem}
+
+/* Track timeline */
+.track-input{display:flex;gap:.5rem;margin-bottom:1.5rem}
+.track-input input{flex:1;padding:.8rem 1rem;border:1.5px solid var(--gray2);border-radius:var(--r);font-size:.88rem;font-family:var(--font);outline:none;background:var(--bg2)}
+.track-input input:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-glow)}
+.track-input button{padding:.8rem 1.4rem;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-weight:600;font-size:.82rem;cursor:pointer;white-space:nowrap}
+.timeline{position:relative;padding-left:2rem;margin-top:1rem}
+.tl-step{position:relative;padding-bottom:2rem;padding-left:1rem}
+.tl-step:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:-2rem;top:2px;width:16px;height:16px;border-radius:50%;border:2px solid var(--gray2);background:var(--bg);z-index:2;transition:all var(--tr)}
+.tl-line{position:absolute;left:calc(-2rem + 7px);top:18px;bottom:0;width:2px;background:var(--gray2)}
+.tl-step:last-child .tl-line{display:none}
+.tl-step.done .tl-dot{background:var(--green);border-color:var(--green)}.tl-step.done .tl-line{background:var(--green)}
+.tl-step.current .tl-dot{background:var(--blue);border-color:var(--blue);box-shadow:0 0 0 4px var(--blue-glow);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px var(--blue-glow)}50%{box-shadow:0 0 0 8px rgba(0,87,255,.08)}}
+.tl-step.future .tl-line{border-left:2px dashed var(--gray2);background:none;width:0}
+.tl-title{font-weight:600;font-size:.85rem}.tl-time{font-size:.7rem;color:var(--gray3);margin-top:2px}
+
+/* Chat */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 140px);background:var(--bg2);border:1px solid var(--gray2);border-radius:var(--r);overflow:hidden}
+.chat-msgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.5rem}
+.msg{max-width:80%;padding:.6rem .9rem;border-radius:12px;font-size:.84rem;line-height:1.5;word-wrap:break-word}
+.msg-c{align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:4px}
+.msg-a{align-self:flex-start;background:var(--gray1);color:var(--gray5);border-bottom-left-radius:4px}
+.msg-time{font-size:.62rem;opacity:.6;margin-top:2px}
+.msg-c .msg-time{text-align:right}
+.chat-typing{padding:.3rem 1rem;font-size:.72rem;color:var(--gray3);font-style:italic;min-height:1.2rem}
+.chat-bar{display:flex;gap:.5rem;padding:.8rem;border-top:1px solid var(--gray2)}
+.chat-bar input{flex:1;padding:.7rem;border:1.5px solid var(--gray2);border-radius:var(--r);font-size:.85rem;font-family:var(--font);outline:none}
+.chat-bar input:focus{border-color:var(--blue)}
+.chat-bar button{padding:.7rem 1.2rem;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-size:.9rem;cursor:pointer}
+.chat-offline{background:#fef2f2;color:var(--red);text-align:center;padding:.4rem;font-size:.72rem;font-weight:600}
+
+/* Empty state */
+.empty{text-align:center;padding:3rem 1rem;color:var(--gray3)}
+.empty i{font-size:2.5rem;margin-bottom:.8rem;display:block;opacity:.4}
+.empty p{font-size:.88rem}
+
+/* Load more */
+.load-more{text-align:center;margin:1rem 0}
+.load-more button{padding:.6rem 1.6rem;background:var(--gray1);border:1px solid var(--gray2);border-radius:var(--r);font-size:.8rem;cursor:pointer;font-family:var(--font);color:var(--gray4)}
+.load-more button:hover{background:var(--gray2)}
+
+/* Bottom tab bar mobile */
+.btabs{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--gray2);z-index:50;padding:.4rem 0 calc(.4rem + env(safe-area-inset-bottom))}
+.btabs-row{display:flex;justify-content:space-around}
+.btab{display:flex;flex-direction:column;align-items:center;gap:2px;padding:.4rem .5rem;font-size:.6rem;color:var(--gray3);cursor:pointer;transition:color var(--tr);border:none;background:none;font-family:var(--font)}
+.btab.active{color:var(--blue)}
+.btab i{font-size:1.1rem}
+
+@media(max-width:768px){
+  .sidebar{display:none}.main{margin-left:0}.btabs{display:block}
+  .content{padding:1rem 1rem 5rem;max-width:100%}
+  .topbar{padding:.8rem 1rem}
+  .chat-wrap{height:calc(100vh - 180px)}
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar (desktop) -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo"><div class="sb-logo-t">HASHLAY</div><div class="sb-logo-s">My Account</div></div>
+  <nav class="sb-nav" id="sb-nav"></nav>
+  <div class="sb-user" id="sb-user"></div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar"><div class="topbar-title" id="topbar-t">MY ORDERS</div></div>
+  <div class="content">
+    <!-- Orders Tab -->
+    <div class="tab active" id="tab-orders"><div id="orders-list"></div><div class="load-more" id="orders-more" style="display:none"><button onclick="loadMoreOrders()">Load More</button></div></div>
+    <!-- Track Tab -->
+    <div class="tab" id="tab-track">
+      <div class="track-input"><input id="track-id" placeholder="Enter Order ID (e.g. HL0523001)"><button onclick="doTrack()"><i class="fa-solid fa-magnifying-glass"></i> Track</button></div>
+      <div id="track-result"></div>
+    </div>
+    <!-- Chat Tab -->
+    <div class="tab" id="tab-chat">
+      <div class="chat-wrap"><div id="chat-offline" class="chat-offline" style="display:none">Reconnecting...</div><div class="chat-msgs" id="chat-msgs"></div><div class="chat-typing" id="chat-typing"></div><div class="chat-bar"><input id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg()"><button onclick="sendMsg()"><i class="fa-solid fa-paper-plane"></i></button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom tabs (mobile) -->
+<div class="btabs" id="btabs"><div class="btabs-row" id="btabs-row"></div></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const API=location.hostname==='localhost'||location.hostname==='127.0.0.1'?'http://localhost:5000':location.origin;
+let _customer=null,_features={},_page=1,_hasMore=false,_orders=[],_sessionId=null,_socket=null,_typingTimer=null;
+
+/* ══ AUTH CHECK ══ */
+async function init(){
+  try{
+    const r=await fetch(API+'/api/customer/auth/me',{credentials:'include'});
+    const d=await r.json();
+    if(!d.loggedIn)return location.href='/auth';
+    _customer=d.customer;
+  }catch{return location.href='/auth';}
+  try{
+    const r=await fetch(API+'/api/customer/portal/settings');
+    const d=await r.json();
+    _features=d;
+  }catch{}
+  buildNav();
+  switchTab('orders');
+}
+init();
+
+/* ══ NAV ══ */
+function buildNav(){
+  const tabs=[];
+  if(_features.featureOrdersEnabled!==false)tabs.push({id:'orders',icon:'fa-solid fa-bag-shopping',label:'My Orders'});
+  if(_features.featureTrackEnabled!==false)tabs.push({id:'track',icon:'fa-solid fa-truck-fast',label:'Track Order'});
+  if(_features.featureChatEnabled)tabs.push({id:'chat',icon:'fa-solid fa-headset',label:'Support'});
+  tabs.push({id:'logout',icon:'fa-solid fa-arrow-right-from-bracket',label:'Logout'});
+
+  // Sidebar
+  const sn=document.getElementById('sb-nav');
+  sn.innerHTML=tabs.map(t=>'<div class="sb-item'+(t.id==='orders'?' active':'')+'" data-tab="'+t.id+'" onclick="switchTab(\''+t.id+'\')"><i class="'+t.icon+'"></i>'+t.label+'</div>').join('');
+
+  // User
+  const u=document.getElementById('sb-user');
+  u.innerHTML='<strong>'+(_customer?.name||'Customer')+'</strong>'+(_customer?.email||_customer?.phone||'');
+
+  // Bottom tabs mobile
+  const br=document.getElementById('btabs-row');
+  br.innerHTML=tabs.map(t=>'<button class="btab'+(t.id==='orders'?' active':'')+'" data-tab="'+t.id+'" onclick="switchTab(\''+t.id+'\')"><i class="'+t.icon+'"></i>'+t.label+'</button>').join('');
+}
+
+async function switchTab(id){
+  if(id==='logout'){
+    await fetch(API+'/api/customer/auth/logout',{method:'POST',credentials:'include'});
+    return location.href='/';
+  }
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.sb-item,.btab').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('[data-tab="'+id+'"]').forEach(n=>n.classList.add('active'));
+  const el=document.getElementById('tab-'+id);
+  if(el)el.classList.add('active');
+  const titles={orders:'MY ORDERS',track:'TRACK ORDER',chat:'SUPPORT CHAT'};
+  document.getElementById('topbar-t').textContent=titles[id]||id.toUpperCase();
+  if(id==='orders'&&!_orders.length)loadOrders();
+  if(id==='chat')initChat();
+}
+
+/* ══ ORDERS ══ */
+async function loadOrders(){
+  _page=1;_orders=[];
+  document.getElementById('orders-list').innerHTML='<div class="empty"><i class="fa-solid fa-spinner fa-spin"></i><p>Loading...</p></div>';
+  await fetchOrders();
+}
+async function loadMoreOrders(){_page++;await fetchOrders();}
+async function fetchOrders(){
+  try{
+    const r=await fetch(API+'/api/customer/portal/orders?page='+_page+'&limit=10',{credentials:'include'});
+    const d=await r.json();
+    if(!d.success)return;
+    _orders=_orders.concat(d.orders);
+    _hasMore=d.hasMore;
+    renderOrders();
+  }catch{}
+}
+function renderOrders(){
+  const el=document.getElementById('orders-list');
+  if(!_orders.length){el.innerHTML='<div class="empty"><i class="fa-solid fa-bag-shopping"></i><p>No orders yet</p></div>';return;}
+  el.innerHTML=_orders.map(o=>{
+    const dt=new Date(o.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+    const bc='badge badge-'+(o.status||'pending');
+    const sl=o.status?.replace(/_/g,' ')||'pending';
+    return '<div class="card" onclick="toggleDetail(\''+o.orderId+'\',this)"><div class="card-row"><span class="card-id">#'+o.orderId+'</span><span class="card-date">'+dt+'</span></div><div class="card-bottom"><span class="card-total">\u20B9'+o.total+'</span><span><span class="'+bc+'">'+sl+'</span> <span class="card-items">'+o.itemCount+' item'+(o.itemCount>1?'s':'')+'</span></span></div><div class="card-detail" id="det-'+o.orderId+'"></div></div>';
+  }).join('');
+  document.getElementById('orders-more').style.display=_hasMore?'block':'none';
+}
+async function toggleDetail(oid,card){
+  const det=document.getElementById('det-'+oid);
+  if(det.classList.contains('show')){det.classList.remove('show');return;}
+  det.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Loading...';det.classList.add('show');
+  try{
+    const r=await fetch(API+'/api/customer/portal/orders/'+oid,{credentials:'include'});
+    const d=await r.json();
+    if(!d.success){det.innerHTML='Failed to load';return;}
+    const o=d.order;
+    let h='<div class="detail-section"><div class="detail-label">Items</div><div class="detail-items">';
+    (o.items||[]).forEach(i=>{h+='<div class="detail-item"><span>'+i.name+' x'+i.quantity+'</span><span>\u20B9'+i.total+'</span></div>';});
+    h+='</div></div>';
+    if(o.address){h+='<div class="detail-section"><div class="detail-label">Delivery Address</div><div>'+[o.address.fullName,o.address.addressLine1,o.address.addressLine2,o.address.city,o.address.state,o.address.pincode].filter(Boolean).join(', ')+'</div></div>';}
+    h+='<div class="detail-section"><div class="detail-label">Payment</div><div>'+(o.paymentMethod||'N/A').toUpperCase()+' — '+(o.paymentStatus||'pending')+'</div></div>';
+    if(_features.featureTrackEnabled!==false)h+='<div style="margin-top:.6rem"><a onclick="event.stopPropagation();trackFromOrder(\''+oid+'\')"><i class="fa-solid fa-truck-fast"></i> Track this order</a></div>';
+    det.innerHTML=h;
+  }catch{det.innerHTML='Error loading details';}
+}
+function trackFromOrder(oid){document.getElementById('track-id').value=oid;switchTab('track');doTrack();}
+
+/* ══ TRACK ══ */
+const STEPS=['pending','confirmed','shipped','out_for_delivery','delivered'];
+const STEP_LABELS={pending:'Order Placed',confirmed:'Confirmed',shipped:'Shipped',out_for_delivery:'Out for Delivery',delivered:'Delivered'};
+async function doTrack(){
+  const oid=document.getElementById('track-id').value.trim();
+  if(!oid){document.getElementById('track-result').innerHTML='<div class="empty"><p>Enter an Order ID above</p></div>';return;}
+  document.getElementById('track-result').innerHTML='<div class="empty"><i class="fa-solid fa-spinner fa-spin"></i><p>Tracking...</p></div>';
+  try{
+    const r=await fetch(API+'/api/customer/portal/track/'+oid,{credentials:'include'});
+    const d=await r.json();
+    if(!d.success){document.getElementById('track-result').innerHTML='<div class="empty"><i class="fa-solid fa-circle-xmark"></i><p>'+d.message+'</p></div>';return;}
+    renderTimeline(d.order);
+  }catch{document.getElementById('track-result').innerHTML='<div class="empty"><p>Network error</p></div>';}
+}
+function renderTimeline(order){
+  const cur=STEPS.indexOf(order.orderStatus)||0;
+  const tlMap={};
+  (order.timeline||[]).forEach(t=>{if(t.status)tlMap[t.status]=t.timestamp;});
+  let h='<div class="timeline">';
+  STEPS.forEach((s,i)=>{
+    const cls=i<cur?'done':i===cur?'current':'future';
+    const ts=tlMap[s]?new Date(tlMap[s]).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+    h+='<div class="tl-step '+cls+'"><div class="tl-dot">'+(i<cur?'<i class="fa-solid fa-check" style="color:#fff;font-size:.5rem;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)"></i>':'')+'</div><div class="tl-line"></div><div class="tl-title">'+STEP_LABELS[s]+'</div>'+(ts?'<div class="tl-time">'+ts+'</div>':'')+'</div>';
+  });
+  h+='</div>';
+  if(order.trackingId)h+='<div style="margin-top:1rem;padding:.8rem;background:var(--gray1);border-radius:var(--r);font-size:.82rem"><strong>Tracking ID:</strong> '+order.trackingId+'</div>';
+  document.getElementById('track-result').innerHTML=h;
+}
+
+/* ══ CHAT ══ */
+async function initChat(){
+  if(_socket)return;
+  // Load messages
+  try{
+    const r=await fetch(API+'/api/customer/portal/chat/messages',{credentials:'include'});
+    const d=await r.json();
+    _sessionId=d.sessionId;
+    renderMsgs(d.messages||[]);
+  }catch{}
+  // Socket
+  _socket=io(API);
+  _socket.on('connect',()=>{
+    document.getElementById('chat-offline').style.display='none';
+    if(_customer)_socket.emit('join_customer',_customer._id||_customer.email);
+  });
+  _socket.on('disconnect',()=>{document.getElementById('chat-offline').style.display='block';});
+  _socket.on('admin_message',data=>{appendMsg(data.message,'a',data.createdAt);});
+  _socket.on('admin_typing',()=>{
+    document.getElementById('chat-typing').textContent='Support is typing...';
+    clearTimeout(_typingTimer);_typingTimer=setTimeout(()=>{document.getElementById('chat-typing').textContent='';},2000);
+  });
+  // Typing emit
+  document.getElementById('chat-input').addEventListener('input',()=>{
+    if(_socket&&_sessionId)_socket.emit('customer_typing',{sessionId:_sessionId});
+  });
+}
+function renderMsgs(msgs){
+  const el=document.getElementById('chat-msgs');
+  el.innerHTML=msgs.length?'':'<div class="empty"><i class="fa-solid fa-comments"></i><p>No messages yet. Say hi!</p></div>';
+  msgs.forEach(m=>appendMsg(m.message,m.senderRole==='customer'?'c':'a',m.createdAt));
+  el.scrollTop=el.scrollHeight;
+}
+function appendMsg(text,type,ts){
+  const el=document.getElementById('chat-msgs');
+  // Remove empty state
+  const em=el.querySelector('.empty');if(em)em.remove();
+  const d=document.createElement('div');
+  d.className='msg msg-'+type;
+  const t=ts?new Date(ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}):'now';
+  d.innerHTML=text+'<div class="msg-time">'+t+'</div>';
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+async function sendMsg(){
+  const inp=document.getElementById('chat-input');
+  const msg=inp.value.trim();if(!msg)return;
+  inp.value='';
+  // Start session if needed
+  if(!_sessionId){
+    try{
+      const r=await fetch(API+'/api/customer/portal/chat/start',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include'});
+      const d=await r.json();
+      _sessionId=d.sessionId;
+    }catch{return;}
+  }
+  appendMsg(msg,'c',new Date());
+  try{
+    await fetch(API+'/api/customer/portal/chat/message',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,sessionId:_sessionId}),credentials:'include'});
+  }catch{}
+}
+</script>
+</body>
+</html>

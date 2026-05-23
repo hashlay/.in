@@ -4978,7 +4978,14 @@
         </div>
         <div class="form-group">
           <label>Email <span style="color:var(--gray-5);font-weight:400;">(for order updates)</span></label>
-          <input type="email" class="form-input" id="co-email" placeholder="your@email.com" />
+          <input type="email" class="form-input" id="co-email" data-checkout-email="true" placeholder="your@email.com" />
+          <!-- Inline OTP verification (progressive enhancement) -->
+          <div id="co-otp-section" style="display:none;margin-top:.6rem;">
+            <div id="co-otp-status" style="display:flex;align-items:center;gap:.4rem;font-size:.72rem;margin-bottom:.5rem;"></div>
+            <div id="co-otp-row" style="display:none;gap:.3rem;justify-content:flex-start;margin-bottom:.5rem;"></div>
+            <div id="co-otp-actions" style="display:none;display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;"></div>
+            <div id="co-otp-msg" style="font-size:.7rem;margin-top:.3rem;"></div>
+          </div>
         </div>
         <div class="form-group">
           <label>Street Address *</label>
@@ -7748,6 +7755,174 @@
     /* ══════════════════════════════════════════════════════════════
        INIT
     ══════════════════════════════════════════════════════════════ */
+    /* ══════════════════════════════════════════════════════════════
+       INLINE CHECKOUT OTP VERIFICATION
+    ══════════════════════════════════════════════════════════════ */
+    (function initCheckoutOtp() {
+      const emailInput = document.getElementById('co-email');
+      const sec = document.getElementById('co-otp-section');
+      const status = document.getElementById('co-otp-status');
+      const row = document.getElementById('co-otp-row');
+      const actions = document.getElementById('co-otp-actions');
+      const msgEl = document.getElementById('co-otp-msg');
+      let otpTimer, otpResendReady = false, isVerified = false;
+
+      if (!emailInput || !sec) return;
+
+      emailInput.addEventListener('blur', async () => {
+        const email = emailInput.value.trim();
+        if (!email || !email.includes('@')) return;
+        if (isVerified) return;
+
+        sec.style.display = 'block';
+        status.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="color:var(--blue-1)"></i> Checking...';
+        row.style.display = 'none';
+        actions.style.display = 'none';
+        msgEl.textContent = '';
+
+        try {
+          const res = await fetch(API_BASE + '/api/customer/auth/send-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier: email }),
+            credentials: 'omit' // Do not send cookies for sending OTP to avoid CSRF issues on public endpoint
+          });
+          const data = await res.json();
+          if (!res.ok || !data.success) {
+            sec.style.display = 'none';
+            return;
+          }
+          
+          status.innerHTML = '<i class="fa-solid fa-envelope-circle-check" style="color:var(--blue-1)"></i> OTP sent to ' + email;
+          buildOtpBoxes();
+          row.style.display = 'flex';
+          actions.style.display = 'flex';
+          startOtpTimer();
+        } catch (e) {
+          sec.style.display = 'none';
+        }
+      });
+
+      function buildOtpBoxes() {
+        row.innerHTML = '';
+        for (let i = 0; i < 6; i++) {
+          const b = document.createElement('input');
+          b.type = 'text'; b.maxLength = 1; b.inputMode = 'numeric';
+          b.style.cssText = 'width:36px;height:42px;text-align:center;font-size:1.2rem;border:1.5px solid var(--gray-5);border-radius:6px;background:var(--gray-3);color:#fff;outline:none;transition:all 0.2s;';
+          b.addEventListener('focus', () => b.style.borderColor = 'var(--blue-1)');
+          b.addEventListener('blur', () => b.style.borderColor = 'var(--gray-5)');
+          b.addEventListener('input', e => {
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 1);
+            if (e.target.value && e.target.nextElementSibling) e.target.nextElementSibling.focus();
+          });
+          b.addEventListener('keydown', e => {
+            if (e.key === 'Backspace' && !e.target.value && e.target.previousElementSibling) {
+              e.target.previousElementSibling.focus();
+              e.target.previousElementSibling.value = '';
+            }
+            if (e.key === 'Enter') verifyOtp();
+          });
+          row.appendChild(b);
+        }
+        
+        actions.innerHTML = `
+          <button type="button" class="btn-primary" style="padding:0.4rem 1rem;font-size:0.8rem;min-width:80px;" id="co-verify-btn">Verify</button>
+          <button type="button" class="btn-outline" style="padding:0.4rem 1rem;font-size:0.8rem;border:none;color:var(--gray-5);" id="co-resend-btn" disabled>Resend in 30s</button>
+        `;
+        document.getElementById('co-verify-btn').addEventListener('click', verifyOtp);
+        document.getElementById('co-resend-btn').addEventListener('click', resendOtp);
+      }
+
+      function startOtpTimer() {
+        otpResendReady = false;
+        let left = 30;
+        const rb = document.getElementById('co-resend-btn');
+        if (!rb) return;
+        rb.disabled = true;
+        clearInterval(otpTimer);
+        otpTimer = setInterval(() => {
+          left--;
+          if (left <= 0) {
+            clearInterval(otpTimer);
+            otpResendReady = true;
+            rb.disabled = false;
+            rb.textContent = 'Resend OTP';
+            rb.style.color = 'var(--blue-1)';
+          } else {
+            rb.textContent = 'Resend in ' + left + 's';
+          }
+        }, 1000);
+      }
+
+      async function resendOtp() {
+        if (!otpResendReady) return;
+        const email = emailInput.value.trim();
+        msgEl.textContent = 'Resending...';
+        msgEl.style.color = 'var(--gray-5)';
+        try {
+          await fetch(API_BASE + '/api/customer/auth/send-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier: email })
+          });
+          msgEl.textContent = 'OTP Resent!';
+          msgEl.style.color = 'var(--green)';
+          startOtpTimer();
+        } catch (e) {
+          msgEl.textContent = 'Error resending OTP';
+          msgEl.style.color = 'var(--red)';
+        }
+      }
+
+      async function verifyOtp() {
+        const otp = Array.from(row.querySelectorAll('input')).map(i => i.value).join('');
+        if (otp.length < 6) {
+          msgEl.textContent = 'Enter 6 digit OTP';
+          msgEl.style.color = 'var(--red)';
+          return;
+        }
+        const btn = document.getElementById('co-verify-btn');
+        btn.textContent = '...';
+        btn.disabled = true;
+        
+        try {
+          const res = await fetch(API_BASE + '/api/customer/auth/verify-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier: emailInput.value.trim(), otp }),
+            credentials: 'include' // Include credentials so the backend sets the JWT cookie on success
+          });
+          const data = await res.json();
+          if (!res.ok || !data.success) {
+            msgEl.textContent = data.message || 'Invalid OTP';
+            msgEl.style.color = 'var(--red)';
+            btn.textContent = 'Verify';
+            btn.disabled = false;
+            return;
+          }
+          
+          isVerified = true;
+          clearInterval(otpTimer);
+          status.innerHTML = '<i class="fa-solid fa-circle-check" style="color:#22c55e"></i> Verified! Your order will be linked to your account.';
+          row.style.display = 'none';
+          actions.style.display = 'none';
+          msgEl.textContent = '';
+          emailInput.style.borderColor = '#22c55e';
+          emailInput.style.backgroundColor = 'rgba(34,197,94,0.05)';
+          emailInput.readOnly = true;
+          
+          // Optionally auto-fill user details if returned from backend? 
+          // Our verify-otp endpoint doesn't return full user details by default unless they were already registered, 
+          // but we'll let the user fill the rest of checkout normally.
+        } catch (e) {
+          msgEl.textContent = 'Network error';
+          msgEl.style.color = 'var(--red)';
+          btn.textContent = 'Verify';
+          btn.disabled = false;
+        }
+      }
+    })();
+
     /* ══════════════════════════════════════════════════════════════
        INIT — Boot the Hashlay frontend
     ══════════════════════════════════════════════════════════════ */
