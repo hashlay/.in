@@ -193,7 +193,7 @@ let _timerInterval = null, _timerEnd = 0, _resendReady = false;
   try {
     const r = await fetch(API+'/api/customer/auth/me',{credentials:'include'});
     const d = await r.json();
-    if(d.loggedIn) return location.href='/portal';
+    if(d.loggedIn) return location.href='/?openAccount=1';
   } catch{}
   // Load settings
   try {
@@ -341,7 +341,7 @@ async function submitOtp(){
     if(!r.ok||!d.success){ showErr('v2-err',d.message||'Incorrect code'); shakeOtp(); return; }
     clearInterval(_timerInterval);
     if(d.isNewUser){ _tempToken=d.tempToken; goView('v-pass'); }
-    else location.href='/portal';
+    else location.href='/?openAccount=1';
   }catch(e){ setLoading('btn-verify',false); showErr('v2-err','Network error.'); }
 }
 function shakeOtp(){ document.querySelectorAll('.otp-box').forEach(b=>{b.classList.add('error');setTimeout(()=>b.classList.remove('error'),500);}); }
@@ -374,7 +374,7 @@ async function submitPassword(){
     const d=await r.json();
     setLoading('btn-create',false);
     if(!r.ok||!d.success){showErr('v3-err',d.message||'Something went wrong');return;}
-    location.href='/portal';
+    location.href='/?openAccount=1';
   }catch(e){setLoading('btn-create',false);showErr('v3-err','Network error.');}
 }
 

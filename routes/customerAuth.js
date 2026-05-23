@@ -317,7 +317,22 @@ router.post('/verify-otp',
     const query = type === 'email' ? { email: identifier } : { phone: identifier };
 
     // ── Check if customer exists ──
-    const existingCustomer = await Customer.findOne(query).select('+passwordHash');
+    let existingCustomer = await Customer.findOne(query).select('+passwordHash');
+    
+    // If checkout flag is present, auto-create and auto-login even without password
+    if (req.body.checkout) {
+      if (!existingCustomer) {
+        existingCustomer = await Customer.create({
+          [type]: identifier,
+          name: req.body.name || null,
+        });
+      }
+      await createSession(existingCustomer, req, res);
+      return res.json({
+        success: true,
+        message: 'OTP verified and logged in.',
+      });
+    }
 
     if (!existingCustomer || !existingCustomer.passwordHash) {
       // New user or user without password — issue temp token for set-password

@@ -9596,3 +9596,6 @@ MongooseError: Cannot call `chatbots.find()` before initial connection is comple
 2026-05-23 22:28:55 [INFO]: ::1 - - [23/May/2026:16:58:55 +0000] "GET /api/admin/chat/unread-count HTTP/1.1" 401 54 "-" "LenovoVantage/3.0.0.191"
 2026-05-23 22:29:18 [INFO]: ::1 - - [23/May/2026:16:59:18 +0000] "GET /api/admin/chat/unread-count HTTP/1.1" 401 54 "-" "LenovoVantage/3.0.0.191"
 2026-05-23 22:29:24 [INFO]: ::1 - - [23/May/2026:16:59:24 +0000] "GET /api/admin/chat/unread-count HTTP/1.1" 401 54 "-" "LenovoVantage/3.0.0.191"
+2026-05-23 23:07:13 [INFO]: 🚀 Hashlay Backend running on port 5000 [development]
+2026-05-23 23:07:19 [INFO]: ✅ MongoDB connected: ac-oyh7nyc-shard-00-02.qr6bfyn.mongodb.net
+2026-05-23 23:07:19 [INFO]: ::1 - - [23/May/2026:17:37:19 +0000] "GET /api/admin/chat/unread-count HTTP/1.1" 401 54 "-" "LenovoVantage/3.0.0.191"

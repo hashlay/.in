@@ -4405,6 +4405,9 @@
 
     </div>
     <div class="nav-actions">
+      <button class="nav-cart-btn" onclick="openAccountPanel()" aria-label="Account" style="margin-right:0.5rem;">
+        <i class="fa-solid fa-user"></i>
+      </button>
       <button class="nav-cart-btn" onclick="toggleCart()" aria-label="Cart">
         <i class="fa-solid fa-cart-shopping"></i>
         <span class="cart-count" id="cart-count">0</span>
@@ -4420,6 +4423,7 @@
     <button onclick="toggleMobileMenu()"
       style="position:absolute;top:2rem;right:2rem;background:none;border:none;color:white;font-size:2rem;">✕</button>
     <a href="#products" onclick="toggleMobileMenu()">Shop</a>
+    <a href="#" onclick="toggleMobileMenu();openAccountPanel()">Account</a>
     <a href="#story" onclick="toggleMobileMenu()">Story</a>
     <a href="#reviews" onclick="toggleMobileMenu()">Reviews</a>
     <a href="#faq-section" onclick="toggleMobileMenu()">FAQ</a>
@@ -4941,6 +4945,128 @@
       </div>
     </div>
   </footer>
+
+  <!-- ─── ACCOUNT DRAWER ─────────────────────────────────────── -->
+  <style>
+    #account-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    #account-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+    #account-drawer {
+      position: fixed;
+      top: 0; right: -400px;
+      width: 400px; max-width: 100vw;
+      height: 100vh;
+      background: var(--white);
+      z-index: 1000;
+      box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+      transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    #account-drawer.open {
+      right: 0;
+    }
+    .acct-tab {
+      flex: 1;
+      padding: 0.8rem 0;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--gray-4);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.2s;
+    }
+    .acct-tab.active {
+      color: var(--blue-1);
+      border-bottom-color: var(--blue-1);
+      background: #fff;
+    }
+    .acct-panel {
+      animation: fadeUp 0.3s ease;
+    }
+    .portal-card {
+      background: #fff;
+      border: 1px solid #e2e2ea;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.8rem;
+      cursor: pointer;
+    }
+    .portal-badge {
+      display: inline-block;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      border-radius: 100px;
+      background: #f0f0f4;
+    }
+    .tl-step { position: relative; padding-bottom: 1.5rem; padding-left: 1rem; }
+    .tl-dot { position: absolute; left: -1.5rem; top: 3px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #e2e2ea; background: #fff; z-index: 2; }
+    .tl-line { position: absolute; left: calc(-1.5rem + 5px); top: 15px; bottom: 0; width: 2px; background: #e2e2ea; }
+    .tl-step:last-child .tl-line { display: none; }
+    .tl-step.done .tl-dot, .tl-step.done .tl-line { background: #22c55e; border-color: #22c55e; }
+    .tl-step.current .tl-dot { background: var(--blue-1); border-color: var(--blue-1); box-shadow: 0 0 0 3px rgba(0,87,255,0.15); }
+    .portal-msg { padding: 0.6rem 0.8rem; border-radius: 10px; font-size: 0.82rem; max-width: 85%; word-wrap: break-word; }
+    .portal-msg-c { align-self: flex-end; background: var(--blue-1); color: #fff; border-bottom-right-radius: 2px; }
+    .portal-msg-a { align-self: flex-start; background: #e2e2ea; color: #111; border-bottom-left-radius: 2px; }
+  </style>
+  <div id="account-overlay" onclick="closeAccountPanel()"></div>
+  <div id="account-drawer">
+    <div class="cart-header">
+      <h3 id="account-title">MY ACCOUNT</h3>
+      <button class="cart-close" onclick="closeAccountPanel()">✕</button>
+    </div>
+    
+    <div id="account-tabs" style="display:flex;border-bottom:1px solid #e2e2ea;background:#f5f5f8;">
+      <button class="acct-tab active" data-tab="orders" onclick="switchAcctTab('orders')"><i class="fa-solid fa-bag-shopping"></i> Orders</button>
+      <button class="acct-tab" data-tab="track" onclick="switchAcctTab('track')"><i class="fa-solid fa-truck-fast"></i> Track</button>
+      <button class="acct-tab" data-tab="chat" onclick="switchAcctTab('chat')"><i class="fa-solid fa-headset"></i> Support</button>
+      <button class="acct-tab" onclick="logoutCustomer()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
+    </div>
+
+    <div class="acct-content" style="flex:1;overflow-y:auto;padding:1rem;background:#fff;">
+      <!-- Orders Tab -->
+      <div class="acct-panel active" id="acct-orders">
+        <div id="portal-orders-list"></div>
+        <div style="text-align:center;margin-top:1rem;display:none;" id="portal-orders-more">
+          <button class="btn-outline" onclick="loadMoreOrders()">Load More</button>
+        </div>
+      </div>
+      <!-- Track Tab -->
+      <div class="acct-panel" id="acct-track" style="display:none;">
+        <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+          <input type="text" class="form-input" id="portal-track-id" placeholder="Order ID (e.g. HL0523001)">
+          <button class="btn-primary" onclick="doPortalTrack()" style="padding:0.6rem 1rem;">Track</button>
+        </div>
+        <div id="portal-track-result"></div>
+      </div>
+      <!-- Chat Tab -->
+      <div class="acct-panel" id="acct-chat" style="display:none;height:100%;flex-direction:column;">
+        <div id="portal-chat-offline" style="background:#fef2f2;color:#ef4444;text-align:center;padding:0.4rem;font-size:0.8rem;display:none;">Reconnecting...</div>
+        <div id="portal-chat-msgs" style="flex:1;overflow-y:auto;padding:0.5rem;display:flex;flex-direction:column;gap:0.5rem;background:#f5f5f8;border-radius:8px;margin-bottom:0.5rem;"></div>
+        <div id="portal-chat-typing" style="font-size:0.75rem;color:#8888aa;font-style:italic;height:1.2rem;"></div>
+        <div style="display:flex;gap:0.5rem;">
+          <input type="text" class="form-input" id="portal-chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendPortalMsg()">
+          <button class="btn-primary" onclick="sendPortalMsg()" style="padding:0.6rem 1rem;"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ─── CART DRAWER ────────────────────────────────────────── -->
   <div id="cart-overlay" onclick="toggleCart()"></div>
@@ -7889,7 +8015,7 @@
           const res = await fetch(API_BASE + '/api/customer/auth/verify-otp', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ identifier: emailInput.value.trim(), otp }),
+            body: JSON.stringify({ identifier: emailInput.value.trim(), otp, checkout: true, name: document.getElementById('co-name')?.value.trim() }),
             credentials: 'include' // Include credentials so the backend sets the JWT cookie on success
           });
           const data = await res.json();
@@ -7922,6 +8048,236 @@
         }
       }
     })();
+
+    /* ══════════════════════════════════════════════════════════════
+       CUSTOMER PORTAL IN STOREFRONT
+    ══════════════════════════════════════════════════════════════ */
+    let portalCustomer = null, portalFeatures = {}, portalPage = 1, portalHasMore = false, portalOrders = [];
+    let portalSessionId = null, portalSocket = null, portalTypingTmr = null;
+
+    async function checkPortalAuth() {
+      try {
+        const r = await fetch(API_BASE + '/api/customer/auth/me', {credentials: 'include'});
+        const d = await r.json();
+        if(!d.loggedIn) return false;
+        portalCustomer = d.customer;
+        
+        try {
+          const sr = await fetch(API_BASE + '/api/customer/portal/settings');
+          portalFeatures = await sr.json();
+        } catch(e) {}
+        return true;
+      } catch(e) { return false; }
+    }
+
+    async function openAccountPanel() {
+      const loggedIn = await checkPortalAuth();
+      if(!loggedIn) {
+        window.location.href = '/auth';
+        return;
+      }
+      
+      document.getElementById('account-title').textContent = (portalCustomer?.name || 'MY ACCOUNT').toUpperCase();
+      document.getElementById('account-overlay').classList.add('open');
+      document.getElementById('account-drawer').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      
+      switchAcctTab('orders');
+    }
+
+    function closeAccountPanel() {
+      document.getElementById('account-overlay').classList.remove('open');
+      document.getElementById('account-drawer').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    async function switchAcctTab(tabId) {
+      document.querySelectorAll('.acct-tab').forEach(b => b.classList.remove('active'));
+      document.querySelector(`.acct-tab[data-tab="${tabId}"]`).classList.add('active');
+      document.querySelectorAll('.acct-panel').forEach(p => p.style.display = 'none');
+      document.getElementById('acct-' + tabId).style.display = tabId === 'chat' ? 'flex' : 'block';
+      
+      if(tabId === 'orders' && !portalOrders.length) {
+        portalPage = 1; portalOrders = [];
+        document.getElementById('portal-orders-list').innerHTML = '<div style="text-align:center;padding:2rem;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>';
+        await fetchPortalOrders();
+      }
+      if(tabId === 'chat') {
+        initPortalChat();
+      }
+    }
+
+    async function fetchPortalOrders() {
+      try {
+        const r = await fetch(API_BASE + '/api/customer/portal/orders?page=' + portalPage + '&limit=10', {credentials: 'include'});
+        const d = await r.json();
+        if(!d.success) return;
+        portalOrders = portalOrders.concat(d.orders);
+        portalHasMore = d.hasMore;
+        renderPortalOrders();
+      } catch(e) {
+        document.getElementById('portal-orders-list').innerHTML = '<div style="text-align:center;padding:2rem;color:red;">Error loading orders</div>';
+      }
+    }
+
+    function renderPortalOrders() {
+      const el = document.getElementById('portal-orders-list');
+      if(!portalOrders.length) {
+        el.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--gray-4);"><i class="fa-solid fa-bag-shopping" style="font-size:2rem;margin-bottom:1rem;opacity:0.5;"></i><br>No orders yet</div>';
+        return;
+      }
+      el.innerHTML = portalOrders.map(o => {
+        const dt = new Date(o.createdAt).toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+        const sl = o.status?.replace(/_/g, ' ') || 'pending';
+        return `<div class="portal-card" onclick="togglePortalOrderDetail('${o.orderId}')">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+            <span style="font-weight:700;font-size:0.9rem;">#${o.orderId}</span>
+            <span style="font-size:0.75rem;color:var(--gray-4);">${dt}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-weight:700;">₹${o.total}</span>
+            <span><span class="portal-badge" style="background:rgba(0,87,255,0.1);color:var(--blue-1);">${sl}</span> <span style="font-size:0.75rem;color:var(--gray-4);margin-left:0.4rem;">${o.itemCount} item(s)</span></span>
+          </div>
+          <div id="portal-det-${o.orderId}" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px solid #e2e2ea;font-size:0.82rem;animation:fadeUp 0.25s;"></div>
+        </div>`;
+      }).join('');
+      document.getElementById('portal-orders-more').style.display = portalHasMore ? 'block' : 'none';
+    }
+
+    async function loadMoreOrders() {
+      portalPage++;
+      await fetchPortalOrders();
+    }
+
+    async function togglePortalOrderDetail(oid) {
+      const det = document.getElementById('portal-det-' + oid);
+      if(det.style.display === 'block') { det.style.display = 'none'; return; }
+      det.style.display = 'block';
+      det.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
+      try {
+        const r = await fetch(API_BASE + '/api/customer/portal/orders/' + oid, {credentials: 'include'});
+        const d = await r.json();
+        if(!d.success) { det.innerHTML = 'Failed to load'; return; }
+        const o = d.order;
+        let h = '<div style="margin-bottom:0.6rem;"><div style="font-size:0.68rem;color:var(--gray-4);text-transform:uppercase;margin-bottom:0.2rem;">Items</div>';
+        (o.items||[]).forEach(i => { h += `<div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px dashed #f0f0f4;"><span>${i.name} x${i.quantity}</span><span>₹${i.total}</span></div>`; });
+        h += '</div>';
+        if(o.address) h += `<div style="margin-bottom:0.6rem;"><div style="font-size:0.68rem;color:var(--gray-4);text-transform:uppercase;margin-bottom:0.2rem;">Delivery</div><div>${[o.address.fullName, o.address.city, o.address.state].filter(Boolean).join(', ')}</div></div>`;
+        h += `<div><a style="color:var(--blue-1);cursor:pointer;font-weight:600;" onclick="event.stopPropagation();document.getElementById('portal-track-id').value='${oid}';switchAcctTab('track');doPortalTrack();"><i class="fa-solid fa-truck-fast"></i> Track this order</a></div>`;
+        det.innerHTML = h;
+      } catch(e) { det.innerHTML = 'Error loading details'; }
+    }
+
+    async function doPortalTrack() {
+      const oid = document.getElementById('portal-track-id').value.trim();
+      const resEl = document.getElementById('portal-track-result');
+      if(!oid) { resEl.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--gray-4);">Enter an Order ID</div>'; return; }
+      resEl.innerHTML = '<div style="padding:2rem;text-align:center;"><i class="fa-solid fa-spinner fa-spin"></i> Tracking...</div>';
+      try {
+        const r = await fetch(API_BASE + '/api/customer/portal/track/' + oid, {credentials: 'include'});
+        const d = await r.json();
+        if(!d.success) { resEl.innerHTML = `<div style="padding:2rem;text-align:center;color:red;">${d.message}</div>`; return; }
+        
+        const steps = ['pending','confirmed','shipped','out_for_delivery','delivered'];
+        const labels = {pending:'Order Placed',confirmed:'Confirmed',shipped:'Shipped',out_for_delivery:'Out for Delivery',delivered:'Delivered'};
+        const cur = steps.indexOf(d.order.orderStatus) || 0;
+        const tlMap = {};
+        (d.order.timeline||[]).forEach(t => { if(t.status) tlMap[t.status] = t.timestamp; });
+        
+        let h = '<div style="position:relative;padding-left:2rem;margin-top:1rem;">';
+        steps.forEach((s, i) => {
+          const cls = i < cur ? 'done' : i === cur ? 'current' : 'future';
+          const ts = tlMap[s] ? new Date(tlMap[s]).toLocaleString('en-IN', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+          h += `<div class="tl-step ${cls}"><div class="tl-dot">${i<cur?'<i class="fa-solid fa-check" style="color:#fff;font-size:6px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></i>':''}</div><div class="tl-line"></div><div style="font-weight:600;font-size:0.85rem;">${labels[s]}</div><div style="font-size:0.7rem;color:var(--gray-4);margin-top:2px;">${ts}</div></div>`;
+        });
+        h += '</div>';
+        if(d.order.trackingId) h += `<div style="margin-top:1rem;padding:0.8rem;background:#f0f0f4;border-radius:8px;font-size:0.82rem;"><strong>Tracking ID:</strong> ${d.order.trackingId}</div>`;
+        resEl.innerHTML = h;
+      } catch(e) { resEl.innerHTML = '<div style="padding:2rem;text-align:center;color:red;">Network error</div>'; }
+    }
+
+    async function initPortalChat() {
+      if(typeof io === 'undefined') {
+        const script = document.createElement('script');
+        script.src = '/socket.io/socket.io.js';
+        script.onload = () => setupPortalChat();
+        document.head.appendChild(script);
+      } else {
+        setupPortalChat();
+      }
+    }
+
+    async function setupPortalChat() {
+      if(portalSocket) return;
+      try {
+        const r = await fetch(API_BASE + '/api/customer/portal/chat/messages', {credentials: 'include'});
+        const d = await r.json();
+        portalSessionId = d.sessionId;
+        renderPortalMsgs(d.messages || []);
+      } catch(e) {}
+      
+      portalSocket = io(API_BASE);
+      portalSocket.on('connect', () => {
+        document.getElementById('portal-chat-offline').style.display = 'none';
+        if(portalCustomer) portalSocket.emit('join_customer', portalCustomer._id || portalCustomer.email);
+      });
+      portalSocket.on('disconnect', () => { document.getElementById('portal-chat-offline').style.display = 'block'; });
+      portalSocket.on('admin_message', data => { appendPortalMsg(data.message, 'a', data.createdAt); });
+      portalSocket.on('admin_typing', () => {
+        document.getElementById('portal-chat-typing').textContent = 'Support is typing...';
+        clearTimeout(portalTypingTmr); portalTypingTmr = setTimeout(() => { document.getElementById('portal-chat-typing').textContent = ''; }, 2000);
+      });
+      document.getElementById('portal-chat-input').addEventListener('input', () => {
+        if(portalSocket && portalSessionId) portalSocket.emit('customer_typing', {sessionId: portalSessionId});
+      });
+    }
+
+    function renderPortalMsgs(msgs) {
+      const el = document.getElementById('portal-chat-msgs');
+      el.innerHTML = msgs.length ? '' : '<div style="text-align:center;padding:2rem;color:var(--gray-4);">No messages yet. Say hi!</div>';
+      msgs.forEach(m => appendPortalMsg(m.message, m.senderRole === 'customer' ? 'c' : 'a', m.createdAt));
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function appendPortalMsg(text, type, ts) {
+      const el = document.getElementById('portal-chat-msgs');
+      if(el.innerHTML.includes('No messages')) el.innerHTML = '';
+      const d = document.createElement('div');
+      d.className = 'portal-msg portal-msg-' + type;
+      const t = ts ? new Date(ts).toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'}) : 'now';
+      d.innerHTML = `${text}<div style="font-size:0.6rem;opacity:0.7;margin-top:2px;text-align:${type==='c'?'right':'left'};">${t}</div>`;
+      el.appendChild(d); el.scrollTop = el.scrollHeight;
+    }
+
+    async function sendPortalMsg() {
+      const inp = document.getElementById('portal-chat-input');
+      const msg = inp.value.trim(); if(!msg) return;
+      inp.value = '';
+      if(!portalSessionId) {
+        try {
+          const r = await fetch(API_BASE + '/api/customer/portal/chat/start', {method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include'});
+          const d = await r.json();
+          portalSessionId = d.sessionId;
+        } catch(e) { return; }
+      }
+      appendPortalMsg(msg, 'c', new Date());
+      try {
+        await fetch(API_BASE + '/api/customer/portal/chat/message', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({message: msg, sessionId: portalSessionId}), credentials: 'include'});
+      } catch(e) {}
+    }
+
+    async function logoutCustomer() {
+      await fetch(API_BASE + '/api/customer/auth/logout', {method: 'POST', credentials: 'include'});
+      window.location.reload();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Auto-open account if redirected from /auth
+      if(window.location.search.includes('openAccount=1')) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+        setTimeout(openAccountPanel, 500);
+      }
+    });
 
     /* ══════════════════════════════════════════════════════════════
        INIT — Boot the Hashlay frontend
