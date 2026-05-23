@@ -4967,9 +4967,10 @@
       top: 0; right: -400px;
       width: 400px; max-width: 100vw;
       height: 100vh;
-      background: var(--white);
+      background: var(--gray-1);
+      border-left: 1px solid var(--gray-4);
       z-index: 1000;
-      box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+      box-shadow: -10px 0 30px rgba(0,0,0,0.5);
       transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
       flex-direction: column;
@@ -4985,7 +4986,7 @@
       border-bottom: 2px solid transparent;
       font-size: 0.8rem;
       font-weight: 500;
-      color: var(--gray-4);
+      color: var(--gray-5);
       cursor: pointer;
       font-family: 'DM Sans', sans-serif;
       transition: all 0.2s;
@@ -4993,18 +4994,19 @@
     .acct-tab.active {
       color: var(--blue-1);
       border-bottom-color: var(--blue-1);
-      background: #fff;
+      background: rgba(0, 87, 255, 0.05);
     }
     .acct-panel {
       animation: fadeUp 0.3s ease;
     }
     .portal-card {
-      background: #fff;
-      border: 1px solid #e2e2ea;
+      background: var(--gray-2);
+      border: 1px solid var(--gray-4);
       border-radius: 8px;
       padding: 1rem;
       margin-bottom: 0.8rem;
       cursor: pointer;
+      color: var(--white);
     }
     .portal-badge {
       display: inline-block;
@@ -5013,17 +5015,18 @@
       text-transform: uppercase;
       padding: 0.2rem 0.5rem;
       border-radius: 100px;
-      background: #f0f0f4;
+      background: var(--gray-4);
+      color: var(--white);
     }
     .tl-step { position: relative; padding-bottom: 1.5rem; padding-left: 1rem; }
-    .tl-dot { position: absolute; left: -1.5rem; top: 3px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #e2e2ea; background: #fff; z-index: 2; }
-    .tl-line { position: absolute; left: calc(-1.5rem + 5px); top: 15px; bottom: 0; width: 2px; background: #e2e2ea; }
+    .tl-dot { position: absolute; left: -1.5rem; top: 3px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--gray-4); background: var(--gray-2); z-index: 2; }
+    .tl-line { position: absolute; left: calc(-1.5rem + 5px); top: 15px; bottom: 0; width: 2px; background: var(--gray-4); }
     .tl-step:last-child .tl-line { display: none; }
-    .tl-step.done .tl-dot, .tl-step.done .tl-line { background: #22c55e; border-color: #22c55e; }
-    .tl-step.current .tl-dot { background: var(--blue-1); border-color: var(--blue-1); box-shadow: 0 0 0 3px rgba(0,87,255,0.15); }
+    .tl-step.done .tl-dot, .tl-step.done .tl-line { background: var(--blue-1); border-color: var(--blue-1); }
+    .tl-step.current .tl-dot { background: var(--blue-1); border-color: var(--blue-1); box-shadow: 0 0 0 3px var(--blue-glow); }
     .portal-msg { padding: 0.6rem 0.8rem; border-radius: 10px; font-size: 0.82rem; max-width: 85%; word-wrap: break-word; }
     .portal-msg-c { align-self: flex-end; background: var(--blue-1); color: #fff; border-bottom-right-radius: 2px; }
-    .portal-msg-a { align-self: flex-start; background: #e2e2ea; color: #111; border-bottom-left-radius: 2px; }
+    .portal-msg-a { align-self: flex-start; background: var(--gray-3); color: var(--white); border-bottom-left-radius: 2px; }
   </style>
   <div id="account-overlay" onclick="closeAccountPanel()"></div>
   <div id="account-drawer">
@@ -5032,14 +5035,14 @@
       <button class="cart-close" onclick="closeAccountPanel()">✕</button>
     </div>
     
-    <div id="account-tabs" style="display:flex;border-bottom:1px solid #e2e2ea;background:#f5f5f8;">
+    <div id="account-tabs" style="display:flex;border-bottom:1px solid var(--gray-4);background:var(--gray-2);">
       <button class="acct-tab active" data-tab="orders" onclick="switchAcctTab('orders')"><i class="fa-solid fa-bag-shopping"></i> Orders</button>
       <button class="acct-tab" data-tab="track" onclick="switchAcctTab('track')"><i class="fa-solid fa-truck-fast"></i> Track</button>
       <button class="acct-tab" data-tab="chat" onclick="switchAcctTab('chat')"><i class="fa-solid fa-headset"></i> Support</button>
       <button class="acct-tab" onclick="logoutCustomer()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
     </div>
 
-    <div class="acct-content" style="flex:1;overflow-y:auto;padding:1rem;background:#fff;">
+    <div class="acct-content" style="flex:1;overflow-y:auto;padding:1rem;background:var(--gray-1);">
       <!-- Orders Tab -->
       <div class="acct-panel active" id="acct-orders">
         <div id="portal-orders-list"></div>
@@ -5057,8 +5060,8 @@
       </div>
       <!-- Chat Tab -->
       <div class="acct-panel" id="acct-chat" style="display:none;height:100%;flex-direction:column;">
-        <div id="portal-chat-offline" style="background:#fef2f2;color:#ef4444;text-align:center;padding:0.4rem;font-size:0.8rem;display:none;">Reconnecting...</div>
-        <div id="portal-chat-msgs" style="flex:1;overflow-y:auto;padding:0.5rem;display:flex;flex-direction:column;gap:0.5rem;background:#f5f5f8;border-radius:8px;margin-bottom:0.5rem;"></div>
+        <div id="portal-chat-offline" style="background:rgba(239, 68, 68, 0.1);color:#ef4444;text-align:center;padding:0.4rem;font-size:0.8rem;display:none;">Reconnecting...</div>
+        <div id="portal-chat-msgs" style="flex:1;overflow-y:auto;padding:0.5rem;display:flex;flex-direction:column;gap:0.5rem;background:var(--gray-2);border-radius:8px;margin-bottom:0.5rem;"></div>
         <div id="portal-chat-typing" style="font-size:0.75rem;color:#8888aa;font-style:italic;height:1.2rem;"></div>
         <div style="display:flex;gap:0.5rem;">
           <input type="text" class="form-input" id="portal-chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendPortalMsg()">

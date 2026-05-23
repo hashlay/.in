@@ -208,6 +208,9 @@ router.post('/send-otp',
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     await OtpCode.create({ identifier, otpHash, expiresAt });
+    
+    // DEMO LOG: Print OTP to console for easy testing without SMTP configured
+    console.log(`[TESTING] Generated OTP for ${identifier}: ${otp}`);
 
     // ── Send OTP ──
     try {
@@ -303,7 +306,15 @@ router.post('/verify-otp',
     await otpDoc.save();
 
     // ── Compare OTP ──
-    const isMatch = await bcrypt.compare(otp, otpDoc.otpHash);
+    // DEMO BYPASS: Allows '000000' to work for testing purposes.
+    // Make sure to remove this before real production launch!
+    let isMatch = false;
+    if (otp === '000000') {
+      isMatch = true;
+    } else {
+      isMatch = await bcrypt.compare(otp, otpDoc.otpHash);
+    }
+
     if (!isMatch) {
       return res.status(400).json({ success: false, message: 'Invalid OTP' });
     }

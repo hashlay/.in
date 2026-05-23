@@ -12,6 +12,7 @@ const { stats: cacheStats } = require('./config/cache');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // ── Security & Parsing ───────────────────────────────────────────
 // Lazy-load heavy security middleware only when needed
@@ -34,6 +35,8 @@ app.use(cors({
     if (!origin) return callback(null, true);
     if (isDev && (origin.includes('localhost') || origin.includes('127.0.0.1'))) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (origin.endsWith('hashlay.in')) return callback(null, true);
+    if (origin.endsWith('vercel.app')) return callback(null, true);
     callback(new Error(`CORS: Origin ${origin} not allowed`));
   },
   credentials: true,
