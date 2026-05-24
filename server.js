@@ -160,38 +160,9 @@ app.use(errorHandler);
 if (process.env.NODE_ENV !== 'production' || process.env.FORCE_LISTEN === 'true') {
   const logger = require('./config/logger');
   const http = require('http');
-  const { Server: SocketServer } = require('socket.io');
   const PORT = process.env.PORT || 5000;
 
   const server = http.createServer(app);
-
-  // ── Socket.io Setup ──────────────────────────────────────────
-  const io = new SocketServer(server, {
-    cors: { origin: '*', methods: ['GET', 'POST'] },
-  });
-  app.set('io', io);
-
-  io.on('connection', (socket) => {
-    // Customers join their own room
-    socket.on('join_customer', (customerId) => {
-      socket.join('customer_' + customerId);
-    });
-    // Admins join the admin inbox room
-    socket.on('join_admin', () => {
-      socket.join('admin_inbox');
-    });
-    // Admin sends a message to a customer
-    socket.on('admin_message', (data) => {
-      io.to('customer_' + data.customerId).emit('admin_message', data);
-    });
-    // Typing indicators
-    socket.on('customer_typing', (data) => {
-      io.to('admin_inbox').emit('customer_typing', data);
-    });
-    socket.on('admin_typing', (data) => {
-      io.to('customer_' + data.customerId).emit('admin_typing', data);
-    });
-  });
 
   server.listen(PORT, () => {
     logger.info(`🚀 Hashlay Backend running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);

@@ -145,7 +145,7 @@ a{color:var(--blue);text-decoration:none;cursor:pointer}a:hover{text-decoration:
 <!-- Bottom tabs (mobile) -->
 <div class="btabs" id="btabs"><div class="btabs-row" id="btabs-row"></div></div>
 
-<script src="/socket.io/socket.io.js"></script>
+
 <script>
 const API=location.hostname==='localhost'||location.hostname==='127.0.0.1'?'http://localhost:5000':location.origin;
 let _customer=null,_features={},_page=1,_hasMore=false,_orders=[],_sessionId=null,_socket=null,_typingTimer=null;
@@ -308,32 +308,29 @@ function renderTimeline(order){
   document.getElementById('track-result').innerHTML=h;
 }
 
-/* ══ CHAT ══ */
+let _pollInterval = null;
+let _lastMsgCount = 0;
+
 async function initChat(){
-  if(_socket)return;
-  // Load messages
-  try{
-    const r=await fetch(API+'/api/customer/portal/chat/messages',{credentials:'include'});
-    const d=await r.json();
-    _sessionId=d.sessionId;
-    renderMsgs(d.messages||[]);
-  }catch{}
-  // Socket
-  _socket=io(API);
-  _socket.on('connect',()=>{
-    document.getElementById('chat-offline').style.display='none';
-    if(_customer)_socket.emit('join_customer',_customer._id||_customer.email);
-  });
-  _socket.on('disconnect',()=>{document.getElementById('chat-offline').style.display='block';});
-  _socket.on('admin_message',data=>{appendMsg(data.message,'a',data.createdAt);});
-  _socket.on('admin_typing',()=>{
-    document.getElementById('chat-typing').textContent='Support is typing...';
-    clearTimeout(_typingTimer);_typingTimer=setTimeout(()=>{document.getElementById('chat-typing').textContent='';},2000);
-  });
-  // Typing emit
-  document.getElementById('chat-input').addEventListener('input',()=>{
-    if(_socket&&_sessionId)_socket.emit('customer_typing',{sessionId:_sessionId});
-  });
+  if(_pollInterval) return;
+  
+  async function fetchMsgs() {
+    try {
+      const r = await fetch(API+'/api/customer/portal/chat/messages', {credentials:'include'});
+      const d = await r.json();
+      if (!d.success) return;
+      _sessionId = d.sessionId;
+      const msgs = d.messages || [];
+      if (msgs.length !== _lastMsgCount) {
+        _lastMsgCount = msgs.length;
+        renderMsgs(msgs);
+      }
+    } catch {}
+  }
+  
+  await fetchMsgs();
+  _pollInterval = setInterval(fetchMsgs, 5000);
+  document.getElementById('chat-offline').style.display = 'none';
 }
 function renderMsgs(msgs){
   const el=document.getElementById('chat-msgs');
