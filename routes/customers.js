@@ -14,6 +14,7 @@ r.get('/export/csv',     verifyToken, c.exportCSV);
 r.post('/',              verifyToken, c.createCustomer);
 r.get('/:id',            verifyToken, c.getCustomer);
 r.put('/:id',            verifyToken, c.updateCustomer);
+r.put('/:id/remove-account', verifyToken, c.removeAccount);
 r.delete('/:id',         verifyToken, c.deleteCustomer);
 r.get('/:id/orders',     verifyToken, c.getCustomerOrders);
 

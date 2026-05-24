@@ -4325,6 +4325,8 @@
                 <option value="new">New Customers</option>
                 <option value="repeat">Repeat Buyers</option>
                 <option value="high_spenders">High Spenders</option>
+                <option value="accounts_no_orders">Accounts (No Orders)</option>
+                <option value="all_accounts">All Accounts</option>
               </select>
             </div>
           </div>
@@ -6081,10 +6083,24 @@
                 <button class="btn btn-secondary btn-sm" onclick="editAccount('${a._id}')">
                   <i class="fa-solid fa-pen"></i> Edit
                 </button>
+                <button class="btn btn-danger btn-sm" style="margin-left:4px;" onclick="deleteAccount('${a._id}')" title="Delete Credentials">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
               </td>
             </tr>
           `;
         }).join('');
+      }
+
+      async function deleteAccount(id) {
+        if(!confirm('Are you sure you want to delete this account credentials? Their order history will remain, but they will need to sign up again.')) return;
+        try {
+          const r = await apiPut('/api/customers/' + id + '/remove-account');
+          if (r.success) {
+            toast('Account credentials deleted');
+            loadAccounts(currentAccountPage);
+          }
+        } catch(e) {}
       }
 
       function editAccount(id) {

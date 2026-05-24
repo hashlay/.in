@@ -511,7 +511,7 @@ router.get('/me', async (req, res) => {
       return res.json({ loggedIn: false });
     }
 
-    const customer = await Customer.findById(decoded.id).select('email phone name');
+    const customer = await Customer.findById(decoded.id).select('email phone name addresses');
     if (!customer) {
       return res.json({ loggedIn: false });
     }
@@ -523,6 +523,7 @@ router.get('/me', async (req, res) => {
         email: customer.email || null,
         phone: customer.phone || null,
         name:  customer.name  || null,
+        addresses: customer.addresses || [],
       },
     });
   } catch {

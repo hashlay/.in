@@ -128,6 +128,13 @@ exports.sendCampaign = async (req, res) => {
     if (campaign.audience === 'new')       { const d=new Date(); d.setDate(d.getDate()-30); q.createdAt={ $gte:d }; }
     if (campaign.audience === 'repeat')    q.totalOrders = { $gt:1 };
     if (campaign.audience === 'high_spenders') q.totalSpend = { $gt:5000 };
+    if (campaign.audience === 'accounts_no_orders') {
+      q.totalOrders = { $in: [0, null] };
+      q.$or = [{ password: { $exists: true, $ne: null } }, { passwordHash: { $exists: true, $ne: null } }];
+    }
+    if (campaign.audience === 'all_accounts') {
+      q.$or = [{ password: { $exists: true, $ne: null } }, { passwordHash: { $exists: true, $ne: null } }];
+    }
     customers = await Customer.find(q).select('email name').lean();
     const emails = customers.map(c=>c.email).filter(Boolean);
     await sendCampaignEmail(emails, campaign.subject || campaign.name, campaign.message);

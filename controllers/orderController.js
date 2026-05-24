@@ -136,6 +136,10 @@ exports.createOrder = async (req, res) => {
         customer.lastOrderAt = new Date();
         // optionally update phone if empty
         if (!customer.phone && body.customerPhone) customer.phone = body.customerPhone;
+        if (body.address && body.address.addressLine1) {
+          const addrExists = customer.addresses.some(a => a.addressLine1 === body.address.addressLine1 && a.pincode === body.address.pincode);
+          if (!addrExists) customer.addresses.push(body.address);
+        }
         await customer.save({ session });
       } else {
         // New customer

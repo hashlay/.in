@@ -86,6 +86,11 @@ exports.updateCustomer = async (req, res) => {
   res.json({ success: true, data: safeCustomer, message: 'Customer updated' });
 };
 
+exports.removeAccount = async (req, res) => {
+  await Customer.findByIdAndUpdate(req.params.id, { $unset: { password: 1, passwordHash: 1 } });
+  res.json({ success: true, message: 'Account credentials removed' });
+};
+
 exports.deleteCustomer = async (req, res) => {
   await Customer.findByIdAndUpdate(req.params.id, { isActive: false });
   res.json({ success: true, message: 'Customer deactivated' });
