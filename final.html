@@ -5057,9 +5057,9 @@
       </div>
       <!-- Track Tab -->
       <div class="acct-panel" id="acct-track" style="display:none;">
-        <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
-          <input type="text" class="form-input" id="portal-track-id" placeholder="Order ID (e.g. HL0523001)">
-          <button class="btn-primary" onclick="doPortalTrack()" style="padding:0.6rem 1rem;">Track</button>
+        <div style="display:flex;gap:0.5rem;margin-bottom:1rem;align-items:stretch;">
+          <input type="text" class="form-input" id="portal-track-id" placeholder="Order ID (e.g. HL0523001)" style="margin:0;flex:1;">
+          <button class="btn-primary" onclick="doPortalTrack()" style="display:flex;align-items:center;justify-content:center;padding:0 1.5rem;margin:0;height:auto;line-height:1;">TRACK</button>
         </div>
         <div id="portal-track-result"></div>
       </div>
@@ -8219,17 +8219,41 @@
         
         const steps = ['pending','confirmed','shipped','out_for_delivery','delivered'];
         const labels = {pending:'Order Placed',confirmed:'Confirmed',shipped:'Shipped',out_for_delivery:'Out for Delivery',delivered:'Delivered'};
-        const cur = steps.indexOf(d.order.orderStatus) || 0;
+        const cur = steps.indexOf(d.order.orderStatus);
+        const currentStep = cur === -1 ? 0 : cur;
         const tlMap = {};
         (d.order.timeline||[]).forEach(t => { if(t.status) tlMap[t.status] = t.timestamp; });
         
-        let h = '<div style="position:relative;padding-left:2rem;margin-top:1rem;">';
+        let h = '';
+        if (d.order.estimatedDeliveryDate) {
+          const estDate = new Date(d.order.estimatedDeliveryDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+          h += `<div style="margin-bottom:1.5rem;padding:1rem;background:var(--blue-glow);border-left:4px solid var(--blue-1);border-radius:8px;">
+                  <div style="font-size:0.75rem;color:var(--blue-1);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem;">Estimated Delivery</div>
+                  <div style="font-size:1.1rem;font-weight:600;color:var(--blue-1);">${estDate}</div>
+                </div>`;
+        }
+
+        h += '<div style="position:relative;padding-left:2rem;margin-top:1rem;margin-bottom:2rem;">';
         steps.forEach((s, i) => {
-          const cls = i < cur ? 'done' : i === cur ? 'current' : 'future';
+          const cls = i < currentStep ? 'done' : i === currentStep ? 'current' : 'future';
           const ts = tlMap[s] ? new Date(tlMap[s]).toLocaleString('en-IN', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
-          h += `<div class="tl-step ${cls}"><div class="tl-dot">${i<cur?'<i class="fa-solid fa-check" style="color:#fff;font-size:6px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></i>':''}</div><div class="tl-line"></div><div style="font-weight:600;font-size:0.85rem;">${labels[s]}</div><div style="font-size:0.7rem;color:var(--gray-4);margin-top:2px;">${ts}</div></div>`;
+          h += `<div class="tl-step ${cls}"><div class="tl-dot">${i<currentStep?'<i class="fa-solid fa-check" style="color:#fff;font-size:6px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></i>':''}</div><div class="tl-line"></div><div style="font-weight:600;font-size:0.85rem;">${labels[s]}</div><div style="font-size:0.7rem;color:var(--gray-4);margin-top:2px;">${ts}</div></div>`;
         });
         h += '</div>';
+
+        if(d.order.timeline && d.order.timeline.length > 0) {
+          h += '<h4 style="margin-bottom:1rem;font-size:0.85rem;text-transform:uppercase;color:var(--gray-4);letter-spacing:0.05em;">Tracking Updates</h4>';
+          h += '<div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.5rem;">';
+          d.order.timeline.slice().reverse().forEach(t => {
+            const ts = new Date(t.timestamp).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+            h += `<div style="padding:0.8rem;background:#f0f0f4;border-radius:8px;border-left:3px solid var(--blue-1);">
+                    <div style="font-weight:600;font-size:0.85rem;margin-bottom:0.3rem;color:var(--black);">${t.message || (t.status ? 'Status: ' + t.status : 'Update')}</div>
+                    <div style="font-size:0.75rem;color:var(--gray-4);"><i class="fa-regular fa-clock" style="margin-right:4px"></i>${ts} ${t.location ? `&nbsp;&bull;&nbsp; <i class="fa-solid fa-location-dot" style="margin-right:4px;color:var(--blue-1)"></i><strong>${t.location}</strong>` : ''}</div>
+                  </div>`;
+          });
+          h += '</div>';
+        }
+
         if(d.order.trackingId) h += `<div style="margin-top:1rem;padding:0.8rem;background:#f0f0f4;border-radius:8px;font-size:0.82rem;"><strong>Tracking ID:</strong> ${d.order.trackingId}</div>`;
         resEl.innerHTML = h;
       } catch(e) { resEl.innerHTML = '<div style="padding:2rem;text-align:center;color:red;">Network error</div>'; }
