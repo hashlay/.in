@@ -6816,8 +6816,17 @@
       const pin = document.getElementById('co-pin').value.trim();
       const state = document.getElementById('co-state').value;
 
-      if (!name || !phone || !email || !street || !city || !pin || !state) {
-        showToast('⚠️ Please fill all required fields (including Email)');
+      let missingFields = [];
+      if (!name) missingFields.push('Name');
+      if (!phone) missingFields.push('Phone');
+      if (!email) missingFields.push('Email');
+      if (!street) missingFields.push('Street Address');
+      if (!city) missingFields.push('City');
+      if (!pin) missingFields.push('PIN Code');
+      if (!state) missingFields.push('State');
+
+      if (missingFields.length > 0) {
+        showToast(`⚠️ Please fill missing fields: ${missingFields.join(', ')}`);
         return;
       }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
