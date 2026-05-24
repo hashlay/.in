@@ -2689,6 +2689,14 @@
        FULL MOBILE RESPONSIVE — COMPREHENSIVE
     ════════════════════════════════════════════════════════ */
     @media (max-width: 768px) {
+      /* Mobile Performance Optimizations */
+      * {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+      nav, .cart-drawer, .acct-drawer, .quick-view-content {
+        background: rgba(10, 10, 15, 0.98) !important;
+      }
 
       /* Announcement bar */
       #announcement-bar {
@@ -7912,10 +7920,22 @@
     /* ══════════════════════════════════════════════════════════════
        NAVBAR SCROLL EFFECT
     ══════════════════════════════════════════════════════════════ */
+    const navBarEl = document.getElementById('navbar');
+    let isNavDark = false;
+    let scrollTicking = false;
     window.addEventListener('scroll', () => {
-      const nav = document.getElementById('navbar');
-      nav.style.background = window.scrollY > 60 ? 'rgba(0,0,0,0.95)' : 'rgba(0,0,0,0.72)';
-    });
+      if (!scrollTicking) {
+        window.requestAnimationFrame(() => {
+          const shouldBeDark = window.scrollY > 60;
+          if (shouldBeDark !== isNavDark) {
+            isNavDark = shouldBeDark;
+            navBarEl.style.background = shouldBeDark ? 'rgba(0,0,0,0.95)' : 'rgba(0,0,0,0.72)';
+          }
+          scrollTicking = false;
+        });
+        scrollTicking = true;
+      }
+    }, { passive: true });
 
     /* ══════════════════════════════════════════════════════════════
        INIT
@@ -8354,13 +8374,76 @@
       window.location.reload();
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       // Auto-open account if redirected from /auth
       if(window.location.search.includes('openAccount=1')) {
         window.history.replaceState({}, document.title, window.location.pathname);
         setTimeout(openAccountPanel, 500);
       }
+
+      // Show login nudge for tracking if not logged in
+      if (!sessionStorage.getItem('loginNudgeShown')) {
+        const loggedIn = await checkPortalAuth();
+        if (!loggedIn) {
+          setTimeout(showLoginNudge, 2500);
+        } else {
+          sessionStorage.setItem('loginNudgeShown', 'true');
+        }
+      }
     });
+
+    function showLoginNudge() {
+      if (sessionStorage.getItem('loginNudgeShown')) return;
+      
+      const style = document.createElement('style');
+      style.innerHTML = `@keyframes nudgeSlideUp { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }`;
+      document.head.appendChild(style);
+
+      const div = document.createElement('div');
+      div.id = 'login-nudge-popup';
+      div.innerHTML = `
+        <button onclick="closeLoginNudge()" style="position:absolute;top:10px;right:10px;background:none;border:none;color:var(--gray-4);cursor:pointer;font-size:1.2rem;line-height:1;transition:color 0.2s;"><i class="fa-solid fa-xmark"></i></button>
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <div style="background:var(--blue-glow);color:var(--blue-1);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;margin-top:2px;">
+            <i class="fa-solid fa-truck-fast"></i>
+          </div>
+          <div style="padding-right:12px;">
+            <h4 style="margin:0 0 6px;font-size:0.95rem;color:var(--white);font-weight:600;">Track Your Order</h4>
+            <p style="margin:0 0 12px;font-size:0.8rem;color:var(--gray-4);line-height:1.4;">Click the account button (top right) to log in and access your live order tracking features.</p>
+            <button onclick="closeLoginNudge(); window.location.href='/auth';" class="btn-primary" style="padding:0.4rem 1rem;font-size:0.8rem;border-radius:6px;min-width:auto;width:auto;">Login Now</button>
+          </div>
+        </div>
+      `;
+      div.style.cssText = "position:fixed;bottom:24px;left:24px;max-width:320px;background:rgba(15,15,20,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;z-index:999999;box-shadow:0 12px 40px rgba(0,0,0,0.8);animation:nudgeSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;font-family:var(--font-body);backdrop-filter:blur(8px);";
+      
+      // On mobile, center it at bottom
+      if (window.innerWidth <= 768) {
+        div.style.left = '50%';
+        div.style.transform = 'translateX(-50%)';
+        div.style.bottom = '16px';
+        div.style.width = 'calc(100% - 32px)';
+        div.style.animation = ''; // Handle animation carefully with translateX
+        div.style.animation = 'nudgeSlideUpMobile 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+        style.innerHTML += `@keyframes nudgeSlideUpMobile { from { opacity: 0; transform: translate(-50%, 20px) scale(0.95); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }`;
+      }
+
+      document.body.appendChild(div);
+      sessionStorage.setItem('loginNudgeShown', 'true');
+    }
+
+    window.closeLoginNudge = function() {
+      const el = document.getElementById('login-nudge-popup');
+      if(el) {
+        el.style.opacity = '0';
+        el.style.transition = 'all 0.3s ease';
+        if (window.innerWidth <= 768) {
+          el.style.transform = 'translate(-50%, 20px)';
+        } else {
+          el.style.transform = 'translateY(20px)';
+        }
+        setTimeout(() => el.remove(), 300);
+      }
+    }
 
     /* ══════════════════════════════════════════════════════════════
        INIT — Boot the Hashlay frontend
