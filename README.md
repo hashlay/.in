@@ -108,13 +108,12 @@ npm start       # Production
 <script>window.HASHLAY_API_URL = 'https://api.hashlay.in';</script>
 ```
 
-### 5. Login to Admin
+### 5. Admin Access
 
-Open `hashlay-admin-connected.html` → Login with:
-- Email: `admin@hashlay.in`
-- Password: `Admin@123`
+To access the admin dashboard, navigate to the `/admin` route on your deployed domain. Use the credentials configured by your system administrator.
 
-> ⚠️ **Change the default password immediately after first login.**
+> 🌐 **Website:** [hashlay.in](https://hashlay.in)  
+> 📸 **Instagram:** [@hashlay.in](https://instagram.com/hashlay.in)
 
 ---
 
