@@ -49,16 +49,15 @@ function identifierType(identifier) {
   return null;
 }
 
-/** Build a Nodemailer transporter from AuthSettings SMTP config */
 function buildTransporter(settings) {
   const pass = settings.smtpPassEncrypted ? decrypt(settings.smtpPassEncrypted) : null;
   return nodemailer.createTransport({
-    host: settings.smtpHost   || process.env.CUSTOMER_SMTP_HOST  || process.env.SMTP_HOST,
-    port: settings.smtpPort   || process.env.CUSTOMER_SMTP_PORT  || 587,
-    secure: (settings.smtpEncryption === 'SSL'),
+    host: settings.smtpHost   || process.env.RESEND_SMTP_HOST || process.env.SMTP_HOST || 'smtp.resend.com',
+    port: settings.smtpPort   || process.env.RESEND_SMTP_PORT || 465,
+    secure: settings.smtpEncryption === 'SSL' || parseInt(process.env.RESEND_SMTP_PORT) === 465,
     auth: {
-      user: settings.smtpUser || process.env.CUSTOMER_SMTP_USER  || process.env.SMTP_USER,
-      pass: pass              || process.env.CUSTOMER_SMTP_PASS  || process.env.SMTP_PASS,
+      user: settings.smtpUser || process.env.RESEND_SMTP_USER || process.env.SMTP_USER,
+      pass: pass              || process.env.RESEND_SMTP_PASS || process.env.SMTP_PASS,
     },
   });
 }

@@ -98,6 +98,18 @@ exports.deleteProduct = async (req, res) => {
   // Bust product caches on delete
   invalidate('products:');
 
+  const { sendAdminNotification } = require('../services/emailService');
+  await sendAdminNotification(
+    `Product Deleted: ${product.name}`,
+    `<div style="font-family:sans-serif;background:#fff1f2;padding:20px;border-radius:8px;">
+      <h2 style="color:#be123c;margin-top:0;">Product Deleted (Archived)</h2>
+      <p><strong>Product ID:</strong> ${product._id}</p>
+      <p><strong>Name:</strong> ${product.name}</p>
+      <p><strong>Category:</strong> ${product.category}</p>
+      <p><strong>Deleted By Admin IP:</strong> ${req.ip}</p>
+    </div>`
+  ).catch(() => {});
+
   res.json({ success: true, message: 'Product deleted' });
 };
 
