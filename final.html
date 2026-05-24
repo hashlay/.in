@@ -173,9 +173,12 @@
       padding: 0 4vw;
       height: 72px;
       background: rgba(0, 0, 0, 0.72);
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.06);
       transition: background var(--transition);
+      transform: translateZ(0);
+      will-change: transform;
     }
 
     .nav-logo {
@@ -741,6 +744,8 @@
       transition: var(--transition);
       position: relative;
       cursor: pointer;
+      transform: translateZ(0);
+      will-change: transform;
     }
 
     .product-card:hover {
@@ -5822,11 +5827,11 @@
           const v = baData.data.value || baData.data;
           if (v.beforeImage) {
             const bp = document.getElementById('ba-before-panel');
-            if (bp) bp.innerHTML = `<img src="${v.beforeImage}" style="width:100%;height:100%;object-fit:cover;"><div class="ba-label">BEFORE</div>`;
+            if (bp) bp.innerHTML = `<img src="${v.beforeImage}" loading="lazy" style="width:100%;height:100%;object-fit:cover;"><div class="ba-label">BEFORE</div>`;
           }
           if (v.afterImage) {
             const ap = document.getElementById('ba-after-panel');
-            if (ap) ap.innerHTML = `<img src="${v.afterImage}" style="width:100%;height:100%;object-fit:cover;"><div class="ba-label">AFTER</div>`;
+            if (ap) ap.innerHTML = `<img src="${v.afterImage}" loading="lazy" style="width:100%;height:100%;object-fit:cover;"><div class="ba-label">AFTER</div>`;
           }
           if (v.caption) {
             const ct = document.getElementById('ba-caption-text');
@@ -6192,7 +6197,7 @@
       const productCards = filteredProducts.map(p => `
     <div class="product-card reveal" onclick="openProductPopup('${p.id}')">
       ${p.badge ? `<div class="product-badge">${p.badge}</div>` : ''}
-      <div class="product-img">${p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" />` : (p.emoji || '📦')}</div>
+      <div class="product-img">${p.image ? `<img src="${p.image}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" />` : (p.emoji || '📦')}</div>
       <div class="quick-view-hint">Quick View →</div>
       <div class="product-info">
         <div class="product-category">${p.category}</div>
@@ -6426,7 +6431,7 @@
 
       // If we have a real image, replace the emoji visual
       if (kitVisual && heroProduct.image && heroProduct.image.startsWith('http')) {
-        kitVisual.innerHTML = `<img src="${heroProduct.image}" alt="${heroProduct.name}" style="width: 100%; height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 1rem; border: 1px solid rgba(255,255,255,0.1);" onclick="openProductPopup('${HERO_PRODUCT_ID}')" />`;
+        kitVisual.innerHTML = `<img src="${heroProduct.image}" alt="${heroProduct.name}" loading="lazy" style="width: 100%; height: 220px; object-fit: cover; border-radius: 12px; margin-bottom: 1rem; border: 1px solid rgba(255,255,255,0.1);" onclick="openProductPopup('${HERO_PRODUCT_ID}')" />`;
         kitVisual.style.display = 'block';
       }
     }
@@ -6457,7 +6462,7 @@
       } else {
         container.innerHTML = CART.map(item => {
           const thumb = (item.images && item.images.length > 0)
-            ? `<img src="${item.images[0]}" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" />`
+            ? `<img src="${item.images[0]}" loading="lazy" style="width:100%;height:100%;object-fit:cover;border-radius:12px;" />`
             : (item.emoji || '📦');
           return `
       <div class="cart-item">
