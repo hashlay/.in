@@ -8220,6 +8220,10 @@
         renderPortalMsgs(d.messages || []);
       } catch(e) {}
       
+      if(typeof io === 'undefined') {
+        document.getElementById('portal-chat-offline').style.display = 'block';
+        return;
+      }
       portalSocket = io(API_BASE);
       portalSocket.on('connect', () => {
         document.getElementById('portal-chat-offline').style.display = 'none';

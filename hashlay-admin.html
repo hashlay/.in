@@ -488,6 +488,7 @@
     /* ── Main Content ───────────────────────────────────────────── */
     #main {
       flex: 1;
+      min-width: 0;
       overflow-y: auto;
       overflow-x: hidden;
       position: relative;
@@ -2500,6 +2501,22 @@
       background: var(--bg-4);
       color: var(--white);
     }
+    @media(max-width:900px) {
+      #si-wrap {
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: auto !important;
+      }
+      #si-left {
+        width: 100% !important;
+        min-width: 0 !important;
+        height: 300px !important;
+      }
+      #si-right {
+        width: 100% !important;
+        min-height: 400px !important;
+      }
+    }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -4475,9 +4492,8 @@
         <div id="ca-toggles-updated" style="font-size:.68rem;color:var(--gray);margin-top:.6rem;"></div>
       </div>
 
-      <div class="grid-2" style="margin-bottom:1.2rem;">
         <!-- SMTP Config -->
-        <div class="card">
+        <div class="card" style="margin-bottom:1.2rem;">
           <div class="card-header">
             <div><div class="card-title"><i class="fa-solid fa-envelope" style="margin-right:.5rem;color:var(--blue-lt);"></i>Customer Auth SMTP</div>
             <div class="card-sub">Email gateway for OTP delivery</div></div>
@@ -4505,7 +4521,7 @@
         </div>
 
         <!-- SMS Config -->
-        <div class="card">
+        <div class="card" style="margin-bottom:1.2rem;">
           <div class="card-header">
             <div><div class="card-title"><i class="fa-solid fa-comment-sms" style="margin-right:.5rem;color:var(--blue-lt);"></i>SMS Gateway</div>
             <div class="card-sub">Fast2SMS or compatible gateway for OTP</div></div>
@@ -4530,7 +4546,6 @@
           </div>
           <div id="ca-sms-result" style="font-size:.78rem;margin-top:.6rem;display:none;border-radius:8px;padding:.5rem .8rem;"></div>
         </div>
-      </div>
 
       <!-- Portal Feature Toggles -->
       <div class="card">
@@ -8485,6 +8500,10 @@
       }
 
       function initSiSocket(){
+        if(typeof io === 'undefined') {
+          console.warn('Socket.io not loaded. Live chat features disabled.');
+          return;
+        }
         if(_siSocket)return;
         _siSocket=io(API_BASE);
         _siSocket.emit('join_admin');
@@ -8514,9 +8533,12 @@
           }
         });
         // Enter to send (shift+enter for newline)
-        document.getElementById('si-input').addEventListener('keydown',e=>{
-          if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAdminReply();}
-        });
+        const siInput = document.getElementById('si-input');
+        if (siInput) {
+          siInput.addEventListener('keydown',e=>{
+            if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAdminReply();}
+          });
+        }
       }
 
       function timeAgo(d){
