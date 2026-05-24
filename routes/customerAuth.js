@@ -581,8 +581,8 @@ router.post('/signup-send-otp', async (req, res) => {
 
   const settings = await AuthSettings.getSettings();
   const transporter = buildTransporter(settings);
-  const fromName  = settings.smtpFromName || process.env.FROM_NAME || 'Hashlay';
-  const fromEmail = settings.smtpFromEmail || process.env.FROM_EMAIL || 'noreply@hashlay.in';
+  const fromName  = settings.smtpFromName || process.env.RESEND_FROM_NAME || process.env.FROM_NAME || 'Hashlay';
+  const fromEmail = settings.smtpFromEmail || process.env.RESEND_FROM_EMAIL || process.env.FROM_EMAIL || 'orders@hashlay.in';
   try {
     await transporter.sendMail({
       from: `"${fromName}" <${fromEmail}>`,
@@ -610,8 +610,8 @@ router.post('/forgot-password', async (req, res) => {
 
   const settings = await AuthSettings.getSettings();
   const transporter = buildTransporter(settings);
-  const fromName  = settings.smtpFromName || process.env.FROM_NAME || 'Hashlay';
-  const fromEmail = settings.smtpFromEmail || process.env.FROM_EMAIL || 'noreply@hashlay.in';
+  const fromName  = settings.smtpFromName || process.env.RESEND_FROM_NAME || process.env.FROM_NAME || 'Hashlay';
+  const fromEmail = settings.smtpFromEmail || process.env.RESEND_FROM_EMAIL || process.env.FROM_EMAIL || 'orders@hashlay.in';
   try {
     await transporter.sendMail({
       from: `"${fromName}" <${fromEmail}>`,
