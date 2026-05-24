@@ -8304,6 +8304,9 @@
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
+      // Always fetch auth state on page load to populate portalCustomer for checkout
+      const loggedIn = await checkPortalAuth();
+
       // Auto-open account if redirected from /auth
       if(window.location.search.includes('openAccount=1')) {
         window.history.replaceState({}, document.title, window.location.pathname);
@@ -8311,13 +8314,10 @@
       }
 
       // Show login nudge for tracking if not logged in
-      if (!sessionStorage.getItem('loginNudgeShown')) {
-        const loggedIn = await checkPortalAuth();
-        if (!loggedIn) {
-          setTimeout(showLoginNudge, 2500);
-        } else {
-          sessionStorage.setItem('loginNudgeShown', 'true');
-        }
+      if (!loggedIn && !sessionStorage.getItem('loginNudgeShown')) {
+        setTimeout(showLoginNudge, 2500);
+      } else if (loggedIn) {
+        sessionStorage.setItem('loginNudgeShown', 'true');
       }
     });
 
