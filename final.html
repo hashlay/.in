@@ -6890,6 +6890,7 @@
           deliveryCharge: orderDetails.deliveryCharge || 0,
           codCharge: 0,
           couponDiscount: orderDetails.couponDiscount || 0,
+          state: orderDetails.state || ''
         });
 
         if (!serverOrder?.success || !serverOrder?.data?.id) {

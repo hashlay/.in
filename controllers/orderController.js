@@ -96,8 +96,36 @@ exports.createOrder = async (req, res) => {
       }
     }
 
-    const deliveryCharge = calculatedSubtotal >= (ds.freeAbove || 999) ? 0 : (ds.charge || 49);
-    const codCharge = body.paymentMethod === 'cod' ? (ds.codCharge || 0) : 0;
+    const deliverySettings = await Settings.findOne({ key: 'delivery' });
+    const shippingSettings = await Settings.findOne({ key: 'shipping' });
+    const ds = deliverySettings?.value || {};
+    const ss = shippingSettings?.value || {};
+
+    const defaultFreeAbove = parseFloat(ds.freeDeliveryThreshold ?? ds.freeAbove) || 599;
+    const defaultCharge = parseFloat(ds.standardCharge ?? ds.charge) || 49;
+    
+    let zoneCharge = defaultCharge;
+    let zoneFreeAbove = defaultFreeAbove;
+
+    const state = body.address?.state || '';
+    if (state && ss.zones && Array.isArray(ss.zones)) {
+      for (const z of ss.zones) {
+        if (Array.isArray(z.states) && z.states.includes(state)) {
+          zoneCharge = parseFloat(z.charge) || 0;
+          if (z.freeAbove !== undefined) {
+             zoneFreeAbove = parseFloat(z.freeAbove) || 99999;
+          }
+          break;
+        }
+      }
+    }
+
+    let deliveryCharge = 0;
+    if (ds.enabled !== false && calculatedSubtotal < zoneFreeAbove) {
+      deliveryCharge = zoneCharge;
+    }
+
+    const codCharge = body.paymentMethod === 'cod' ? (parseFloat(ds.codCharge) || 0) : 0;
     const total = calculatedSubtotal - discount + deliveryCharge + codCharge;
 
     const orderData = {

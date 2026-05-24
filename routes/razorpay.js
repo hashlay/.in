@@ -16,7 +16,7 @@ const getRazorpayInstance = async () => {
 // Create Razorpay order
 r.post('/create-order', async (req, res) => {
   try {
-    const { items, currency = 'INR', receipt, notes, paymentMethod, deliveryCharge = 0, codCharge = 0, couponDiscount = 0 } = req.body;
+    const { items, currency = 'INR', receipt, notes, paymentMethod, deliveryCharge = 0, codCharge = 0, couponDiscount = 0, state = '' } = req.body;
     if (!Array.isArray(items) || items.length === 0)
       return res.status(400).json({ success: false, message: 'Cart items are required' });
 
@@ -47,17 +47,46 @@ r.post('/create-order', async (req, res) => {
     if (paymentMethod === 'cod' && codCharge < 0)
       return res.status(400).json({ success: false, message: 'Invalid COD charge' });
 
+    // ── Delivery Calculation matching Frontend ──
     const deliverySettings = await Settings.findOne({ key: 'delivery' });
+    const shippingSettings = await Settings.findOne({ key: 'shipping' });
+    
     const deliveryValue = deliverySettings?.value || {};
-    const freeAbove = parseFloat(deliveryValue.freeAbove) || 999;
-    const adminCharge = parseFloat(deliveryValue.charge) || 49;
+    const shippingValue = shippingSettings?.value || {};
+    
+    // Base defaults
+    const defaultFreeAbove = parseFloat(deliveryValue.freeDeliveryThreshold ?? deliveryValue.freeAbove) || 599;
+    const defaultCharge = parseFloat(deliveryValue.standardCharge ?? deliveryValue.charge) || 49;
     const adminCodCharge = parseFloat(deliveryValue.codCharge) || 0;
     
-    const expectedDelivery = (subtotal >= freeAbove) ? 0 : adminCharge;
+    let zoneCharge = defaultCharge;
+    let zoneFreeAbove = defaultFreeAbove;
+
+    // Check zone overrides if state is provided
+    if (state && shippingValue.zones && Array.isArray(shippingValue.zones)) {
+      for (const z of shippingValue.zones) {
+        if (Array.isArray(z.states) && z.states.includes(state)) {
+          zoneCharge = parseFloat(z.charge) || 0;
+          if (z.freeAbove !== undefined) {
+             zoneFreeAbove = parseFloat(z.freeAbove) || 99999;
+          }
+          break;
+        }
+      }
+    }
+
+    let expectedDelivery = 0;
+    const deliveryEnabled = deliveryValue.enabled !== false;
+    
+    if (deliveryEnabled && subtotal < zoneFreeAbove) {
+      expectedDelivery = zoneCharge;
+    }
+    
     const expectedCodCharge = (paymentMethod === 'cod') ? adminCodCharge : 0;
 
     if (parseFloat(deliveryCharge) !== expectedDelivery)
-      return res.status(400).json({ success: false, message: 'Delivery charge mismatch' });
+      return res.status(400).json({ success: false, message: `Delivery charge mismatch. Expected ₹${expectedDelivery} but got ₹${deliveryCharge}.` });
+
     if (parseFloat(codCharge) !== expectedCodCharge)
       return res.status(400).json({ success: false, message: 'COD charge mismatch' });
 
