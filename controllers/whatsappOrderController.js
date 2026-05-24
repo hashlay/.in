@@ -114,6 +114,18 @@ exports.createWhatsappOrder = async (req, res) => {
 
     await notifyNewOrder(createdOrder).catch(() => {});
 
+    // Trigger Automatic Email with Invoice (if email is provided)
+    if (createdOrder.customerEmail) {
+      try {
+        const { generateInvoiceBuffer } = require('../services/invoiceService');
+        const { sendOrderConfirmation } = require('../services/emailService');
+        const invoiceBuffer = await generateInvoiceBuffer(createdOrder).catch(() => null);
+        await sendOrderConfirmation(createdOrder, invoiceBuffer).catch(() => {});
+      } catch (e) {
+        console.error('Failed to send WhatsApp order email:', e);
+      }
+    }
+
     return res.status(201).json({ success: true, data: createdOrder, message: 'WhatsApp order created' });
   } catch (error) {
     console.error('WhatsApp order creation error:', error);
