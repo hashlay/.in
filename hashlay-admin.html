@@ -6056,7 +6056,7 @@
         if (data && data.data && data.data.docs) {
           ACCOUNTS_DATA = data.data.docs;
           renderAccounts();
-          renderPagination('accounts-pagination', data.data.totalPages, currentAccountPage, (p) => loadAccounts(p));
+          renderPagination('accounts-pagination', data.data.totalPages, currentAccountPage, 'loadAccounts');
         }
       }
 

@@ -83,7 +83,6 @@
       background: var(--black);
       color: var(--white);
       overflow-x: hidden;
-      cursor: none;
     }
 
     img {
@@ -97,57 +96,9 @@
     }
 
     button {
-      cursor: none;
       font-family: var(--font-body);
     }
 
-    /* ─── Custom Cursor ──────────────────────────────────── */
-    #cursor-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--blue-1);
-      border-radius: 50%;
-      position: fixed;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: transform 0.1s, background 0.2s;
-    }
-
-    #cursor-ring {
-      width: 36px;
-      height: 36px;
-      border: 1.5px solid rgba(0, 87, 255, 0.6);
-      border-radius: 50%;
-      position: fixed;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      z-index: 9998;
-      transform: translate(-50%, -50%);
-      transition: transform 0.18s, width 0.25s, height 0.25s, border-color 0.2s;
-    }
-
-    body.hovering #cursor-ring {
-      width: 56px;
-      height: 56px;
-      border-color: var(--blue-1);
-    }
-
-    @media (pointer: coarse) {
-
-      #cursor-dot,
-      #cursor-ring {
-        display: none;
-      }
-
-      body,
-      button {
-        cursor: auto;
-      }
-    }
 
     /* ─── Noise Overlay ─────────────────────────────────── */
     body::before {
@@ -1363,7 +1314,7 @@
     }
 
     .star-rating span {
-      cursor: none;
+      cursor: pointer;
       transition: transform 0.1s;
       color: var(--gray-4);
     }
@@ -4384,9 +4335,6 @@
 
 <body>
 
-  <!-- Custom Cursor -->
-  <div id="cursor-dot"></div>
-  <div id="cursor-ring"></div>
 
   <!-- Toast Container -->
   <div id="toast-container"></div>
@@ -5709,25 +5657,6 @@
     let currentDeliveryCharge = 0;
     let currentPopupProductId = null;
 
-    /* ══════════════════════════════════════════════════════════════
-       CURSOR
-    ══════════════════════════════════════════════════════════════ */
-    const dot = document.getElementById('cursor-dot');
-    const ring = document.getElementById('cursor-ring');
-    let mx = 0, my = 0, rx = 0, ry = 0;
-    document.addEventListener('mousemove', e => {
-      mx = e.clientX; my = e.clientY;
-      dot.style.left = mx + 'px'; dot.style.top = my + 'px';
-    });
-    (function animateRing() {
-      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
-      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-      requestAnimationFrame(animateRing);
-    })();
-    document.querySelectorAll('a,button,.product-card,.review-card,.value-item,.kit-icon,.payment-option,.faq-question').forEach(el => {
-      el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
-      el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
-    });
 
     /* ══════════════════════════════════════════════════════════════
        SCROLL REVEAL
