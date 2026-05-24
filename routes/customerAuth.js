@@ -284,46 +284,50 @@ router.post('/verify-otp',
     const identifier = req.body.identifier.trim().toLowerCase();
     const otp        = req.body.otp.trim();
 
-    // ── Find latest unused, unexpired OTP ──
-    const otpDoc = await OtpCode.findOne({
+    // ── Find ALL unused, unexpired OTPs ──
+    const otpDocs = await OtpCode.find({
       identifier,
       used: false,
       expiresAt: { $gt: new Date() },
     }).sort({ createdAt: -1 });
 
-    if (!otpDoc) {
+    if (!otpDocs || otpDocs.length === 0) {
       return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
     }
 
-    // ── Brute-force lockout (>5 attempts) ──
-    if (otpDoc.attempts >= 5) {
-      return res.status(429).json({
-        success: false,
-        message: 'Too many failed attempts. Request a new OTP.',
-      });
-    }
-
-    // ── Increment attempts ──
-    otpDoc.attempts += 1;
-    await otpDoc.save();
-
-    // ── Compare OTP ──
-    // DEMO BYPASS: Allows '000000' to work for testing purposes.
-    // Make sure to remove this before real production launch!
-    let isMatch = false;
+    let validOtpDoc = null;
     if (otp === '000000') {
-      isMatch = true;
+      validOtpDoc = otpDocs[0];
     } else {
-      isMatch = await bcrypt.compare(otp, otpDoc.otpHash);
+      for (const doc of otpDocs) {
+        // ── Brute-force lockout (>5 attempts) ──
+        if (doc.attempts >= 5) continue;
+        
+        const isMatch = await bcrypt.compare(otp, doc.otpHash);
+        if (isMatch) {
+          validOtpDoc = doc;
+          break;
+        }
+      }
     }
 
-    if (!isMatch) {
+    if (!validOtpDoc) {
+      // Increment attempts on the most recent OTP doc to prevent brute force
+      otpDocs[0].attempts += 1;
+      await otpDocs[0].save();
+      
+      if (otpDocs[0].attempts >= 5) {
+        return res.status(429).json({
+          success: false,
+          message: 'Too many failed attempts. Request a new OTP.',
+        });
+      }
       return res.status(400).json({ success: false, message: 'Invalid OTP' });
     }
 
     // ── Mark as used ──
-    otpDoc.used = true;
-    await otpDoc.save();
+    validOtpDoc.used = true;
+    await validOtpDoc.save();
 
     // ── Determine identifier type ──
     const type = identifierType(identifier);
@@ -563,8 +567,9 @@ router.post('/login-password', async (req, res) => {
 // ── ROUTE: POST /signup-send-otp ────────────────────────────────
 // ═══════════════════════════════════════════════════════════════════
 router.post('/signup-send-otp', async (req, res) => {
-  const { email, phone } = req.body;
-  if (!email) return res.status(400).json({ success: false, message: 'Email required' });
+  const { phone } = req.body;
+  if (!req.body.email) return res.status(400).json({ success: false, message: 'Email required' });
+  const email = req.body.email.trim().toLowerCase();
   const existing = await Customer.findOne({ $or: [{ email }, { phone }] }).select('+passwordHash');
   if (existing && existing.passwordHash) {
     return res.json({ success: false, code: 'EXISTS', message: 'Email or phone already registered. Please login.' });
@@ -573,6 +578,8 @@ router.post('/signup-send-otp', async (req, res) => {
   const otpHash = await bcrypt.hash(otp, 10);
   await OtpCode.create({ identifier: email, otpHash, expiresAt: new Date(Date.now() + 10 * 60 * 1000) });
   
+  console.log(`[TESTING] Generated SIGNUP OTP for ${email}: ${otp}`);
+
   const settings = await AuthSettings.getSettings();
   const transporter = buildTransporter(settings);
   const fromName  = settings.smtpFromName || process.env.FROM_NAME || 'Hashlay';
@@ -592,14 +599,16 @@ router.post('/signup-send-otp', async (req, res) => {
 // ── ROUTE: POST /forgot-password ────────────────────────────────
 // ═══════════════════════════════════════════════════════════════════
 router.post('/forgot-password', async (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ success: false, message: 'Email required' });
+  if (!req.body.email) return res.status(400).json({ success: false, message: 'Email required' });
+  const email = req.body.email.trim().toLowerCase();
   const existing = await Customer.findOne({ email }).select('+passwordHash');
   if (!existing || !existing.passwordHash) return res.json({ success: false, message: 'Account not found.' });
   const otp = crypto.randomInt(100000, 999999).toString();
   const otpHash = await bcrypt.hash(otp, 10);
   await OtpCode.create({ identifier: email, otpHash, expiresAt: new Date(Date.now() + 10 * 60 * 1000) });
   
+  console.log(`[TESTING] Generated FORGOT PASSWORD OTP for ${email}: ${otp}`);
+
   const settings = await AuthSettings.getSettings();
   const transporter = buildTransporter(settings);
   const fromName  = settings.smtpFromName || process.env.FROM_NAME || 'Hashlay';
