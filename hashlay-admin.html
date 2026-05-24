@@ -2576,6 +2576,7 @@
             class="nav-badge" id="pending-badge">4</span></div>
         <div class="nav-item" onclick="goPage('waorders',this)"><i class="nav-icon fa-brands fa-whatsapp"></i>WhatsApp Orders</div>
         <div class="nav-item" onclick="goPage('products',this)"><i class="nav-icon fa-solid fa-box"></i>Products</div>
+        <div class="nav-item" onclick="goPage('accounts',this)"><i class="nav-icon fa-solid fa-address-card"></i>Accounts</div>
         <div class="nav-item" onclick="goPage('customers',this)"><i class="nav-icon fa-solid fa-users"></i>Customers</div>
         <div class="nav-item" onclick="goPage('reviews',this)"><i class="nav-icon fa-solid fa-star"></i>Reviews<span
             class="nav-badge" id="review-badge">3</span></div>
@@ -3107,6 +3108,38 @@
         </div>
       </div>
 
+      <div class="modal-overlay" id="modal-account">
+        <div class="modal-box" style="max-width:500px;">
+          <div class="modal-header">
+            <div class="modal-title">Edit Account Credentials</div>
+            <button class="modal-close" onclick="closeModal('modal-account')">✕</button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="account-edit-id" />
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" class="input" id="account-edit-name" />
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" class="input" id="account-edit-email" />
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="text" class="input" id="account-edit-phone" />
+            </div>
+            <div class="form-group">
+              <label>New Password (Optional)</label>
+              <input type="password" class="input" id="account-edit-password" placeholder="Leave blank to keep unchanged" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modal-account')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveAccountEdit()">💾 Save Changes</button>
+          </div>
+        </div>
+      </div>
+
       <!-- ═══════════════════════════════════════════════════
          PAGE: PRODUCTS
     ════════════════════════════════════════════════════ -->
@@ -3154,6 +3187,38 @@
               <tbody id="products-tbody"></tbody>
             </table>
           </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════
+         PAGE: ACCOUNTS
+    ════════════════════════════════════════════════════ -->
+      <div class="page" id="page-accounts">
+        <div class="section-hdr">
+          <div class="section-hdr-left">
+            <div class="section-hdr-title">ACCOUNTS</div>
+            <div class="section-hdr-sub">Manage registered customer accounts & credentials</div>
+          </div>
+        </div>
+        <div class="filters-row">
+          <input class="filter-search" type="text" placeholder="Search accounts…" id="account-search"
+            oninput="loadAccounts(1, this.value)" style="margin-left:auto;" />
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Account Name</th>
+                  <th>Contact Info</th>
+                  <th>Joined</th>
+                  <th style="text-align:center;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="accounts-tbody"></tbody>
+            </table>
+          </div>
+          <div class="pagination" id="accounts-pagination"></div>
         </div>
       </div>
 
@@ -5105,7 +5170,7 @@
       ═══════════════════════════════════════════════════ */
       const PAGE_TITLES = {
         dashboard: 'Dashboard', orders: 'Orders', products: 'Products',
-        customers: 'Customers', reviews: 'Reviews', marketing: 'Marketing',
+        customers: 'Customers', accounts: 'Accounts', reviews: 'Reviews', marketing: 'Marketing',
         analytics: 'Analytics', faq: 'FAQ Manager', chatbot: 'AI Chatbot',
         notify: 'Notify List', contact: 'Contact Messages', settings: 'Settings',
         admins: 'Admin Users', notifications: 'Notifications', activitylog: 'Activity Log',
@@ -5132,6 +5197,7 @@
         if (id === 'waorders') loadWaOrders();
         if (id === 'custauth') loadCustAuthSettings();
         if (id === 'supportinbox') loadSupportInbox();
+        if (id === 'accounts') loadAccounts(1);
       }
 
       function toggleSidebar() {
@@ -5970,6 +6036,93 @@
         if (result && result.success) {
           toast('Featured status updated!', 'success');
           loadProducts();
+        }
+      }
+
+      /* ═══════════════════════════════════════════════════
+         ACCOUNTS
+      ═══════════════════════════════════════════════════ */
+      let ACCOUNTS_DATA = [];
+      let currentAccountPage = 1;
+
+      async function loadAccounts(page = 1, search = '') {
+        currentAccountPage = page;
+        const q = document.getElementById('account-search')?.value || search;
+        let url = `/api/customers/accounts?page=${page}&limit=20`;
+        if (q) url += `&search=${encodeURIComponent(q)}`;
+        const data = await apiGet(url);
+        if (data && data.data && data.data.docs) {
+          ACCOUNTS_DATA = data.data.docs;
+          renderAccounts();
+          renderPagination('accounts-pagination', data.data.totalPages, currentAccountPage, (p) => loadAccounts(p));
+        }
+      }
+
+      function renderAccounts() {
+        const tbody = document.getElementById('accounts-tbody');
+        if (!tbody) return;
+        if (!ACCOUNTS_DATA.length) {
+          tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:2rem;">No accounts found</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = ACCOUNTS_DATA.map(a => {
+          const contact = [];
+          if (a.email) contact.push(`<div>✉️ ${a.email}</div>`);
+          if (a.phone) contact.push(`<div>📞 ${a.phone}</div>`);
+          return `
+            <tr>
+              <td>
+                <div style="font-weight:600;">${a.name}</div>
+                <div style="font-size:0.75rem;color:var(--gray-4);"><i class="fa-solid fa-key" style="margin-right:4px;"></i> Password Set</div>
+              </td>
+              <td>${contact.join('')}</td>
+              <td>${new Date(a.createdAt).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'})}</td>
+              <td style="text-align:center;">
+                <button class="btn btn-secondary btn-sm" onclick="editAccount('${a._id}')">
+                  <i class="fa-solid fa-pen"></i> Edit
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      function editAccount(id) {
+        const account = ACCOUNTS_DATA.find(a => a._id === id);
+        if (!account) return;
+        document.getElementById('account-edit-id').value = account._id;
+        document.getElementById('account-edit-name').value = account.name || '';
+        document.getElementById('account-edit-email').value = account.email || '';
+        document.getElementById('account-edit-phone').value = account.phone || '';
+        document.getElementById('account-edit-password').value = '';
+        openModal('modal-account');
+      }
+
+      async function saveAccountEdit() {
+        const id = document.getElementById('account-edit-id').value;
+        const name = document.getElementById('account-edit-name').value.trim();
+        const email = document.getElementById('account-edit-email').value.trim();
+        const phone = document.getElementById('account-edit-phone').value.trim();
+        const password = document.getElementById('account-edit-password').value;
+
+        if (!name || !email) return toast('Name and Email are required', 'error');
+
+        const payload = { name, email, phone };
+        if (password) payload.password = password;
+
+        const btn = document.querySelector('#modal-account .btn-primary');
+        const oldText = btn.innerHTML;
+        setBtnLoading(btn, true);
+
+        try {
+          const r = await apiPut('/api/customers/' + id, payload);
+          if (r.success) {
+            toast('Account updated successfully');
+            closeModal('modal-account');
+            loadAccounts(currentAccountPage);
+          }
+        } finally {
+          setBtnLoading(btn, false, oldText);
         }
       }
 

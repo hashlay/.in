@@ -5,7 +5,7 @@ const { notifyNewCustomer } = require('../services/notificationService');
 
 exports.getCustomers = async (req, res) => {
   const { page = 1, limit = 20, search, filter, sort = '-createdAt' } = req.query;
-  const query = { isActive: true };
+  const query = { isActive: true, totalOrders: { $gt: 0 } };
 
   if (search) query.$or = [
     { name: new RegExp(search, 'i') },
@@ -14,13 +14,34 @@ exports.getCustomers = async (req, res) => {
   ];
 
   let sortOpt = sort;
-  if (filter === 'high_spenders') sortOpt = '-totalSpend';
+  if (filter === 'highspenders') sortOpt = '-totalSpend';
   else if (filter === 'new') {
     const d = new Date(); d.setDate(d.getDate() - 30);
     query.createdAt = { $gte: d };
   } else if (filter === 'repeat') query.totalOrders = { $gt: 1 };
 
   const opts = { page: parseInt(page), limit: parseInt(limit), sort: sortOpt, lean: true };
+  const result = await Customer.paginate(query, opts);
+  res.json({ success: true, data: result });
+};
+
+exports.getAccounts = async (req, res) => {
+  const { page = 1, limit = 20, search } = req.query;
+  const query = { isActive: true, $or: [ { password: { $exists: true, $ne: null } }, { passwordHash: { $exists: true, $ne: null } } ] };
+
+  if (search) {
+    query.$and = [
+      { $or: query.$or },
+      { $or: [
+        { name: new RegExp(search, 'i') },
+        { email: new RegExp(search, 'i') },
+        { phone: new RegExp(search, 'i') },
+      ] }
+    ];
+    delete query.$or;
+  }
+
+  const opts = { page: parseInt(page), limit: parseInt(limit), sort: '-createdAt', lean: true };
   const result = await Customer.paginate(query, opts);
   res.json({ success: true, data: result });
 };
@@ -54,11 +75,14 @@ exports.updateCustomer = async (req, res) => {
   if (!customer) return res.status(404).json({ success: false, message: 'Customer not found' });
 
   Object.assign(customer, data);
-  if (password) customer.password = password;
+  if (password) {
+    customer.passwordHash = await require('bcryptjs').hash(password, 12);
+  }
   await customer.save();
 
   const safeCustomer = customer.toObject();
   delete safeCustomer.password;
+  delete safeCustomer.passwordHash;
   res.json({ success: true, data: safeCustomer, message: 'Customer updated' });
 };
 

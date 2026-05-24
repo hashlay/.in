@@ -8219,18 +8219,7 @@
     }
 
     async function initPortalChat() {
-      // Socket.io disabled for Vercel Serverless deployments to prevent 404 console errors.
-      /*
-      if(typeof io === 'undefined') {
-        const script = document.createElement('script');
-        script.src = '/socket.io/socket.io.js';
-        script.onload = () => setupPortalChat();
-        document.head.appendChild(script);
-      } else {
-        setupPortalChat();
-      }
-      */
-      document.getElementById('portal-chat-offline').style.display = 'block';
+      setupPortalChat();
     }
 
     let portalPollTmr = null;
