@@ -217,8 +217,8 @@ router.post('/send-otp',
     try {
       if (type === 'email') {
         const transporter = buildTransporter(settings);
-        const fromName  = settings.smtpFromName  || process.env.CUSTOMER_SMTP_FROM_NAME  || process.env.FROM_NAME  || 'Hashlay';
-        const fromEmail = settings.smtpFromEmail || process.env.CUSTOMER_SMTP_FROM_EMAIL || process.env.FROM_EMAIL || 'noreply@hashlay.in';
+        const fromName  = settings.smtpFromName  || process.env.RESEND_FROM_NAME || process.env.CUSTOMER_SMTP_FROM_NAME  || process.env.FROM_NAME  || 'Hashlay';
+        const fromEmail = settings.smtpFromEmail || process.env.RESEND_FROM_EMAIL || process.env.CUSTOMER_SMTP_FROM_EMAIL || process.env.FROM_EMAIL || 'orders@hashlay.in';
 
         await transporter.sendMail({
           from:    `"${fromName}" <${fromEmail}>`,
