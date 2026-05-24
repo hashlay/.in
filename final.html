@@ -5256,7 +5256,7 @@
 
       <!-- Order Success -->
       <div class="order-confirm" id="order-confirm">
-        <div class="confirm-icon"><i class="fa-solid fa-party-horn"></i></div>
+        <div class="confirm-icon">🎉</div>
         <div class="confirm-title">ORDER PLACED!</div>
         <div class="confirm-sub">Thank you for your Hashlay order! You'll receive a confirmation on WhatsApp & email
           shortly. Estimated delivery: 3–5 business days.</div>
@@ -8201,6 +8201,8 @@
     }
 
     async function initPortalChat() {
+      // Socket.io disabled for Vercel Serverless deployments to prevent 404 console errors.
+      /*
       if(typeof io === 'undefined') {
         const script = document.createElement('script');
         script.src = '/socket.io/socket.io.js';
@@ -8209,6 +8211,8 @@
       } else {
         setupPortalChat();
       }
+      */
+      document.getElementById('portal-chat-offline').style.display = 'block';
     }
 
     async function setupPortalChat() {
