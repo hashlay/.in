@@ -326,18 +326,29 @@ function otpPaste(e){
 }
 function getOtp(){ return Array.from(document.querySelectorAll('.otp-box')).map(b=>b.value).join(''); }
 
+let _resendEnd = 0;
+
 /* ══ TIMER ══ */
 function startTimer(){
   _timerEnd=Date.now()+10*60*1000;
+  _resendEnd=Date.now()+30*1000;
   _resendReady=false;
-  const rl=document.getElementById('resend-link');
-  rl.classList.remove('active'); rl.textContent='Resend OTP (wait 30s)';
-  setTimeout(()=>{ _resendReady=true; rl.classList.add('active'); rl.textContent='Resend OTP'; },30000);
+  document.getElementById('resend-link').classList.remove('active');
   clearInterval(_timerInterval);
   _timerInterval=setInterval(tickTimer,1000);
   tickTimer();
 }
 function tickTimer(){
+  const rlLeft = Math.max(0, _resendEnd - Date.now());
+  const rl = document.getElementById('resend-link');
+  if (rlLeft > 0) {
+    rl.textContent = 'Resend OTP (wait ' + Math.ceil(rlLeft/1000) + 's)';
+  } else if (!_resendReady) {
+    _resendReady = true;
+    rl.classList.add('active');
+    rl.textContent = 'Resend OTP';
+  }
+
   const left=Math.max(0,_timerEnd-Date.now());
   const el=document.getElementById('otp-timer');
   if(left<=0){ clearInterval(_timerInterval); el.innerHTML='<span class="expired">Code expired. Request a new one.</span>'; return; }

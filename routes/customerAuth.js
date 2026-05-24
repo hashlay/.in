@@ -112,8 +112,10 @@ async function createSession(customer, req, res) {
   });
 
   // Update last login
-  customer.lastLoginAt = new Date();
-  await customer.save();
+  await Customer.updateOne(
+    { _id: customer._id },
+    { $set: { lastLoginAt: new Date() } }
+  );
 
   res.cookie('customer_token', token, COOKIE_OPTIONS);
   return token;
