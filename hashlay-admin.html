@@ -8027,19 +8027,57 @@
       <div class="form-label">Status</div>
       <span class="badge ${STATUS_BADGE[o.orderStatus] || 'badge-gray'}">${o.orderStatus}</span>
     </div>
-    <div class="form-label" style="margin-bottom:.6rem;">Order Timeline</div>
-    <div class="timeline">
-      ${['pending', 'confirmed', 'processing', 'shipped', 'delivered'].map((s, i) => {
-          const stepsDone = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'].indexOf(o.orderStatus);
-          const done = i <= stepsDone;
-          return `<div class="tl-item ${done ? 'done' : ''}">
-          <div class="tl-status" style="color:${done ? 'var(--blue-lt)' : 'var(--gray)'}">${s.charAt(0).toUpperCase() + s.slice(1)}</div>
-          <div class="tl-time">${done ? 'Completed' : 'Pending'}</div>
-        </div>`;
-        }).join('')}
+    <div class="form-label" style="margin-bottom:.6rem;">Add Tracking Update</div>
+    <div class="grid-2" style="margin-bottom:.5rem;">
+      <input type="text" id="track-loc-${o._id}" class="form-control" placeholder="Location (e.g. Mumbai Hub)">
+      <input type="text" id="track-msg-${o._id}" class="form-control" placeholder="Message (e.g. Arrived)">
+    </div>
+    <div style="margin-bottom:1rem;">
+      <button class="btn btn-primary" onclick="addTrackingUpdate('${o._id}')" style="padding:0.4rem 1rem;font-size:0.85rem;">Add Update</button>
+    </div>
+    
+    <div class="form-label" style="margin-bottom:.6rem;">Estimated Delivery Date</div>
+    <div style="display:flex; gap:10px; margin-bottom:1.5rem;">
+      <input type="date" id="est-date-${o._id}" class="form-control" value="${o.estimatedDeliveryDate ? new Date(o.estimatedDeliveryDate).toISOString().split('T')[0] : ''}">
+      <button class="btn btn-primary" onclick="updateEstDelivery('${o._id}')" style="padding:0.4rem 1rem;font-size:0.85rem;">Save Date</button>
+    </div>
+
+    <div class="form-label" style="margin-bottom:.6rem;">Detailed Timeline</div>
+    <div class="timeline" style="margin-bottom:1.5rem;">
+      ${(o.timeline && o.timeline.length > 0) ? o.timeline.slice().reverse().map(t => `
+        <div class="tl-item done">
+          <div class="tl-status" style="color:var(--blue-lt)">${t.message || t.status}</div>
+          <div class="tl-time">${new Date(t.timestamp).toLocaleString('en-IN')} ${t.location ? `· <strong>${t.location}</strong>` : ''}</div>
+        </div>
+      `).join('') : '<div style="color:var(--gray);font-size:0.85rem;">No updates yet</div>'}
     </div>
   `;
         openModal('modal-order');
+      }
+
+      async function addTrackingUpdate(id) {
+        const loc = document.getElementById('track-loc-' + id).value.trim();
+        const msg = document.getElementById('track-msg-' + id).value.trim();
+        if (!msg) { toast('Message is required', 'error'); return; }
+        const res = await apiPatch('/api/orders/' + id + '/status', {
+          addTrackingEvent: true, location: loc, message: msg
+        });
+        if (res && res.success) {
+          toast('Tracking added!', 'success');
+          loadOrders();
+          setTimeout(() => viewOrder(id), 500); // refresh modal
+        }
+      }
+
+      async function updateEstDelivery(id) {
+        const date = document.getElementById('est-date-' + id).value;
+        const res = await apiPatch('/api/orders/' + id + '/status', {
+          estimatedDeliveryDate: date || null
+        });
+        if (res && res.success) {
+          toast('Estimated date updated!', 'success');
+          loadOrders();
+        }
       }
 
       function generateInvoiceHTML(orderId) {

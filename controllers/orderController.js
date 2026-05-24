@@ -196,7 +196,7 @@ exports.createOrder = async (req, res) => {
 };
 
 exports.updateOrderStatus = async (req, res) => {
-  const { orderStatus, deliveryStatus, trackingId, notes, paymentStatus } = req.body;
+  const { orderStatus, deliveryStatus, trackingId, notes, paymentStatus, estimatedDeliveryDate, addTrackingEvent, location, message, timestamp } = req.body;
   const order = await Order.findById(req.params.id);
   if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
 
@@ -214,11 +214,23 @@ exports.updateOrderStatus = async (req, res) => {
   if (deliveryStatus) order.deliveryStatus = deliveryStatus;
   if (trackingId)     order.trackingId     = trackingId;
   if (notes)          order.notes          = notes;
+  if (estimatedDeliveryDate !== undefined) {
+    order.estimatedDeliveryDate = estimatedDeliveryDate ? new Date(estimatedDeliveryDate) : null;
+    updated = true;
+  }
 
-  if (updated) {
+  if (addTrackingEvent) {
     order.timeline.push({
       status: orderStatus || deliveryStatus || 'Update',
-      message: req.body.message || `Status updated`,
+      message: message || `Tracking updated`,
+      location: location || '',
+      timestamp: timestamp ? new Date(timestamp) : new Date(),
+    });
+    updated = true;
+  } else if (updated && orderStatus) {
+    order.timeline.push({
+      status: orderStatus,
+      message: message || `Status updated to ${orderStatus}`,
       timestamp: new Date(),
     });
   }

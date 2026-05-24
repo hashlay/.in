@@ -17,11 +17,15 @@ const addressSchema = new mongoose.Schema({
 }, { _id: false });
 
 const timelineSchema = new mongoose.Schema({
-  status: String, message: String, timestamp: { type: Date, default: Date.now },
+  status: String, 
+  message: String, 
+  location: String,
+  timestamp: { type: Date, default: Date.now },
 }, { _id: false });
 
 const orderSchema = new mongoose.Schema({
   orderId:        { type: String, unique: true },
+  estimatedDeliveryDate: { type: Date },
   customer:       { type: mongoose.Schema.Types.ObjectId, ref: 'Customer' },
   customerName:   { type: String, required: true },
   customerEmail:  { type: String },

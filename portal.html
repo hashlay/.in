@@ -268,17 +268,43 @@ async function doTrack(){
   }catch{document.getElementById('track-result').innerHTML='<div class="empty"><p>Network error</p></div>';}
 }
 function renderTimeline(order){
-  const cur=STEPS.indexOf(order.orderStatus)||0;
+  const cur=STEPS.indexOf(order.orderStatus);
+  const currentStep = cur === -1 ? 0 : cur;
+  let h='';
+  
+  if (order.estimatedDeliveryDate) {
+    const estDate = new Date(order.estimatedDeliveryDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    h += `<div style="margin-bottom:1.5rem;padding:1rem;background:var(--blue-glow);border-left:4px solid var(--blue);border-radius:var(--r);">
+            <div style="font-size:0.75rem;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem;">Estimated Delivery</div>
+            <div style="font-size:1.1rem;font-weight:600;color:var(--blue-dk);">${estDate}</div>
+          </div>`;
+  }
+
+  h += '<div class="timeline" style="margin-bottom:2rem;">';
   const tlMap={};
   (order.timeline||[]).forEach(t=>{if(t.status)tlMap[t.status]=t.timestamp;});
-  let h='<div class="timeline">';
   STEPS.forEach((s,i)=>{
-    const cls=i<cur?'done':i===cur?'current':'future';
+    const cls=i<currentStep?'done':i===currentStep?'current':'future';
     const ts=tlMap[s]?new Date(tlMap[s]).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
-    h+='<div class="tl-step '+cls+'"><div class="tl-dot">'+(i<cur?'<i class="fa-solid fa-check" style="color:#fff;font-size:.5rem;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)"></i>':'')+'</div><div class="tl-line"></div><div class="tl-title">'+STEP_LABELS[s]+'</div>'+(ts?'<div class="tl-time">'+ts+'</div>':'')+'</div>';
+    h+='<div class="tl-step '+cls+'"><div class="tl-dot">'+(i<currentStep?'<i class="fa-solid fa-check" style="color:#fff;font-size:.5rem;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)"></i>':'')+'</div><div class="tl-line"></div><div class="tl-title">'+STEP_LABELS[s]+'</div>'+(ts?'<div class="tl-time">'+ts+'</div>':'')+'</div>';
   });
   h+='</div>';
-  if(order.trackingId)h+='<div style="margin-top:1rem;padding:.8rem;background:var(--gray1);border-radius:var(--r);font-size:.82rem"><strong>Tracking ID:</strong> '+order.trackingId+'</div>';
+
+  if(order.timeline && order.timeline.length > 0) {
+    h += '<h4 style="margin-bottom:1rem;font-size:0.85rem;text-transform:uppercase;color:var(--gray4);letter-spacing:0.05em;">Tracking Updates</h4>';
+    h += '<div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.5rem;">';
+    order.timeline.slice().reverse().forEach(t => {
+      const ts = new Date(t.timestamp).toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+      h += `<div style="padding:0.8rem;background:var(--gray1);border-radius:var(--r);border-left:3px solid var(--blue);">
+              <div style="font-weight:600;font-size:0.85rem;margin-bottom:0.3rem;color:var(--black);">${t.message || (t.status ? 'Status: ' + t.status : 'Update')}</div>
+              <div style="font-size:0.75rem;color:var(--gray4);"><i class="fa-regular fa-clock" style="margin-right:4px"></i>${ts} ${t.location ? `&nbsp;&bull;&nbsp; <i class="fa-solid fa-location-dot" style="margin-right:4px;color:var(--blue)"></i><strong>${t.location}</strong>` : ''}</div>
+            </div>`;
+    });
+    h += '</div>';
+  }
+
+  if(order.trackingId)h+='<div style="padding:.8rem;background:var(--gray1);border-radius:var(--r);font-size:.82rem"><strong>Tracking ID:</strong> '+order.trackingId+'</div>';
+  
   document.getElementById('track-result').innerHTML=h;
 }
 
