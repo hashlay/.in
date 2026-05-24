@@ -389,7 +389,11 @@ router.post('/set-password',
       return res.status(400).json({ success: false, message: errors.array()[0].msg });
     }
 
-    const { tempToken, password, confirmPassword } = req.body;
+    const { tempToken, password, confirmPassword, name, email, phone } = req.body;
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({ success: false, message: "Path 'name' is required" });
+    }
 
     if (password !== confirmPassword) {
       return res.status(400).json({ success: false, message: 'Passwords do not match' });
@@ -408,6 +412,20 @@ router.post('/set-password',
     }
 
     const { identifier, type } = decoded;
+    
+    // Check if the extra email or phone already exists
+    if (email && type !== 'email') {
+      const existingEmail = await Customer.findOne({ email });
+      if (existingEmail && existingEmail.phone !== identifier) {
+        return res.status(400).json({ success: false, message: 'This email is already registered to another account.' });
+      }
+    }
+    if (phone && type !== 'phone') {
+      const existingPhone = await Customer.findOne({ phone });
+      if (existingPhone && existingPhone.email !== identifier) {
+        return res.status(400).json({ success: false, message: 'This phone number is already registered to another account.' });
+      }
+    }
 
     // ── Hash password with bcrypt cost 12 ──
     const passwordHash = await bcrypt.hash(password, 12);
@@ -416,12 +434,15 @@ router.post('/set-password',
     const query  = type === 'email' ? { email: identifier } : { phone: identifier };
     const update = {
       passwordHash,
+      name: name.trim(),
+      ...(email ? { email: email.trim() } : {}),
+      ...(phone ? { phone: phone.trim() } : {}),
       ...(type === 'email' ? { email: identifier } : { phone: identifier }),
     };
 
     const customer = await Customer.findOneAndUpdate(
       query,
-      { $set: update, $setOnInsert: { name: null, source: 'customer-portal' } },
+      { $set: update, $setOnInsert: { source: 'customer-portal' } },
       { upsert: true, new: true, setDefaultsOnInsert: true },
     );
 

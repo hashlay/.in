@@ -99,6 +99,14 @@
     .auth-footer a{color:var(--gray-4);text-decoration:none}
     .auth-footer a:hover{text-decoration:underline}
 
+    /* ── Hide browser default password reveal icons ── */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear,
+    input[type="password"]::-webkit-contacts-auto-fill-button,
+    input[type="password"]::-webkit-credentials-auto-fill-button {
+      display: none;
+    }
+
     /* ── Responsive ── */
     @media(max-width:480px){
       body{padding:.5rem;align-items:flex-start;padding-top:2rem}
@@ -147,9 +155,21 @@
 
     <!-- ═══ VIEW 3: Set Password ═══ -->
     <div class="view" id="v-pass">
-      <div class="auth-h">CREATE YOUR PASSWORD</div>
-      <div class="auth-sub">You're almost in. Set a password for future logins.</div>
+      <div class="auth-h">CREATE YOUR ACCOUNT</div>
+      <div class="auth-sub">You're almost in. Enter your details for future logins and faster checkouts.</div>
       <div id="v3-err" class="err-msg"></div>
+      <div class="field">
+        <label class="field-label">Full Name</label>
+        <input class="field-input" type="text" id="new-name" placeholder="John Doe">
+      </div>
+      <div class="field" id="extra-email-wrap" style="display:none;">
+        <label class="field-label">Email Address</label>
+        <input class="field-input" type="email" id="new-email" placeholder="your@email.com">
+      </div>
+      <div class="field" id="extra-phone-wrap" style="display:none;">
+        <label class="field-label">Phone Number</label>
+        <input class="field-input" type="tel" id="new-phone" placeholder="Enter phone number">
+      </div>
       <div class="field">
         <label class="field-label">Password</label>
         <div class="pass-wrap">
@@ -212,7 +232,17 @@ function goView(id){
   setTimeout(()=>{
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('exit-left'));
     document.getElementById(id).classList.add('active');
-    const fi = document.querySelector('#'+id+' input');
+    
+    // Auto-display missing fields for new account creation
+    if(id === 'v-pass') {
+      if(_identMode === 'email') {
+        document.getElementById('extra-phone-wrap').style.display = 'block';
+      } else {
+        document.getElementById('extra-email-wrap').style.display = 'block';
+      }
+    }
+    
+    const fi = document.querySelector('#'+id+' input:not([type="hidden"])');
     if(fi) setTimeout(()=>fi.focus(),100);
   },150);
 }
@@ -364,13 +394,33 @@ function updateStrength(){
 async function submitPassword(){
   hideErr('v3-err');
   const p1=document.getElementById('pass1').value, p2=document.getElementById('pass2').value;
+  const name=document.getElementById('new-name').value.trim();
+  
+  if(!name){showErr('v3-err','Please enter your full name');return;}
   if(p1.length<8){showErr('v3-err','Password must be at least 8 characters');return;}
   if(!/[A-Z]/.test(p1)){showErr('v3-err','Password must contain an uppercase letter');return;}
   if(!/[0-9]/.test(p1)){showErr('v3-err','Password must contain a number');return;}
   if(p1!==p2){showErr('v3-err','Passwords do not match');return;}
+  
+  let extraEmail = '', extraPhone = '';
+  if(_identMode==='phone') extraEmail = document.getElementById('new-email').value.trim();
+  else extraPhone = document.getElementById('new-phone').value.trim();
+  
   setLoading('btn-create',true);
   try{
-    const r=await fetch(API+'/api/customer/auth/set-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tempToken:_tempToken,password:p1,confirmPassword:p2}),credentials:'include'});
+    const r=await fetch(API+'/api/customer/auth/set-password',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        tempToken:_tempToken,
+        password:p1,
+        confirmPassword:p2,
+        name:name,
+        email:extraEmail,
+        phone:extraPhone
+      }),
+      credentials:'include'
+    });
     const d=await r.json();
     setLoading('btn-create',false);
     if(!r.ok||!d.success){showErr('v3-err',d.message||'Something went wrong');return;}

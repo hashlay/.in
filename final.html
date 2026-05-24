@@ -6531,6 +6531,16 @@
     function openCheckout() {
       closeCart(true); // close cart without triggering extra history.back
       resetCheckoutForm();
+      
+      // Auto-fill customer details if logged in
+      if (typeof portalCustomer !== 'undefined' && portalCustomer) {
+        document.getElementById('co-name').value = portalCustomer.name || '';
+        document.getElementById('co-email').value = portalCustomer.email || '';
+        document.getElementById('co-phone').value = portalCustomer.phone || '';
+        document.getElementById('co-email').dataset.verified = 'true';
+        document.getElementById('co-email').readOnly = true;
+      }
+      
       document.getElementById('checkout-form-container').style.display = 'block';
       document.getElementById('order-confirm').classList.remove('show');
       document.getElementById('checkout-modal').classList.add('open');
@@ -7910,7 +7920,7 @@
       emailInput.addEventListener('blur', async () => {
         const email = emailInput.value.trim();
         if (!email || !email.includes('@')) return;
-        if (isVerified) return;
+        if (isVerified || emailInput.dataset.verified === 'true') return;
 
         sec.style.display = 'block';
         status.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="color:var(--blue-1)"></i> Checking...';
