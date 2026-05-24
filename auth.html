@@ -123,28 +123,74 @@
 
   <div class="auth-card">
 
-    <!-- ═══ VIEW 1: Identifier ═══ -->
-    <div class="view active" id="v-ident">
-      <div class="auth-h">SIGN IN OR CREATE ACCOUNT</div>
-      <div class="auth-sub">Enter your email to get started.</div>
-      <div id="v1-err" class="err-msg"></div>
+    <!-- ═══ VIEW: LOGIN ═══ -->
+    <div class="view active" id="v-login">
+      <div class="auth-h">SIGN IN</div>
+      <div class="auth-sub">Welcome back to Hashlay.</div>
+      <div id="login-err" class="err-msg"></div>
       <div class="field">
-        <label class="field-label" id="ident-label">Email address</label>
-        <div id="ident-wrap">
-          <input class="field-input" type="email" id="ident-input" placeholder="Enter your email" autocomplete="email" autofocus>
+        <label class="field-label">Email address</label>
+        <input class="field-input" type="email" id="login-email" placeholder="Enter your email" autofocus>
+      </div>
+      <div class="field">
+        <label class="field-label" style="display:flex;justify-content:space-between">
+          <span>Password</span>
+          <a onclick="goView('v-forgot')" style="text-transform:none;cursor:pointer;color:var(--blue);font-weight:500">Forgot Password?</a>
+        </label>
+        <div class="pass-wrap">
+          <input class="field-input" type="password" id="login-pass" placeholder="Enter your password">
+          <button type="button" class="pass-toggle" onclick="togPass('login-pass',this)">👁</button>
         </div>
       </div>
-      <button class="btn btn-primary" id="btn-continue" onclick="submitIdentifier()">
-        <span class="btn-text">Continue</span><span class="btn-spinner"></span>
+      <button class="btn btn-primary" id="btn-login" onclick="submitLogin()">
+        <span class="btn-text">Sign In</span><span class="btn-spinner"></span>
       </button>
-      <div class="switch-link" id="phone-switch" style="display:none"><a onclick="toggleIdentMode()">Use phone number instead</a></div>
+      <div class="switch-link">Don't have an account? <a onclick="goView('v-signup')">Sign up</a></div>
     </div>
 
-    <!-- ═══ VIEW 2: OTP ═══ -->
+    <!-- ═══ VIEW: SIGNUP ═══ -->
+    <div class="view" id="v-signup">
+      <div class="auth-h">CREATE ACCOUNT</div>
+      <div class="auth-sub">Join Hashlay for faster checkout.</div>
+      <div id="signup-err" class="err-msg"></div>
+      <div class="field">
+        <label class="field-label">Full Name</label>
+        <input class="field-input" type="text" id="signup-name" placeholder="John Doe">
+      </div>
+      <div class="field">
+        <label class="field-label">Email Address</label>
+        <input class="field-input" type="email" id="signup-email" placeholder="your@email.com">
+      </div>
+      <div class="field">
+        <label class="field-label">Phone Number</label>
+        <input class="field-input" type="tel" id="signup-phone" placeholder="Enter 10 digit number">
+      </div>
+      <button class="btn btn-primary" id="btn-signup" onclick="submitSignup()">
+        <span class="btn-text">Continue</span><span class="btn-spinner"></span>
+      </button>
+      <div class="switch-link">Already have an account? <a onclick="goView('v-login')">Log in</a></div>
+    </div>
+
+    <!-- ═══ VIEW: FORGOT ═══ -->
+    <div class="view" id="v-forgot">
+      <div class="auth-h">RESET PASSWORD</div>
+      <div class="auth-sub">Enter your email to receive a reset code.</div>
+      <div id="forgot-err" class="err-msg"></div>
+      <div class="field">
+        <label class="field-label">Email Address</label>
+        <input class="field-input" type="email" id="forgot-email" placeholder="Enter your email">
+      </div>
+      <button class="btn btn-primary" id="btn-forgot" onclick="submitForgot()">
+        <span class="btn-text">Send Reset OTP</span><span class="btn-spinner"></span>
+      </button>
+      <div class="switch-link"><a onclick="goView('v-login')">Back to Login</a></div>
+    </div>
+
+    <!-- ═══ VIEW: OTP ═══ -->
     <div class="view" id="v-otp">
       <div class="auth-h">ENTER VERIFICATION CODE</div>
-      <div class="auth-sub">Sent to <strong id="otp-dest"></strong>. <a onclick="goView('v-ident')">Change</a></div>
-      <div id="v2-err" class="err-msg"></div>
+      <div class="auth-sub">Sent to <strong id="otp-dest"></strong>. <a onclick="goView('v-login')">Change</a></div>
+      <div id="otp-err" class="err-msg"></div>
       <div class="otp-row" id="otp-row"></div>
       <div class="otp-meta"><span id="otp-timer"></span></div>
       <button class="btn btn-primary" id="btn-verify" onclick="submitOtp()">
@@ -153,23 +199,11 @@
       <a class="resend-link" id="resend-link" onclick="resendOtp()">Resend OTP</a>
     </div>
 
-    <!-- ═══ VIEW 3: Set Password ═══ -->
+    <!-- ═══ VIEW: SET PASSWORD (SIGNUP) ═══ -->
     <div class="view" id="v-pass">
-      <div class="auth-h">CREATE YOUR ACCOUNT</div>
-      <div class="auth-sub">You're almost in. Enter your details for future logins and faster checkouts.</div>
-      <div id="v3-err" class="err-msg"></div>
-      <div class="field">
-        <label class="field-label">Full Name</label>
-        <input class="field-input" type="text" id="new-name" placeholder="John Doe">
-      </div>
-      <div class="field" id="extra-email-wrap" style="display:none;">
-        <label class="field-label">Email Address</label>
-        <input class="field-input" type="email" id="new-email" placeholder="your@email.com">
-      </div>
-      <div class="field" id="extra-phone-wrap" style="display:none;">
-        <label class="field-label">Phone Number</label>
-        <input class="field-input" type="tel" id="new-phone" placeholder="Enter phone number">
-      </div>
+      <div class="auth-h">CREATE PASSWORD</div>
+      <div class="auth-sub">Create a secure password for your new account.</div>
+      <div id="pass-err" class="err-msg"></div>
       <div class="field">
         <label class="field-label">Password</label>
         <div class="pass-wrap">
@@ -189,7 +223,31 @@
         </div>
       </div>
       <button class="btn btn-primary" id="btn-create" onclick="submitPassword()">
-        <span class="btn-text">Create Account & Sign In</span><span class="btn-spinner"></span>
+        <span class="btn-text">Create Account</span><span class="btn-spinner"></span>
+      </button>
+    </div>
+
+    <!-- ═══ VIEW: RESET PASSWORD (FORGOT) ═══ -->
+    <div class="view" id="v-reset">
+      <div class="auth-h">NEW PASSWORD</div>
+      <div class="auth-sub">Enter a new secure password.</div>
+      <div id="reset-err" class="err-msg"></div>
+      <div class="field">
+        <label class="field-label">New Password</label>
+        <div class="pass-wrap">
+          <input class="field-input" type="password" id="reset-pass1" placeholder="Min. 8 characters">
+          <button type="button" class="pass-toggle" onclick="togPass('reset-pass1',this)">👁</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Confirm New Password</label>
+        <div class="pass-wrap">
+          <input class="field-input" type="password" id="reset-pass2" placeholder="Re-enter password">
+          <button type="button" class="pass-toggle" onclick="togPass('reset-pass2',this)">👁</button>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-reset" onclick="submitResetPassword()">
+        <span class="btn-text">Reset Password & Login</span><span class="btn-spinner"></span>
       </button>
     </div>
 
@@ -201,25 +259,19 @@
 </div>
 
 <script>
-const API = location.hostname==='localhost'||location.hostname==='127.0.0.1'
-  ? 'http://localhost:5000' : location.origin;
+const API = location.hostname==='localhost'||location.hostname==='127.0.0.1' ? 'http://localhost:5000' : location.origin;
 
-let _ident = '', _identMode = 'email', _phoneEnabled = false, _tempToken = null;
+let _authFlow = ''; // 'signup' or 'forgot'
+let _ident = '';
+let _tempToken = null;
 let _timerInterval = null, _timerEnd = 0, _resendReady = false;
 
 /* ══ INIT ══ */
 (async function init(){
-  // Check if already logged in
   try {
     const r = await fetch(API+'/api/customer/auth/me?t=' + Date.now(),{credentials:'include'});
     const d = await r.json();
     if(d.loggedIn) return location.href='/?openAccount=1';
-  } catch{}
-  // Load settings
-  try {
-    const r = await fetch(API+'/api/customer/auth/settings');
-    const d = await r.json();
-    if(d.phoneLoginEnabled){ _phoneEnabled=true; document.getElementById('phone-switch').style.display='block'; }
   } catch{}
 })();
 
@@ -233,60 +285,99 @@ function goView(id){
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('exit-left'));
     document.getElementById(id).classList.add('active');
     
-    // Auto-display missing fields for new account creation
-    if(id === 'v-pass') {
-      if(_identMode === 'email') {
-        document.getElementById('extra-phone-wrap').style.display = 'block';
-      } else {
-        document.getElementById('extra-email-wrap').style.display = 'block';
-      }
-    }
-    
     const fi = document.querySelector('#'+id+' input:not([type="hidden"])');
     if(fi) setTimeout(()=>fi.focus(),100);
   },150);
 }
 
-/* ══ TOGGLE EMAIL/PHONE ══ */
-function toggleIdentMode(){
-  const lbl=document.getElementById('ident-label');
-  const wrap=document.getElementById('ident-wrap');
-  const sw=document.querySelector('#phone-switch a');
-  if(_identMode==='email'){
-    _identMode='phone';
-    lbl.textContent='Phone number';
-    wrap.innerHTML='<div class="field-row"><span class="field-prefix">+91</span><input class="field-input" type="tel" id="ident-input" placeholder="Enter phone number" autocomplete="tel"></div>';
-    sw.textContent='Use email instead';
-  } else {
-    _identMode='email';
-    lbl.textContent='Email address';
-    wrap.innerHTML='<input class="field-input" type="email" id="ident-input" placeholder="Enter your email" autocomplete="email">';
-    sw.textContent='Use phone number instead';
-  }
-  document.getElementById('ident-input').focus();
+/* ══ LOGIN ══ */
+async function submitLogin() {
+  hideErr('login-err');
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-pass').value;
+  if (!email || !password) return showErr('login-err', 'Please enter email and password');
+  
+  setLoading('btn-login', true);
+  try {
+    const r = await fetch(API+'/api/customer/auth/login-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+      credentials: 'include'
+    });
+    const d = await r.json();
+    setLoading('btn-login', false);
+    if (!r.ok || !d.success) {
+      if (d.code === 'NOT_FOUND') {
+        showErr('login-err', d.message);
+        setTimeout(() => goView('v-signup'), 2000);
+      } else {
+        showErr('login-err', d.message || 'Login failed');
+      }
+      return;
+    }
+    location.href = '/?openAccount=1';
+  } catch(e) { setLoading('btn-login', false); showErr('login-err', 'Network error.'); }
 }
 
-/* ══ SUBMIT IDENTIFIER ══ */
-async function submitIdentifier(){
-  hideErr('v1-err');
-  const inp=document.getElementById('ident-input');
-  let val=inp.value.trim();
-  if(!val){ showErr('v1-err','Please enter your '+(_identMode==='email'?'email':'phone number')); inp.classList.add('error'); return; }
-  if(_identMode==='phone') val='+91'+val.replace(/^\+91/,'').replace(/\D/g,'');
-  inp.classList.remove('error');
-  _ident=val;
-
-  setLoading('btn-continue',true);
-  try{
-    const r=await fetch(API+'/api/customer/auth/send-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({identifier:_ident}),credentials:'include'});
-    const d=await r.json();
-    setLoading('btn-continue',false);
-    if(!r.ok||!d.success){ showErr('v1-err',d.message||'Something went wrong'); return; }
-    document.getElementById('otp-dest').textContent=_ident;
+/* ══ SIGNUP ══ */
+async function submitSignup() {
+  hideErr('signup-err');
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const phone = document.getElementById('signup-phone').value.trim();
+  if (!name || !email || !phone) return showErr('signup-err', 'Please fill all fields');
+  
+  setLoading('btn-signup', true);
+  try {
+    const r = await fetch(API+'/api/customer/auth/signup-send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, phone })
+    });
+    const d = await r.json();
+    setLoading('btn-signup', false);
+    if (!r.ok || !d.success) {
+      if (d.code === 'EXISTS') {
+        showErr('signup-err', d.message);
+        setTimeout(() => goView('v-login'), 2000);
+      } else {
+        showErr('signup-err', d.message || 'Something went wrong');
+      }
+      return;
+    }
+    _authFlow = 'signup';
+    _ident = email;
+    document.getElementById('otp-dest').textContent = _ident;
     buildOtpBoxes();
     startTimer();
     goView('v-otp');
-  }catch(e){ setLoading('btn-continue',false); showErr('v1-err','Network error. Try again.'); }
+  } catch(e) { setLoading('btn-signup', false); showErr('signup-err', 'Network error.'); }
+}
+
+/* ══ FORGOT PASSWORD ══ */
+async function submitForgot() {
+  hideErr('forgot-err');
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!email) return showErr('forgot-err', 'Please enter your email');
+  
+  setLoading('btn-forgot', true);
+  try {
+    const r = await fetch(API+'/api/customer/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const d = await r.json();
+    setLoading('btn-forgot', false);
+    if (!r.ok || !d.success) return showErr('forgot-err', d.message || 'Failed to send reset email');
+    _authFlow = 'forgot_password';
+    _ident = email;
+    document.getElementById('otp-dest').textContent = _ident;
+    buildOtpBoxes();
+    startTimer();
+    goView('v-otp');
+  } catch(e) { setLoading('btn-forgot', false); showErr('forgot-err', 'Network error.'); }
 }
 
 /* ══ OTP BOXES ══ */
@@ -363,27 +454,38 @@ async function resendOtp(){
   document.getElementById('resend-link').classList.remove('active');
   document.getElementById('resend-link').textContent='Sending...';
   try{
-    await fetch(API+'/api/customer/auth/send-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({identifier:_ident}),credentials:'include'});
+    const endpoint = _authFlow === 'signup' ? '/api/customer/auth/signup-send-otp' : '/api/customer/auth/forgot-password';
+    await fetch(API+endpoint, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:_ident})
+    });
     startTimer();
-    hideErr('v2-err');
+    hideErr('otp-err');
   }catch{}
 }
 
 /* ══ SUBMIT OTP ══ */
 async function submitOtp(){
-  hideErr('v2-err');
+  hideErr('otp-err');
   const otp=getOtp();
-  if(otp.length<6){ showErr('v2-err','Enter all 6 digits'); shakeOtp(); return; }
+  if(otp.length<6){ showErr('otp-err','Enter all 6 digits'); shakeOtp(); return; }
   setLoading('btn-verify',true);
   try{
-    const r=await fetch(API+'/api/customer/auth/verify-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({identifier:_ident,otp}),credentials:'include'});
+    const r=await fetch(API+'/api/customer/auth/verify-otp',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({identifier:_ident,otp,flow:_authFlow}),
+      credentials:'include'
+    });
     const d=await r.json();
     setLoading('btn-verify',false);
-    if(!r.ok||!d.success){ showErr('v2-err',d.message||'Incorrect code'); shakeOtp(); return; }
+    if(!r.ok||!d.success){ showErr('otp-err',d.message||'Incorrect code'); shakeOtp(); return; }
     clearInterval(_timerInterval);
-    if(d.isNewUser){ _tempToken=d.tempToken; goView('v-pass'); }
-    else location.href='/?openAccount=1';
-  }catch(e){ setLoading('btn-verify',false); showErr('v2-err','Network error.'); }
+    _tempToken = d.tempToken;
+    if (_authFlow === 'signup') goView('v-pass');
+    else goView('v-reset');
+  }catch(e){ setLoading('btn-verify',false); showErr('otp-err','Network error.'); }
 }
 function shakeOtp(){ document.querySelectorAll('.otp-box').forEach(b=>{b.classList.add('error');setTimeout(()=>b.classList.remove('error'),500);}); }
 
@@ -401,21 +503,16 @@ function updateStrength(){
   else{w.classList.add('str-strong');l.textContent='Strong';}
 }
 
-/* ══ SUBMIT PASSWORD ══ */
+/* ══ SUBMIT PASSWORD (SIGNUP) ══ */
 async function submitPassword(){
-  hideErr('v3-err');
+  hideErr('pass-err');
   const p1=document.getElementById('pass1').value, p2=document.getElementById('pass2').value;
-  const name=document.getElementById('new-name').value.trim();
+  const name=document.getElementById('signup-name').value;
+  const email=document.getElementById('signup-email').value;
+  const phone=document.getElementById('signup-phone').value;
   
-  if(!name){showErr('v3-err','Please enter your full name');return;}
-  if(p1.length<8){showErr('v3-err','Password must be at least 8 characters');return;}
-  if(!/[A-Z]/.test(p1)){showErr('v3-err','Password must contain an uppercase letter');return;}
-  if(!/[0-9]/.test(p1)){showErr('v3-err','Password must contain a number');return;}
-  if(p1!==p2){showErr('v3-err','Passwords do not match');return;}
-  
-  let extraEmail = '', extraPhone = '';
-  if(_identMode==='phone') extraEmail = document.getElementById('new-email').value.trim();
-  else extraPhone = document.getElementById('new-phone').value.trim();
+  if(p1.length<8){showErr('pass-err','Password must be at least 8 characters');return;}
+  if(p1!==p2){showErr('pass-err','Passwords do not match');return;}
   
   setLoading('btn-create',true);
   try{
@@ -426,23 +523,50 @@ async function submitPassword(){
         tempToken:_tempToken,
         password:p1,
         confirmPassword:p2,
-        name:name,
-        email:extraEmail,
-        phone:extraPhone
+        name, email, phone
       }),
       credentials:'include'
     });
     const d=await r.json();
     setLoading('btn-create',false);
-    if(!r.ok||!d.success){showErr('v3-err',d.message||'Something went wrong');return;}
+    if(!r.ok||!d.success){showErr('pass-err',d.message||'Something went wrong');return;}
     location.href='/?openAccount=1';
-  }catch(e){setLoading('btn-create',false);showErr('v3-err','Network error.');}
+  }catch(e){setLoading('btn-create',false);showErr('pass-err','Network error.');}
+}
+
+/* ══ SUBMIT RESET PASSWORD ══ */
+async function submitResetPassword(){
+  hideErr('reset-err');
+  const p1=document.getElementById('reset-pass1').value, p2=document.getElementById('reset-pass2').value;
+  if(p1.length<8){showErr('reset-err','Password must be at least 8 characters');return;}
+  if(p1!==p2){showErr('reset-err','Passwords do not match');return;}
+  
+  setLoading('btn-reset',true);
+  try{
+    const r=await fetch(API+'/api/customer/auth/reset-password',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        tempToken:_tempToken,
+        newPassword:p1
+      }),
+      credentials:'include'
+    });
+    const d=await r.json();
+    setLoading('btn-reset',false);
+    if(!r.ok||!d.success){showErr('reset-err',d.message||'Something went wrong');return;}
+    // Login with the new password
+    document.getElementById('login-email').value = _ident;
+    document.getElementById('login-pass').value = p1;
+    goView('v-login');
+    submitLogin();
+  }catch(e){setLoading('btn-reset',false);showErr('reset-err','Network error.');}
 }
 
 /* ══ HELPERS ══ */
-function setLoading(id,on){const b=document.getElementById(id);if(on)b.classList.add('loading');else b.classList.remove('loading');b.disabled=on;}
-function showErr(id,msg){const e=document.getElementById(id);e.textContent=msg;e.classList.add('show');}
-function hideErr(id){document.getElementById(id).classList.remove('show');}
+function setLoading(id,on){const b=document.getElementById(id);if(!b)return;if(on)b.classList.add('loading');else b.classList.remove('loading');b.disabled=on;}
+function showErr(id,msg){const e=document.getElementById(id);if(!e)return;e.textContent=msg;e.classList.add('show');}
+function hideErr(id){const e=document.getElementById(id);if(e)e.classList.remove('show');}
 function togPass(id,btn){const i=document.getElementById(id);const on=i.type==='password';i.type=on?'text':'password';btn.textContent=on?'🙈':'👁';}
 
 /* ══ ENTER KEY ══ */
@@ -450,8 +574,11 @@ document.addEventListener('keydown',e=>{
   if(e.key!=='Enter')return;
   const a=document.querySelector('.view.active');
   if(!a)return;
-  if(a.id==='v-ident')submitIdentifier();
+  if(a.id==='v-login')submitLogin();
+  else if(a.id==='v-signup')submitSignup();
+  else if(a.id==='v-forgot')submitForgot();
   else if(a.id==='v-pass')submitPassword();
+  else if(a.id==='v-reset')submitResetPassword();
 });
 </script>
 </body>

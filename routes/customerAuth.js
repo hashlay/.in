@@ -347,6 +347,18 @@ router.post('/verify-otp',
       });
     }
 
+    if (req.body.flow === 'forgot_password') {
+      if (!existingCustomer || !existingCustomer.passwordHash) {
+        return res.status(400).json({ success: false, message: 'Account not found. Please sign up.' });
+      }
+      const tempToken = jwt.sign(
+        { identifier, type, purpose: 'reset-password' },
+        process.env.JWT_SECRET,
+        { expiresIn: '15m' }
+      );
+      return res.json({ success: true, isNewUser: false, tempToken, message: 'OTP verified. Please reset your password.' });
+    }
+
     if (!existingCustomer || !existingCustomer.passwordHash) {
       // New user or user without password — issue temp token for set-password
       const tempToken = jwt.sign(
@@ -531,5 +543,93 @@ router.get('/me', async (req, res) => {
   }
 });
 
+
+// ═══════════════════════════════════════════════════════════════════
+// ── ROUTE: POST /login-password ─────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+router.post('/login-password', async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).json({ success: false, message: 'Email and password required' });
+  const customer = await Customer.findOne({ email }).select('+passwordHash');
+  if (!customer) return res.json({ success: false, code: 'NOT_FOUND', message: 'Account not found. Please sign up.' });
+  if (!customer.passwordHash) return res.json({ success: false, code: 'NOT_FOUND', message: 'You have not set up a password. Please sign up or use forgot password.' });
+  const isMatch = await bcrypt.compare(password, customer.passwordHash);
+  if (!isMatch) return res.json({ success: false, code: 'WRONG_PASSWORD', message: 'Incorrect password' });
+  await createSession(customer, req, res);
+  return res.json({ success: true, message: 'Login successful' });
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// ── ROUTE: POST /signup-send-otp ────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+router.post('/signup-send-otp', async (req, res) => {
+  const { email, phone } = req.body;
+  if (!email) return res.status(400).json({ success: false, message: 'Email required' });
+  const existing = await Customer.findOne({ $or: [{ email }, { phone }] }).select('+passwordHash');
+  if (existing && existing.passwordHash) {
+    return res.json({ success: false, code: 'EXISTS', message: 'Email or phone already registered. Please login.' });
+  }
+  const otp = crypto.randomInt(100000, 999999).toString();
+  const otpHash = await bcrypt.hash(otp, 10);
+  await OtpCode.create({ identifier: email, otpHash, expiresAt: new Date(Date.now() + 10 * 60 * 1000) });
+  
+  const settings = await AuthSettings.getSettings();
+  const transporter = buildTransporter(settings);
+  const fromName  = settings.smtpFromName || process.env.FROM_NAME || 'Hashlay';
+  const fromEmail = settings.smtpFromEmail || process.env.FROM_EMAIL || 'noreply@hashlay.in';
+  try {
+    await transporter.sendMail({
+      from: `"${fromName}" <${fromEmail}>`,
+      to: email,
+      subject: 'Your Hashlay Signup OTP',
+      html: otpEmailHtml(otp, fromName),
+    });
+  } catch(e) {}
+  return res.json({ success: true, message: 'OTP sent' });
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// ── ROUTE: POST /forgot-password ────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ success: false, message: 'Email required' });
+  const existing = await Customer.findOne({ email }).select('+passwordHash');
+  if (!existing || !existing.passwordHash) return res.json({ success: false, message: 'Account not found.' });
+  const otp = crypto.randomInt(100000, 999999).toString();
+  const otpHash = await bcrypt.hash(otp, 10);
+  await OtpCode.create({ identifier: email, otpHash, expiresAt: new Date(Date.now() + 10 * 60 * 1000) });
+  
+  const settings = await AuthSettings.getSettings();
+  const transporter = buildTransporter(settings);
+  const fromName  = settings.smtpFromName || process.env.FROM_NAME || 'Hashlay';
+  const fromEmail = settings.smtpFromEmail || process.env.FROM_EMAIL || 'noreply@hashlay.in';
+  try {
+    await transporter.sendMail({
+      from: `"${fromName}" <${fromEmail}>`,
+      to: email,
+      subject: 'Your Hashlay Password Reset OTP',
+      html: otpEmailHtml(otp, fromName),
+    });
+  } catch(e) {}
+  return res.json({ success: true, message: 'OTP sent' });
+});
+
+// ═══════════════════════════════════════════════════════════════════
+// ── ROUTE: POST /reset-password ─────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════
+router.post('/reset-password', async (req, res) => {
+  const { tempToken, newPassword } = req.body;
+  if (!newPassword || newPassword.length < 8) return res.status(400).json({ success: false, message: 'Password must be at least 8 chars' });
+  try {
+    const decoded = jwt.verify(tempToken, process.env.JWT_SECRET);
+    if (decoded.purpose !== 'reset-password') return res.status(400).json({ success: false, message: 'Invalid token' });
+    const hash = await bcrypt.hash(newPassword, 12);
+    await Customer.findOneAndUpdate({ email: decoded.identifier }, { passwordHash: hash });
+    return res.json({ success: true, message: 'Password reset successful' });
+  } catch(e) {
+    return res.status(400).json({ success: false, message: 'Token expired or invalid' });
+  }
+});
 
 module.exports = router;
