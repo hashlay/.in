@@ -49,15 +49,19 @@ r.post('/create-order', async (req, res) => {
 
     const deliverySettings = await Settings.findOne({ key: 'delivery' });
     const deliveryValue = deliverySettings?.value || {};
-    const expectedDelivery = (subtotal >= (deliveryValue.freeAbove || 999)) ? 0 : (deliveryValue.charge || 49);
-    const expectedCodCharge = (paymentMethod === 'cod') ? (deliveryValue.codCharge || 0) : 0;
+    const freeAbove = parseFloat(deliveryValue.freeAbove) || 999;
+    const adminCharge = parseFloat(deliveryValue.charge) || 49;
+    const adminCodCharge = parseFloat(deliveryValue.codCharge) || 0;
+    
+    const expectedDelivery = (subtotal >= freeAbove) ? 0 : adminCharge;
+    const expectedCodCharge = (paymentMethod === 'cod') ? adminCodCharge : 0;
 
-    if (deliveryCharge !== expectedDelivery)
+    if (parseFloat(deliveryCharge) !== expectedDelivery)
       return res.status(400).json({ success: false, message: 'Delivery charge mismatch' });
-    if (codCharge !== expectedCodCharge)
+    if (parseFloat(codCharge) !== expectedCodCharge)
       return res.status(400).json({ success: false, message: 'COD charge mismatch' });
 
-    const amount = subtotal + deliveryCharge + codCharge - couponDiscount;
+    const amount = subtotal + parseFloat(deliveryCharge) + parseFloat(codCharge) - parseFloat(couponDiscount);
     if (!amount || amount < 1)
       return res.status(400).json({ success: false, message: 'Invalid order amount' });
 
