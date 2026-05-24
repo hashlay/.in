@@ -519,6 +519,7 @@ router.get('/me', async (req, res) => {
     return res.json({
       loggedIn: true,
       customer: {
+        _id:   customer._id,
         email: customer.email || null,
         phone: customer.phone || null,
         name:  customer.name  || null,

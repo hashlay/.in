@@ -118,7 +118,7 @@ router.get('/track/:orderId', async (req, res) => {
 
 router.post('/chat/start', async (req, res) => {
   // Resume existing open session or create new one
-  let session = await ChatSession.findOne({ customerId: req.customer._id, status: 'open' });
+  let session = await ChatSession.findOne({ customerId: req.customer._id, status: 'open' }).sort({ createdAt: -1 });
   if (!session) {
     session = await ChatSession.create({ customerId: req.customer._id });
   }
@@ -130,7 +130,7 @@ router.post('/chat/start', async (req, res) => {
 // ═══════════════════════════════════════════════════════════════════
 
 router.get('/chat/messages', async (req, res) => {
-  const session = await ChatSession.findOne({ customerId: req.customer._id, status: 'open' });
+  const session = await ChatSession.findOne({ customerId: req.customer._id, status: 'open' }).sort({ createdAt: -1 });
   if (!session) return res.json({ success: true, messages: [], sessionId: null });
 
   const messages = await ChatMessage.find({ sessionId: session._id })
