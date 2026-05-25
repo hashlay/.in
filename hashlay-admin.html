@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow">
   <title>Hashlay Admin — Command Center</title>
-  <link rel="icon" type="image/jpeg" href="https://res.cloudinary.com/drj19ghhl/image/upload/v1777176961/f47e171f-1606-4005-9edd-41239b24ea44_ovi6oo.jpg">
+  <link rel="icon" type="image/jpeg"
+    href="https://res.cloudinary.com/drj19ghhl/image/upload/v1777176961/f47e171f-1606-4005-9edd-41239b24ea44_ovi6oo.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap"
@@ -14,7 +15,12 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
   <style>
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
     /* ── Variables ─────────────────────────────────────────────── */
     :root {
       --black: #000000;
@@ -1033,22 +1039,27 @@
       outline: none;
       text-align: left;
     }
-    
+
     select.badge-blue {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='%2366aaff' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
     }
+
     select.badge-green {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='%234ade80' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
     }
+
     select.badge-yellow {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='%23fbbf24' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
     }
+
     select.badge-red {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='%23f87171' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
     }
+
     select.badge-cyan {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='%2322d3ee' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
     }
+
     select.badge-gray {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='%239999bb' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
     }
@@ -2503,17 +2514,20 @@
       background: var(--bg-4);
       color: var(--white);
     }
+
     @media(max-width:900px) {
       #si-wrap {
         flex-direction: column !important;
         height: auto !important;
         min-height: auto !important;
       }
+
       #si-left {
         width: 100% !important;
         min-width: 0 !important;
         height: 300px !important;
       }
+
       #si-right {
         width: 100% !important;
         min-height: 400px !important;
@@ -2544,9 +2558,9 @@
       <div class="login-title">Sign in to continue</div>
       <div class="login-error" id="login-error">❌ Invalid credentials. Please try again.</div>
       <label class="login-label" for="l-email">Email</label>
-      <input class="login-input" type="email" id="l-email" placeholder="admin@hashlay.in" value="admin@hashlay.in" />
+      <input class="login-input" type="email" id="l-email" placeholder="Username" />
       <label class="login-label" for="l-pass">Password</label>
-      <input class="login-input" type="password" id="l-pass" placeholder="••••••••"
+      <input class="login-input" type="password" id="l-pass" placeholder="Password"
         onkeydown="if(event.key==='Enter')doLogin()" />
       <button class="login-btn" onclick="doLogin()">Access Dashboard →</button>
 
@@ -2571,35 +2585,51 @@
 
       <nav class="sidebar-nav">
         <div class="sidebar-section-label">Main</div>
-        <div class="nav-item active" onclick="goPage('dashboard',this)"><i class="nav-icon fa-solid fa-chart-line"></i>Dashboard</div>
-        <div class="nav-item" onclick="goPage('orders',this)"><i class="nav-icon fa-solid fa-cart-shopping"></i>Orders<span
-            class="nav-badge" id="pending-badge">4</span></div>
-        <div class="nav-item" onclick="goPage('waorders',this)"><i class="nav-icon fa-brands fa-whatsapp"></i>WhatsApp Orders</div>
+        <div class="nav-item active" onclick="goPage('dashboard',this)"><i
+            class="nav-icon fa-solid fa-chart-line"></i>Dashboard</div>
+        <div class="nav-item" onclick="goPage('orders',this)"><i
+            class="nav-icon fa-solid fa-cart-shopping"></i>Orders<span class="nav-badge" id="pending-badge">4</span>
+        </div>
+        <div class="nav-item" onclick="goPage('waorders',this)"><i class="nav-icon fa-brands fa-whatsapp"></i>WhatsApp
+          Orders</div>
         <div class="nav-item" onclick="goPage('products',this)"><i class="nav-icon fa-solid fa-box"></i>Products</div>
-        <div class="nav-item" onclick="goPage('accounts',this)"><i class="nav-icon fa-solid fa-address-card"></i>Accounts</div>
-        <div class="nav-item" onclick="goPage('customers',this)"><i class="nav-icon fa-solid fa-users"></i>Customers</div>
+        <div class="nav-item" onclick="goPage('accounts',this)"><i
+            class="nav-icon fa-solid fa-address-card"></i>Accounts</div>
+        <div class="nav-item" onclick="goPage('customers',this)"><i class="nav-icon fa-solid fa-users"></i>Customers
+        </div>
         <div class="nav-item" onclick="goPage('reviews',this)"><i class="nav-icon fa-solid fa-star"></i>Reviews<span
             class="nav-badge" id="review-badge">3</span></div>
 
         <div class="sidebar-section-label" style="margin-top:.6rem;">Growth</div>
-        <div class="nav-item" onclick="goPage('marketing',this)"><i class="nav-icon fa-solid fa-bullseye"></i>Marketing</div>
-        <div class="nav-item" onclick="goPage('analytics',this)"><i class="nav-icon fa-solid fa-chart-pie"></i>Analytics</div>
+        <div class="nav-item" onclick="goPage('marketing',this)"><i class="nav-icon fa-solid fa-bullseye"></i>Marketing
+        </div>
+        <div class="nav-item" onclick="goPage('analytics',this)"><i class="nav-icon fa-solid fa-chart-pie"></i>Analytics
+        </div>
 
         <div class="sidebar-section-label" style="margin-top:.6rem;">Content</div>
-        <div class="nav-item" onclick="goPage('faq',this)"><i class="nav-icon fa-solid fa-circle-question"></i>FAQ Manager</div>
-        <div class="nav-item" onclick="goPage('chatbot',this)"><i class="nav-icon fa-solid fa-robot"></i>AI Chatbot</div>
+        <div class="nav-item" onclick="goPage('faq',this)"><i class="nav-icon fa-solid fa-circle-question"></i>FAQ
+          Manager</div>
+        <div class="nav-item" onclick="goPage('chatbot',this)"><i class="nav-icon fa-solid fa-robot"></i>AI Chatbot
+        </div>
         <div class="nav-item" onclick="goPage('notify',this)"><i class="nav-icon fa-solid fa-bell"></i>Notify List</div>
-        <div class="nav-item" onclick="goPage('contact',this)"><i class="nav-icon fa-solid fa-envelope"></i>Messages</div>
-        <div class="nav-item" onclick="goPage('supportinbox',this)"><i class="nav-icon fa-solid fa-headset"></i>Support Inbox<span class="nav-badge" id="chat-nav-badge" style="display:none;">0</span></div>
+        <div class="nav-item" onclick="goPage('contact',this)"><i class="nav-icon fa-solid fa-envelope"></i>Messages
+        </div>
+        <div class="nav-item" onclick="goPage('supportinbox',this)"><i class="nav-icon fa-solid fa-headset"></i>Support
+          Inbox<span class="nav-badge" id="chat-nav-badge" style="display:none;">0</span></div>
 
         <div class="sidebar-section-label" style="margin-top:.6rem;">System</div>
-        <div class="nav-item" onclick="goPage('notifications',this)"><i class="nav-icon fa-solid fa-bell"></i>Notifications<span
-            class="nav-badge" id="notif-nav-badge" style="display:none;">0</span></div>
-        <div class="nav-item" onclick="goPage('activitylog',this)"><i class="nav-icon fa-solid fa-clipboard-list"></i>Activity Log</div>
-        <div class="nav-item" onclick="goPage('custauth',this)"><i class="nav-icon fa-solid fa-user-lock"></i>Customer Auth</div>
+        <div class="nav-item" onclick="goPage('notifications',this)"><i
+            class="nav-icon fa-solid fa-bell"></i>Notifications<span class="nav-badge" id="notif-nav-badge"
+            style="display:none;">0</span></div>
+        <div class="nav-item" onclick="goPage('activitylog',this)"><i
+            class="nav-icon fa-solid fa-clipboard-list"></i>Activity Log</div>
+        <div class="nav-item" onclick="goPage('custauth',this)"><i class="nav-icon fa-solid fa-user-lock"></i>Customer
+          Auth</div>
         <div class="nav-item" onclick="goPage('settings',this)"><i class="nav-icon fa-solid fa-gear"></i>Settings</div>
-        <div class="nav-item" onclick="goPage('admins',this)"><i class="nav-icon fa-solid fa-user-shield"></i>Admin Users</div>
-        <div class="nav-item danger" onclick="doLogout()"><i class="nav-icon fa-solid fa-arrow-right-from-bracket"></i>Logout</div>
+        <div class="nav-item" onclick="goPage('admins',this)"><i class="nav-icon fa-solid fa-user-shield"></i>Admin
+          Users</div>
+        <div class="nav-item danger" onclick="doLogout()"><i
+            class="nav-icon fa-solid fa-arrow-right-from-bracket"></i>Logout</div>
       </nav>
 
       <div class="sidebar-footer">
@@ -2629,7 +2659,8 @@
             <input class="topbar-search" type="text" placeholder="Global search…" />
           </div>
           <button class="notif-btn" onclick="goPage('notifications',null)" title="Notifications"
-            style="position:relative;"><i class="fa-solid fa-bell"></i><span class="notif-count" id="notif-count-badge">0</span></button>
+            style="position:relative;"><i class="fa-solid fa-bell"></i><span class="notif-count"
+              id="notif-count-badge">0</span></button>
           <button class="topbar-btn primary" onclick="goPage('products',null);openAddProduct()">+ Add Product</button>
         </div>
       </div>
@@ -2736,16 +2767,18 @@
           <div class="reset-modal-box">
             <div class="reset-modal-title">⚠️ RESET CONFIRMATION</div>
             <div class="reset-modal-sub">
-              This action will reset the selected stat to zero. This is <strong style="color:#f87171;">irreversible</strong>. 
+              This action will reset the selected stat to zero. This is <strong
+                style="color:#f87171;">irreversible</strong>.
               Enter the secret password to confirm.
             </div>
             <div class="reset-modal-error" id="reset-modal-error">❌ Incorrect password. Try again.</div>
-            <input type="password" class="reset-modal-input" id="reset-modal-password" placeholder="Enter secret password..." 
-              onkeydown="if(event.key==='Enter')confirmResetStat()" />
+            <input type="password" class="reset-modal-input" id="reset-modal-password"
+              placeholder="Enter secret password..." onkeydown="if(event.key==='Enter')confirmResetStat()" />
             <input type="hidden" id="reset-modal-stat-type" value="" />
             <div class="reset-modal-actions">
-              <button class="btn btn-secondary" onclick="closeResetModal()" style="padding:.55rem 1.2rem;font-size:.78rem;">Cancel</button>
-              <button class="btn" onclick="confirmResetStat()" 
+              <button class="btn btn-secondary" onclick="closeResetModal()"
+                style="padding:.55rem 1.2rem;font-size:.78rem;">Cancel</button>
+              <button class="btn" onclick="confirmResetStat()"
                 style="padding:.55rem 1.2rem;font-size:.78rem;background:var(--danger);color:#fff;border:none;border-radius:var(--radius);">
                 🔒 Reset to Zero
               </button>
@@ -2785,7 +2818,9 @@
                 <div class="card-title">Revenue Overview</div>
                 <div class="card-sub">Last 7 days performance</div>
               </div>
-              <select id="revenue-range-select" class="form-select" style="width:auto;padding:.3rem .7rem;font-size:.72rem;" onchange="handleRevenueRangeChange(this.value)">
+              <select id="revenue-range-select" class="form-select"
+                style="width:auto;padding:.3rem .7rem;font-size:.72rem;"
+                onchange="handleRevenueRangeChange(this.value)">
                 <option value="7d">Last 7 Days</option>
                 <option value="30d">Last 30 Days</option>
                 <option value="3m">Last 3 Months</option>
@@ -2858,8 +2893,10 @@
             <div class="section-hdr-sub">Manage and track all customer orders</div>
           </div>
           <div class="section-hdr-right">
-            <button class="btn btn-secondary btn-sm" onclick="openExportModal('orders','csv')"><i class="fa-solid fa-download"></i> Export CSV</button>
-            <button class="btn btn-secondary btn-sm" onclick="openExportModal('orders','excel')"><i class="fa-solid fa-file-excel"></i> Export
+            <button class="btn btn-secondary btn-sm" onclick="openExportModal('orders','csv')"><i
+                class="fa-solid fa-download"></i> Export CSV</button>
+            <button class="btn btn-secondary btn-sm" onclick="openExportModal('orders','excel')"><i
+                class="fa-solid fa-file-excel"></i> Export
               Excel</button>
           </div>
         </div>
@@ -2910,7 +2947,8 @@
             <div class="section-hdr-sub">Manage orders received via WhatsApp</div>
           </div>
           <div class="section-hdr-right">
-            <button class="btn btn-secondary btn-sm" onclick="openWaScreenshotModal()"><i class="fa-solid fa-camera"></i> Scan Screenshot</button>
+            <button class="btn btn-secondary btn-sm" onclick="openWaScreenshotModal()"><i
+                class="fa-solid fa-camera"></i> Scan Screenshot</button>
             <button class="btn btn-primary btn-sm" onclick="openWaOrderModal()">+ Add Order</button>
           </div>
         </div>
@@ -2959,31 +2997,39 @@
             <button class="modal-close" onclick="closeModal('modal-wa-screenshot')">✕</button>
           </div>
           <div class="modal-body">
-            <p style="color:var(--gray-lt);font-size:.85rem;margin-bottom:1rem;">Upload a WhatsApp order/message screenshot. AI will automatically extract the order details for you.</p>
+            <p style="color:var(--gray-lt);font-size:.85rem;margin-bottom:1rem;">Upload a WhatsApp order/message
+              screenshot. AI will automatically extract the order details for you.</p>
             <div class="form-group">
               <label class="form-label">Screenshot Image URL</label>
-              <input class="form-input" type="url" id="wa-screenshot-url" placeholder="Paste Cloudinary/image URL here..." />
+              <input class="form-input" type="url" id="wa-screenshot-url"
+                placeholder="Paste Cloudinary/image URL here..." />
             </div>
             <div style="text-align:center;margin:1rem 0;">
               <span style="color:var(--gray);font-size:.8rem;">— OR —</span>
             </div>
             <div class="form-group">
               <label class="form-label">Upload Screenshot</label>
-              <input class="form-input" type="file" id="wa-screenshot-file" accept="image/*" onchange="handleWaScreenshotUpload(this)" />
+              <input class="form-input" type="file" id="wa-screenshot-file" accept="image/*"
+                onchange="handleWaScreenshotUpload(this)" />
             </div>
             <div id="wa-screenshot-preview" style="margin-top:1rem;display:none;">
-              <img id="wa-screenshot-img" style="max-width:100%;border-radius:var(--radius);border:1px solid var(--bg-5);" />
+              <img id="wa-screenshot-img"
+                style="max-width:100%;border-radius:var(--radius);border:1px solid var(--bg-5);" />
             </div>
             <div id="wa-parse-status" style="margin-top:1rem;display:none;">
-              <div style="display:flex;align-items:center;gap:.6rem;padding:1rem;background:var(--bg-3);border-radius:var(--radius);">
-                <div class="spinner" style="width:20px;height:20px;border:2px solid var(--blue);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;"></div>
+              <div
+                style="display:flex;align-items:center;gap:.6rem;padding:1rem;background:var(--bg-3);border-radius:var(--radius);">
+                <div class="spinner"
+                  style="width:20px;height:20px;border:2px solid var(--blue);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;">
+                </div>
                 <span style="color:var(--gray-lt);font-size:.85rem;">AI is analyzing the screenshot...</span>
               </div>
             </div>
           </div>
           <div class="modal-footer">
             <button class="btn btn-secondary" onclick="closeModal('modal-wa-screenshot')">Cancel</button>
-            <button class="btn btn-primary" id="wa-parse-btn" onclick="parseWaScreenshot()"><i class="fa-solid fa-robot"></i> Extract Details</button>
+            <button class="btn btn-primary" id="wa-parse-btn" onclick="parseWaScreenshot()"><i
+                class="fa-solid fa-robot"></i> Extract Details</button>
           </div>
         </div>
       </div>
@@ -3096,7 +3142,8 @@
             <div>
               <div class="fw-600" style="margin-bottom:.6rem;color:var(--blue-lt);">📝 Notes</div>
               <div class="form-group">
-                <textarea class="form-textarea" id="wa-notes" placeholder="Any additional notes about this order..."></textarea>
+                <textarea class="form-textarea" id="wa-notes"
+                  placeholder="Any additional notes about this order..."></textarea>
               </div>
               <input type="hidden" id="wa-screenshot-ref" />
             </div>
@@ -3130,7 +3177,8 @@
             </div>
             <div class="form-group">
               <label>New Password (Optional)</label>
-              <input type="password" class="input" id="account-edit-password" placeholder="Leave blank to keep unchanged" />
+              <input type="password" class="input" id="account-edit-password"
+                placeholder="Leave blank to keep unchanged" />
             </div>
           </div>
           <div class="modal-footer">
@@ -3232,7 +3280,8 @@
             <div class="section-hdr-sub">Your customer database</div>
           </div>
           <div class="section-hdr-right">
-            <button class="btn btn-secondary btn-sm" onclick="openExportModal('customers','csv')"><i class="fa-solid fa-download"></i> Export CSV</button>
+            <button class="btn btn-secondary btn-sm" onclick="openExportModal('customers','csv')"><i
+                class="fa-solid fa-download"></i> Export CSV</button>
           </div>
         </div>
         <div class="filters-row">
@@ -3511,7 +3560,8 @@
           <div class="section-hdr-title">CAR CARE NOTIFY LIST</div>
           <div class="section-hdr-sub">Customers waiting for Car Care product launch</div>
           <div class="section-hdr-right">
-            <button class="btn btn-secondary btn-sm" onclick="openExportModal('notify','csv')"><i class="fa-solid fa-download"></i> Export CSV</button>
+            <button class="btn btn-secondary btn-sm" onclick="openExportModal('notify','csv')"><i
+                class="fa-solid fa-download"></i> Export CSV</button>
           </div>
         </div>
         <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.5rem;">
@@ -3579,7 +3629,8 @@
                 <textarea class="form-textarea" id="cm-msg" readonly style="min-height:150px;"></textarea>
               </div>
             </div>
-            <div class="modal-footer" style="display:flex;justify-content:flex-end;padding:1.2rem 1.8rem;border-top:1px solid rgba(255, 255, 255, .06);">
+            <div class="modal-footer"
+              style="display:flex;justify-content:flex-end;padding:1.2rem 1.8rem;border-top:1px solid rgba(255, 255, 255, .06);">
               <button class="btn btn-secondary" onclick="closeModal('modal-contact-msg')">Close</button>
             </div>
           </div>
@@ -3591,7 +3642,8 @@
             <div class="section-hdr-sub">Customer inquiries from the website</div>
           </div>
           <div class="section-hdr-right">
-            <button class="btn btn-secondary btn-sm" onclick="openExportModal('contacts','csv')"><i class="fa-solid fa-download"></i> Export CSV</button>
+            <button class="btn btn-secondary btn-sm" onclick="openExportModal('contacts','csv')"><i
+                class="fa-solid fa-download"></i> Export CSV</button>
           </div>
         </div>
         <div class="card">
@@ -3798,7 +3850,10 @@
                     style="font-size:.75rem;color:var(--gray);" />
                   <button class="btn btn-secondary btn-sm"
                     onclick="uploadSettingsImage('s-ba-before-file','s-ba-before-img')">📤 Upload</button>
-                  <button class="btn btn-secondary btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);" onclick="document.getElementById('s-ba-before-img').value=''; document.getElementById('s-ba-before-file').value='';">🗑️ Clear</button>
+                  <button class="btn btn-secondary btn-sm"
+                    style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);"
+                    onclick="document.getElementById('s-ba-before-img').value=''; document.getElementById('s-ba-before-file').value='';">🗑️
+                    Clear</button>
                 </div>
                 <div style="font-size:.7rem;color:var(--gray);margin-top:.3rem;">Image shown on the left (dirty/old
                   state)</div>
@@ -3811,7 +3866,10 @@
                     style="font-size:.75rem;color:var(--gray);" />
                   <button class="btn btn-secondary btn-sm"
                     onclick="uploadSettingsImage('s-ba-after-file','s-ba-after-img')">📤 Upload</button>
-                  <button class="btn btn-secondary btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);" onclick="document.getElementById('s-ba-after-img').value=''; document.getElementById('s-ba-after-file').value='';">🗑️ Clear</button>
+                  <button class="btn btn-secondary btn-sm"
+                    style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);"
+                    onclick="document.getElementById('s-ba-after-img').value=''; document.getElementById('s-ba-after-file').value='';">🗑️
+                    Clear</button>
                 </div>
                 <div style="font-size:.7rem;color:var(--gray);margin-top:.3rem;">Image shown on the right (clean/new
                   state)</div>
@@ -3855,7 +3913,10 @@
                   <input type="file" accept="video/*" id="s-vid1-file" style="font-size:.75rem;color:var(--gray);" />
                   <button class="btn btn-secondary btn-sm" onclick="uploadSettingsVideo('s-vid1-file','s-vid1-url')">📤
                     Upload Video</button>
-                  <button class="btn btn-secondary btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);" onclick="document.getElementById('s-vid1-url').value=''; document.getElementById('s-vid1-file').value='';">🗑️ Clear</button>
+                  <button class="btn btn-secondary btn-sm"
+                    style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);"
+                    onclick="document.getElementById('s-vid1-url').value=''; document.getElementById('s-vid1-file').value='';">🗑️
+                    Clear</button>
                 </div>
               </div>
               <div class="form-group">
@@ -3866,7 +3927,10 @@
                     style="font-size:.75rem;color:var(--gray);" />
                   <button class="btn btn-secondary btn-sm"
                     onclick="uploadSettingsImage('s-vid1-thumb-file','s-vid1-thumb')">📤 Upload</button>
-                  <button class="btn btn-secondary btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);" onclick="document.getElementById('s-vid1-thumb').value=''; document.getElementById('s-vid1-thumb-file').value='';">🗑️ Clear</button>
+                  <button class="btn btn-secondary btn-sm"
+                    style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);"
+                    onclick="document.getElementById('s-vid1-thumb').value=''; document.getElementById('s-vid1-thumb-file').value='';">🗑️
+                    Clear</button>
                 </div>
               </div>
             </div>
@@ -3889,7 +3953,10 @@
                   <input type="file" accept="video/*" id="s-vid2-file" style="font-size:.75rem;color:var(--gray);" />
                   <button class="btn btn-secondary btn-sm" onclick="uploadSettingsVideo('s-vid2-file','s-vid2-url')">📤
                     Upload Video</button>
-                  <button class="btn btn-secondary btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);" onclick="document.getElementById('s-vid2-url').value=''; document.getElementById('s-vid2-file').value='';">🗑️ Clear</button>
+                  <button class="btn btn-secondary btn-sm"
+                    style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);"
+                    onclick="document.getElementById('s-vid2-url').value=''; document.getElementById('s-vid2-file').value='';">🗑️
+                    Clear</button>
                 </div>
               </div>
               <div class="form-group">
@@ -3900,7 +3967,10 @@
                     style="font-size:.75rem;color:var(--gray);" />
                   <button class="btn btn-secondary btn-sm"
                     onclick="uploadSettingsImage('s-vid2-thumb-file','s-vid2-thumb')">📤 Upload</button>
-                  <button class="btn btn-secondary btn-sm" style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);" onclick="document.getElementById('s-vid2-thumb').value=''; document.getElementById('s-vid2-thumb-file').value='';">🗑️ Clear</button>
+                  <button class="btn btn-secondary btn-sm"
+                    style="background:rgba(239,68,68,0.1);color:#ef4444;border-color:rgba(239,68,68,0.2);"
+                    onclick="document.getElementById('s-vid2-thumb').value=''; document.getElementById('s-vid2-thumb-file').value='';">🗑️
+                    Clear</button>
                 </div>
               </div>
             </div>
@@ -4060,576 +4130,644 @@
 
 
 
-    <!-- Invoice Print Area (hidden, used for print/PDF) -->
-    <div id="invoice-print-area" style="display:none;"></div>
+      <!-- Invoice Print Area (hidden, used for print/PDF) -->
+      <div id="invoice-print-area" style="display:none;"></div>
 
-    <!-- ══════════════════════════════════════════════════
+      <!-- ══════════════════════════════════════════════════
      MODALS
 ══════════════════════════════════════════════════ -->
 
-    <!-- Export Modal -->
-    <div class="modal-overlay" id="modal-export">
-      <div class="modal-box" style="max-width:480px;">
-        <div class="modal-header">
-          <div class="modal-title" id="export-modal-title">📥 Export Data</div>
-          <button class="modal-close" onclick="closeModal('modal-export')">✕</button>
+      <!-- Export Modal -->
+      <div class="modal-overlay" id="modal-export">
+        <div class="modal-box" style="max-width:480px;">
+          <div class="modal-header">
+            <div class="modal-title" id="export-modal-title">📥 Export Data</div>
+            <button class="modal-close" onclick="closeModal('modal-export')">✕</button>
+          </div>
+          <div class="modal-body">
+            <div
+              style="margin-bottom:1.2rem;padding:1rem;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:10px;">
+              <div style="font-size:.8rem;color:var(--gray);margin-bottom:.6rem;">📅 Date Range (Optional — leave blank
+                for all data)</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">From</label>
+                  <input class="form-input" type="date" id="export-from" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">To</label>
+                  <input class="form-input" type="date" id="export-to" />
+                </div>
+              </div>
+            </div>
+            <div id="export-info" style="font-size:.82rem;color:var(--gray);margin-bottom:1rem;"></div>
+            <div style="display:flex;gap:.8rem;justify-content:flex-end;">
+              <button class="btn btn-secondary" onclick="closeModal('modal-export')">Cancel</button>
+              <button class="btn btn-primary" id="export-confirm-btn" onclick="executeExport()">
+                <span id="export-btn-icon">📥</span> Download
+              </button>
+            </div>
+          </div>
         </div>
-        <div class="modal-body">
-          <div
-            style="margin-bottom:1.2rem;padding:1rem;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.15);border-radius:10px;">
-            <div style="font-size:.8rem;color:var(--gray);margin-bottom:.6rem;">📅 Date Range (Optional — leave blank
-              for all data)</div>
+      </div>
+
+      <!-- Add/Edit Product Modal -->
+      <div class="modal-overlay" id="modal-product">
+        <div class="modal-box" style="max-width:700px;">
+          <div class="modal-header">
+            <div class="modal-title" id="modal-product-title">Add New Product</div>
+            <button class="modal-close" onclick="closeModal('modal-product')">✕</button>
+          </div>
+          <div class="modal-body">
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">From</label>
-                <input class="form-input" type="date" id="export-from" />
+                <label class="form-label">Product Name *</label>
+                <input class="form-input" type="text" id="p-name" placeholder="Complete Sneaker Care Kit" />
               </div>
               <div class="form-group">
-                <label class="form-label">To</label>
-                <input class="form-input" type="date" id="export-to" />
+                <label class="form-label">Category</label>
+                <select class="form-select" id="p-cat">
+                  <option>Sneaker Care</option>
+                  <option>Car Care</option>
+                  <option>Bundle</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Product Slug</label>
+              <input class="form-input" type="text" id="p-slug" placeholder="sneaker-care-kit" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Price (₹) *</label>
+                <input class="form-input" type="number" id="p-price" placeholder="599" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Offer Price (₹)</label>
+                <input class="form-input" type="number" id="p-offer" placeholder="399" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Short Description</label>
+              <input class="form-input" type="text" id="p-desc" placeholder="Everything you need for sneaker care…" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Review Count</label>
+                <input class="form-input" type="number" id="p-reviewcount" placeholder="e.g. 127" value="0" />
+                <div style="font-size:.68rem;color:var(--gray);margin-top:.2rem;">Number of reviews to display</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Rating (1-5)</label>
+                <input class="form-input" type="number" id="p-rating" placeholder="4.5" step="0.1" min="0" max="5"
+                  value="4.5" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">About This Product</label>
+              <textarea class="form-textarea" id="p-about" placeholder="Describe what this product is and what it does…"
+                style="min-height:70px;"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Key Features <span style="font-size:.7rem;color:var(--gray);">(one per
+                  line)</span></label>
+              <textarea class="form-textarea" id="p-features"
+                placeholder="Premium pH-balanced formula&#10;Safe on all materials&#10;Professional-grade cleaning"
+                style="min-height:70px;"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Usage Instructions</label>
+              <textarea class="form-textarea" id="p-usage" placeholder="Step-by-step usage instructions…"
+                style="min-height:70px;"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Stock Quantity</label>
+                <input class="form-input" type="number" id="p-stock" placeholder="100" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Offer Badge</label>
+                <input class="form-input" type="text" id="p-badge" placeholder="BESTSELLER" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Product Images <span style="font-size:.7rem;color:var(--gray);">(1-5 images,
+                  upload from device or paste URLs)</span></label>
+              <input type="file" id="product-image-file" accept="image/*" multiple class="form-input"
+                onchange="previewMultipleImages(this)" />
+              <div class="form-group" style="margin-top:.4rem;">
+                <label class="form-label" style="font-size:.72rem;">Or paste image URLs (one per line)</label>
+                <textarea class="form-textarea" id="p-image-urls"
+                  placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"
+                  style="min-height:50px;font-size:.78rem;"></textarea>
+              </div>
+              <div id="product-images-preview" style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;"></div>
+              <input type="hidden" id="product-image-url" value="" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <div class="toggle-wrap">
+                  <label class="toggle"><input type="checkbox" id="p-instock" checked><span
+                      class="toggle-slider"></span></label>
+                  <span class="toggle-label">In Stock</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="toggle-wrap">
+                  <label class="toggle"><input type="checkbox" id="p-featured"><span
+                      class="toggle-slider"></span></label>
+                  <span class="toggle-label">Featured Product</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="toggle-wrap">
+                  <label class="toggle"><input type="checkbox" id="p-hero"><span class="toggle-slider"></span></label>
+                  <span class="toggle-label">Hero Product</span>
+                </div>
               </div>
             </div>
           </div>
-          <div id="export-info" style="font-size:.82rem;color:var(--gray);margin-bottom:1rem;"></div>
-          <div style="display:flex;gap:.8rem;justify-content:flex-end;">
-            <button class="btn btn-secondary" onclick="closeModal('modal-export')">Cancel</button>
-            <button class="btn btn-primary" id="export-confirm-btn" onclick="executeExport()">
-              <span id="export-btn-icon">📥</span> Download
-            </button>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modal-product')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveProduct()">Save Product</button>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Add/Edit Product Modal -->
-    <div class="modal-overlay" id="modal-product">
-      <div class="modal-box" style="max-width:700px;">
-        <div class="modal-header">
-          <div class="modal-title" id="modal-product-title">Add New Product</div>
-          <button class="modal-close" onclick="closeModal('modal-product')">✕</button>
+      <!-- View Order Modal -->
+      <div class="modal-overlay" id="modal-order">
+        <div class="modal-box">
+          <div class="modal-header">
+            <div class="modal-title" id="modal-order-id">Order #HL-0072</div>
+            <button class="modal-close" onclick="closeModal('modal-order')">✕</button>
+          </div>
+          <div class="modal-body" id="modal-order-body">
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="downloadInvoicePDF()">⬇️ Download PDF</button>
+            <button class="btn btn-secondary" onclick="printInvoice()">🖨 Print Invoice</button>
+            <button class="btn btn-primary" onclick="closeModal('modal-order')">Close</button>
+          </div>
         </div>
-        <div class="modal-body">
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Product Name *</label>
-              <input class="form-input" type="text" id="p-name" placeholder="Complete Sneaker Care Kit" />
+      </div>
+
+      <!-- Add Coupon Modal -->
+      <div class="modal-overlay" id="modal-coupon">
+        <div class="modal-box">
+          <div class="modal-header">
+            <div class="modal-title">Create Coupon</div>
+            <button class="modal-close" onclick="closeModal('modal-coupon')">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Coupon Code *</label>
+                <input class="form-input" type="text" id="c-code" placeholder="HASHLAY20"
+                  style="text-transform:uppercase;" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Discount Type</label>
+                <select class="form-select" id="c-type">
+                  <option value="percent">Percentage (%)</option>
+                  <option value="flat">Flat Amount (₹)</option>
+                </select>
+              </div>
             </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Discount Value</label>
+                <input class="form-input" type="number" id="c-value" placeholder="20" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Minimum Order (₹)</label>
+                <input class="form-input" type="number" id="c-min" placeholder="399" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Expiry Date</label>
+                <input class="form-input" type="date" id="c-expiry" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Usage Limit</label>
+                <input class="form-input" type="number" id="c-limit" placeholder="100" />
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="toggle-wrap">
+                <label class="toggle"><input type="checkbox" id="c-active" checked><span
+                    class="toggle-slider"></span></label>
+                <span class="toggle-label">Active</span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modal-coupon')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveCoupon()">Create Coupon</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Campaign Modal -->
+      <div class="modal-overlay" id="modal-campaign">
+        <div class="modal-box">
+          <div class="modal-header">
+            <div class="modal-title">Create Campaign</div>
+            <button class="modal-close" onclick="closeModal('modal-campaign')">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label">Campaign Name</label>
+              <input class="form-input" type="text" id="campaign-name" placeholder="Summer Sale Campaign" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Channel</label>
+                <select class="form-select" id="campaign-channel">
+                  <option value="email">Email</option>
+                  <option value="sms">SMS</option>
+                  <option value="whatsapp">WhatsApp</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Audience</label>
+                <select class="form-select" id="campaign-audience">
+                  <option value="all">All Customers</option>
+                  <option value="new">New Customers</option>
+                  <option value="repeat">Repeat Buyers</option>
+                  <option value="high_spenders">High Spenders</option>
+                  <option value="accounts_no_orders">Accounts (No Orders)</option>
+                  <option value="all_accounts">All Accounts</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Subject (For Email)</label>
+              <input class="form-input" type="text" id="campaign-subject" placeholder="Big Summer Sale!" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Message</label>
+              <textarea class="form-textarea" id="campaign-message" placeholder="Hey {name}! "></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Schedule Date</label>
+                <input class="form-input" type="datetime-local" id="campaign-schedule" />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modal-campaign')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveCampaign()">Save & Create</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add/Edit FAQ Modal -->
+      <div class="modal-overlay" id="modal-faq">
+        <div class="modal-box">
+          <div class="modal-header">
+            <div class="modal-title" id="faq-modal-title">Add FAQ</div>
+            <button class="modal-close" onclick="closeModal('modal-faq')">✕</button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="faq-id" />
             <div class="form-group">
               <label class="form-label">Category</label>
-              <select class="form-select" id="p-cat">
-                <option>Sneaker Care</option>
-                <option>Car Care</option>
-                <option>Bundle</option>
+              <select class="form-select" id="faq-cat">
+                <option>Product</option>
+                <option>Shipping</option>
+                <option>Payment</option>
+                <option>Returns</option>
               </select>
             </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Product Slug</label>
-            <input class="form-input" type="text" id="p-slug" placeholder="sneaker-care-kit" />
-          </div>
-          <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Price (₹) *</label>
-              <input class="form-input" type="number" id="p-price" placeholder="599" />
+              <label class="form-label">Question *</label>
+              <input class="form-input" type="text" id="faq-q" placeholder="Is the foam safe for suede?" />
             </div>
             <div class="form-group">
-              <label class="form-label">Offer Price (₹)</label>
-              <input class="form-input" type="number" id="p-offer" placeholder="399" />
+              <label class="form-label">Answer *</label>
+              <textarea class="form-textarea" id="faq-a"
+                placeholder="Yes, our foam is specially formulated…"></textarea>
             </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Short Description</label>
-            <input class="form-input" type="text" id="p-desc" placeholder="Everything you need for sneaker care…" />
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modal-faq')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveFaq()">Save FAQ</button>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Review Count</label>
-              <input class="form-input" type="number" id="p-reviewcount" placeholder="e.g. 127" value="0" />
-              <div style="font-size:.68rem;color:var(--gray);margin-top:.2rem;">Number of reviews to display</div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Rating (1-5)</label>
-              <input class="form-input" type="number" id="p-rating" placeholder="4.5" step="0.1" min="0" max="5"
-                value="4.5" />
-            </div>
+        </div>
+      </div>
+
+      <!-- Add/Edit Admin Modal -->
+      <div class="modal-overlay" id="modal-admin">
+        <div class="modal-box">
+          <div class="modal-header">
+            <div class="modal-title" id="modal-admin-title">Add Admin User</div>
+            <button class="modal-close" onclick="closeModal('modal-admin')">✕</button>
           </div>
-          <div class="form-group">
-            <label class="form-label">About This Product</label>
-            <textarea class="form-textarea" id="p-about" placeholder="Describe what this product is and what it does…"
-              style="min-height:70px;"></textarea>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Key Features <span style="font-size:.7rem;color:var(--gray);">(one per
-                line)</span></label>
-            <textarea class="form-textarea" id="p-features"
-              placeholder="Premium pH-balanced formula&#10;Safe on all materials&#10;Professional-grade cleaning"
-              style="min-height:70px;"></textarea>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Usage Instructions</label>
-            <textarea class="form-textarea" id="p-usage" placeholder="Step-by-step usage instructions…"
-              style="min-height:70px;"></textarea>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Stock Quantity</label>
-              <input class="form-input" type="number" id="p-stock" placeholder="100" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Offer Badge</label>
-              <input class="form-input" type="text" id="p-badge" placeholder="BESTSELLER" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Product Images <span style="font-size:.7rem;color:var(--gray);">(1-5 images,
-                upload from device or paste URLs)</span></label>
-            <input type="file" id="product-image-file" accept="image/*" multiple class="form-input"
-              onchange="previewMultipleImages(this)" />
-            <div class="form-group" style="margin-top:.4rem;">
-              <label class="form-label" style="font-size:.72rem;">Or paste image URLs (one per line)</label>
-              <textarea class="form-textarea" id="p-image-urls"
-                placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"
-                style="min-height:50px;font-size:.78rem;"></textarea>
-            </div>
-            <div id="product-images-preview" style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;"></div>
-            <input type="hidden" id="product-image-url" value="" />
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <div class="toggle-wrap">
-                <label class="toggle"><input type="checkbox" id="p-instock" checked><span
-                    class="toggle-slider"></span></label>
-                <span class="toggle-label">In Stock</span>
+          <div class="modal-body">
+            <input type="hidden" id="admin-id" />
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input class="form-input" type="text" id="admin-name" placeholder="Rahul Sharma" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input class="form-input" type="email" id="admin-email" placeholder="rahul@hashlay.in" />
               </div>
             </div>
-            <div class="form-group">
-              <div class="toggle-wrap">
-                <label class="toggle"><input type="checkbox" id="p-featured"><span class="toggle-slider"></span></label>
-                <span class="toggle-label">Featured Product</span>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Password <span id="admin-pass-hint"
+                    style="font-size:0.7rem;color:var(--gray-5);font-weight:normal">(Leave blank to keep
+                    current)</span></label>
+                <input class="form-input" type="password" id="admin-password" placeholder="Min 6 characters" />
               </div>
-            </div>
-            <div class="form-group">
-              <div class="toggle-wrap">
-                <label class="toggle"><input type="checkbox" id="p-hero"><span class="toggle-slider"></span></label>
-                <span class="toggle-label">Hero Product</span>
+              <div class="form-group">
+                <label class="form-label">Role</label>
+                <select class="form-select" id="admin-role">
+                  <option value="super_admin">Super Admin</option>
+                  <option value="admin">Admin</option>
+                  <option value="manager">Manager</option>
+                  <option value="support_staff">Support Staff</option>
+                </select>
               </div>
             </div>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="closeModal('modal-product')">Cancel</button>
-          <button class="btn btn-primary" onclick="saveProduct()">Save Product</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- View Order Modal -->
-    <div class="modal-overlay" id="modal-order">
-      <div class="modal-box">
-        <div class="modal-header">
-          <div class="modal-title" id="modal-order-id">Order #HL-0072</div>
-          <button class="modal-close" onclick="closeModal('modal-order')">✕</button>
-        </div>
-        <div class="modal-body" id="modal-order-body">
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="downloadInvoicePDF()">⬇️ Download PDF</button>
-          <button class="btn btn-secondary" onclick="printInvoice()">🖨 Print Invoice</button>
-          <button class="btn btn-primary" onclick="closeModal('modal-order')">Close</button>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modal-admin')">Cancel</button>
+            <button class="btn btn-primary" id="modal-admin-btn" onclick="saveAdmin()">Save Admin</button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Add Coupon Modal -->
-    <div class="modal-overlay" id="modal-coupon">
-      <div class="modal-box">
-        <div class="modal-header">
-          <div class="modal-title">Create Coupon</div>
-          <button class="modal-close" onclick="closeModal('modal-coupon')">✕</button>
-        </div>
-        <div class="modal-body">
-          <div class="form-row">
+      <!-- Chatbot Rule Modal (Quick Reply & Auto Response) -->
+      <div class="modal-overlay" id="modal-qr">
+        <div class="modal-box" style="max-width:480px;">
+          <div class="modal-header">
+            <div class="modal-title" id="qr-modal-title">Add Chatbot Rule</div>
+            <button class="modal-close" onclick="closeModal('modal-qr')">✕</button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="qr-id" />
             <div class="form-group">
-              <label class="form-label">Coupon Code *</label>
-              <input class="form-input" type="text" id="c-code" placeholder="HASHLAY20"
-                style="text-transform:uppercase;" />
+              <label class="form-label">Button Label (Optional, for Quick Replies)</label>
+              <input class="form-input" type="text" id="qr-label" placeholder="e.g. How to use foam?" />
             </div>
             <div class="form-group">
-              <label class="form-label">Discount Type</label>
-              <select class="form-select" id="c-type">
-                <option value="percent">Percentage (%)</option>
-                <option value="flat">Flat Amount (₹)</option>
+              <label class="form-label">Keywords (Comma separated, for Auto Responses)</label>
+              <input class="form-input" type="text" id="qr-keywords" placeholder="e.g. use, foam, apply" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Response Message (Required)</label>
+              <textarea class="form-textarea" id="qr-response" placeholder="Apply a small amount…"></textarea>
+            </div>
+            <div class="form-group" style="display:flex; align-items:center; gap:0.5rem; margin-top:1rem;">
+              <input type="checkbox" id="qr-active" checked />
+              <label class="form-label" style="margin:0;">Active Rule</label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modal-qr')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveChatbotRule()">Save Rule</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Update Order Status Modal -->
+      <div class="modal-overlay" id="modal-status">
+        <div class="modal-box" style="max-width:420px;">
+          <div class="modal-header">
+            <div class="modal-title">Update Order Status</div>
+            <button class="modal-close" onclick="closeModal('modal-status')">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label">Order Status</label>
+              <select class="form-select" id="new-status-select">
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
               </select>
             </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Discount Value</label>
-              <input class="form-input" type="number" id="c-value" placeholder="20" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Minimum Order (₹)</label>
-              <input class="form-input" type="number" id="c-min" placeholder="399" />
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Expiry Date</label>
-              <input class="form-input" type="date" id="c-expiry" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Usage Limit</label>
-              <input class="form-input" type="number" id="c-limit" placeholder="100" />
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="toggle-wrap">
-              <label class="toggle"><input type="checkbox" id="c-active" checked><span
-                  class="toggle-slider"></span></label>
-              <span class="toggle-label">Active</span>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="closeModal('modal-coupon')">Cancel</button>
-          <button class="btn btn-primary" onclick="saveCoupon()">Create Coupon</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Add Campaign Modal -->
-    <div class="modal-overlay" id="modal-campaign">
-      <div class="modal-box">
-        <div class="modal-header">
-          <div class="modal-title">Create Campaign</div>
-          <button class="modal-close" onclick="closeModal('modal-campaign')">✕</button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label">Campaign Name</label>
-            <input class="form-input" type="text" id="campaign-name" placeholder="Summer Sale Campaign" />
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Channel</label>
-              <select class="form-select" id="campaign-channel">
-                <option value="email">Email</option>
-                <option value="sms">SMS</option>
-                <option value="whatsapp">WhatsApp</option>
+            <div class="form-group" style="margin-top: 1rem;">
+              <label class="form-label">Payment Status</label>
+              <select class="form-select" id="new-payment-select">
+                <option value="pending">Pending</option>
+                <option value="paid">Paid</option>
+                <option value="failed">Failed</option>
+                <option value="refunded">Refunded</option>
               </select>
             </div>
-            <div class="form-group">
-              <label class="form-label">Audience</label>
-              <select class="form-select" id="campaign-audience">
-                <option value="all">All Customers</option>
-                <option value="new">New Customers</option>
-                <option value="repeat">Repeat Buyers</option>
-                <option value="high_spenders">High Spenders</option>
-                <option value="accounts_no_orders">Accounts (No Orders)</option>
-                <option value="all_accounts">All Accounts</option>
-              </select>
-            </div>
+            <input type="hidden" id="status-order-id" />
           </div>
-          <div class="form-group">
-            <label class="form-label">Subject (For Email)</label>
-            <input class="form-input" type="text" id="campaign-subject" placeholder="Big Summer Sale!" />
+          <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('modal-status')">Cancel</button>
+            <button class="btn btn-primary" onclick="confirmStatusUpdate()">Update Status</button>
           </div>
-          <div class="form-group">
-            <label class="form-label">Message</label>
-            <textarea class="form-textarea" id="campaign-message" placeholder="Hey {name}! "></textarea>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Schedule Date</label>
-              <input class="form-input" type="datetime-local" id="campaign-schedule" />
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="closeModal('modal-campaign')">Cancel</button>
-          <button class="btn btn-primary" onclick="saveCampaign()">Save & Create</button>
         </div>
       </div>
-    </div>
-
-    <!-- Add/Edit FAQ Modal -->
-    <div class="modal-overlay" id="modal-faq">
-      <div class="modal-box">
-        <div class="modal-header">
-          <div class="modal-title" id="faq-modal-title">Add FAQ</div>
-          <button class="modal-close" onclick="closeModal('modal-faq')">✕</button>
-        </div>
-        <div class="modal-body">
-          <input type="hidden" id="faq-id" />
-          <div class="form-group">
-            <label class="form-label">Category</label>
-            <select class="form-select" id="faq-cat">
-              <option>Product</option>
-              <option>Shipping</option>
-              <option>Payment</option>
-              <option>Returns</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Question *</label>
-            <input class="form-input" type="text" id="faq-q" placeholder="Is the foam safe for suede?" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Answer *</label>
-            <textarea class="form-textarea" id="faq-a" placeholder="Yes, our foam is specially formulated…"></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="closeModal('modal-faq')">Cancel</button>
-          <button class="btn btn-primary" onclick="saveFaq()">Save FAQ</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Add/Edit Admin Modal -->
-    <div class="modal-overlay" id="modal-admin">
-      <div class="modal-box">
-        <div class="modal-header">
-          <div class="modal-title" id="modal-admin-title">Add Admin User</div>
-          <button class="modal-close" onclick="closeModal('modal-admin')">✕</button>
-        </div>
-        <div class="modal-body">
-          <input type="hidden" id="admin-id" />
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Full Name</label>
-              <input class="form-input" type="text" id="admin-name" placeholder="Rahul Sharma" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Email</label>
-              <input class="form-input" type="email" id="admin-email" placeholder="rahul@hashlay.in" />
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Password <span id="admin-pass-hint"
-                  style="font-size:0.7rem;color:var(--gray-5);font-weight:normal">(Leave blank to keep
-                  current)</span></label>
-              <input class="form-input" type="password" id="admin-password" placeholder="Min 6 characters" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Role</label>
-              <select class="form-select" id="admin-role">
-                <option value="super_admin">Super Admin</option>
-                <option value="admin">Admin</option>
-                <option value="manager">Manager</option>
-                <option value="support_staff">Support Staff</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="closeModal('modal-admin')">Cancel</button>
-          <button class="btn btn-primary" id="modal-admin-btn" onclick="saveAdmin()">Save Admin</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Chatbot Rule Modal (Quick Reply & Auto Response) -->
-    <div class="modal-overlay" id="modal-qr">
-      <div class="modal-box" style="max-width:480px;">
-        <div class="modal-header">
-          <div class="modal-title" id="qr-modal-title">Add Chatbot Rule</div>
-          <button class="modal-close" onclick="closeModal('modal-qr')">✕</button>
-        </div>
-        <div class="modal-body">
-          <input type="hidden" id="qr-id" />
-          <div class="form-group">
-            <label class="form-label">Button Label (Optional, for Quick Replies)</label>
-            <input class="form-input" type="text" id="qr-label" placeholder="e.g. How to use foam?" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Keywords (Comma separated, for Auto Responses)</label>
-            <input class="form-input" type="text" id="qr-keywords" placeholder="e.g. use, foam, apply" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Response Message (Required)</label>
-            <textarea class="form-textarea" id="qr-response" placeholder="Apply a small amount…"></textarea>
-          </div>
-          <div class="form-group" style="display:flex; align-items:center; gap:0.5rem; margin-top:1rem;">
-            <input type="checkbox" id="qr-active" checked />
-            <label class="form-label" style="margin:0;">Active Rule</label>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="closeModal('modal-qr')">Cancel</button>
-          <button class="btn btn-primary" onclick="saveChatbotRule()">Save Rule</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Update Order Status Modal -->
-    <div class="modal-overlay" id="modal-status">
-      <div class="modal-box" style="max-width:420px;">
-        <div class="modal-header">
-          <div class="modal-title">Update Order Status</div>
-          <button class="modal-close" onclick="closeModal('modal-status')">✕</button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label">Order Status</label>
-            <select class="form-select" id="new-status-select">
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="processing">Processing</option>
-              <option value="shipped">Shipped</option>
-              <option value="delivered">Delivered</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-          <div class="form-group" style="margin-top: 1rem;">
-            <label class="form-label">Payment Status</label>
-            <select class="form-select" id="new-payment-select">
-              <option value="pending">Pending</option>
-              <option value="paid">Paid</option>
-              <option value="failed">Failed</option>
-              <option value="refunded">Refunded</option>
-            </select>
-          </div>
-          <input type="hidden" id="status-order-id" />
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="closeModal('modal-status')">Cancel</button>
-          <button class="btn btn-primary" onclick="confirmStatusUpdate()">Update Status</button>
-        </div>
-      </div>
-    </div>
 
 
-    <!-- ── Support Inbox Page ──────────────────────────────────── -->
-    <div class="page" id="page-supportinbox">
-      <div class="section-hdr"><div class="section-hdr-title">SUPPORT INBOX</div><div class="section-hdr-sub">Live chat with customers</div></div>
-      <div id="si-wrap" style="display:flex;gap:1rem;height:calc(100vh - 180px);min-height:400px;">
-        <!-- Left: Conversations -->
-        <div id="si-left" style="width:340px;min-width:280px;background:var(--bg-2);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-lg);display:flex;flex-direction:column;overflow:hidden;">
-          <div style="padding:.8rem;border-bottom:1px solid rgba(255,255,255,.06);">
-            <div style="display:flex;gap:.4rem;margin-bottom:.6rem;">
-              <button class="btn btn-sm si-filter active" data-f="all" onclick="filterSessions('all',this)" style="flex:1;padding:.4rem;font-size:.68rem;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:var(--blue);color:#fff;cursor:pointer;">All</button>
-              <button class="btn btn-sm si-filter" data-f="open" onclick="filterSessions('open',this)" style="flex:1;padding:.4rem;font-size:.68rem;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:transparent;color:var(--gray-lt);cursor:pointer;">Open</button>
-              <button class="btn btn-sm si-filter" data-f="resolved" onclick="filterSessions('resolved',this)" style="flex:1;padding:.4rem;font-size:.68rem;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:transparent;color:var(--gray-lt);cursor:pointer;">Resolved</button>
-            </div>
-            <input class="form-input" type="text" id="si-search" placeholder="Search by email..." oninput="filterSessionSearch()" style="font-size:.78rem;padding:.5rem .7rem;">
-          </div>
-          <div id="si-list" style="flex:1;overflow-y:auto;"></div>
+      <!-- ── Support Inbox Page ──────────────────────────────────── -->
+      <div class="page" id="page-supportinbox">
+        <div class="section-hdr">
+          <div class="section-hdr-title">SUPPORT INBOX</div>
+          <div class="section-hdr-sub">Live chat with customers</div>
         </div>
-        <!-- Right: Chat thread -->
-        <div id="si-right" style="flex:1;background:var(--bg-2);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-lg);display:flex;flex-direction:column;overflow:hidden;">
-          <div id="si-thread-hdr" style="padding:.8rem 1rem;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;min-height:52px;">
-            <div id="si-thread-info" style="font-size:.82rem;color:var(--gray);">Select a conversation</div>
-            <div id="si-thread-actions" style="display:none;">
-              <select class="form-select" id="si-status-sel" onchange="changeSessionStatus()" style="font-size:.72rem;padding:.3rem .5rem;border-radius:6px;"></select>
+        <div id="si-wrap" style="display:flex;gap:1rem;height:calc(100vh - 180px);min-height:400px;">
+          <!-- Left: Conversations -->
+          <div id="si-left"
+            style="width:340px;min-width:280px;background:var(--bg-2);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-lg);display:flex;flex-direction:column;overflow:hidden;">
+            <div style="padding:.8rem;border-bottom:1px solid rgba(255,255,255,.06);">
+              <div style="display:flex;gap:.4rem;margin-bottom:.6rem;">
+                <button class="btn btn-sm si-filter active" data-f="all" onclick="filterSessions('all',this)"
+                  style="flex:1;padding:.4rem;font-size:.68rem;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:var(--blue);color:#fff;cursor:pointer;">All</button>
+                <button class="btn btn-sm si-filter" data-f="open" onclick="filterSessions('open',this)"
+                  style="flex:1;padding:.4rem;font-size:.68rem;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:transparent;color:var(--gray-lt);cursor:pointer;">Open</button>
+                <button class="btn btn-sm si-filter" data-f="resolved" onclick="filterSessions('resolved',this)"
+                  style="flex:1;padding:.4rem;font-size:.68rem;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:transparent;color:var(--gray-lt);cursor:pointer;">Resolved</button>
+              </div>
+              <input class="form-input" type="text" id="si-search" placeholder="Search by email..."
+                oninput="filterSessionSearch()" style="font-size:.78rem;padding:.5rem .7rem;">
             </div>
+            <div id="si-list" style="flex:1;overflow-y:auto;"></div>
           </div>
-          <div id="si-msgs" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.4rem;"></div>
-          <div id="si-typing" style="padding:0 1rem;font-size:.7rem;color:var(--gray);font-style:italic;min-height:1.2rem;"></div>
-          <div id="si-input-bar" style="display:none;padding:.6rem;border-top:1px solid rgba(255,255,255,.06);">
-            <div style="display:flex;gap:.4rem;">
-              <textarea id="si-input" rows="1" class="form-input" placeholder="Type a reply..." style="flex:1;resize:none;font-size:.82rem;padding:.6rem;min-height:38px;max-height:100px;"></textarea>
-              <button class="btn btn-primary" onclick="sendAdminReply()" style="padding:.5rem 1rem;white-space:nowrap;"><i class="fa-solid fa-paper-plane"></i></button>
+          <!-- Right: Chat thread -->
+          <div id="si-right"
+            style="flex:1;background:var(--bg-2);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-lg);display:flex;flex-direction:column;overflow:hidden;">
+            <div id="si-thread-hdr"
+              style="padding:.8rem 1rem;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;min-height:52px;">
+              <div id="si-thread-info" style="font-size:.82rem;color:var(--gray);">Select a conversation</div>
+              <div id="si-thread-actions" style="display:none;">
+                <select class="form-select" id="si-status-sel" onchange="changeSessionStatus()"
+                  style="font-size:.72rem;padding:.3rem .5rem;border-radius:6px;"></select>
+              </div>
+            </div>
+            <div id="si-msgs" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.4rem;">
+            </div>
+            <div id="si-typing"
+              style="padding:0 1rem;font-size:.7rem;color:var(--gray);font-style:italic;min-height:1.2rem;"></div>
+            <div id="si-input-bar" style="display:none;padding:.6rem;border-top:1px solid rgba(255,255,255,.06);">
+              <div style="display:flex;gap:.4rem;">
+                <textarea id="si-input" rows="1" class="form-input" placeholder="Type a reply..."
+                  style="flex:1;resize:none;font-size:.82rem;padding:.6rem;min-height:38px;max-height:100px;"></textarea>
+                <button class="btn btn-primary" onclick="sendAdminReply()"
+                  style="padding:.5rem 1rem;white-space:nowrap;"><i class="fa-solid fa-paper-plane"></i></button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- ── Customer Auth Settings Page ──────────────────────────── -->
-    <div class="page" id="page-custauth">
-      <div class="section-hdr">
-        <div class="section-hdr-title">CUSTOMER AUTH SETTINGS</div>
-        <div class="section-hdr-sub">Configure customer login, SMTP, SMS gateway & portal features</div>
-      </div>
-
-      <!-- Warning Banners -->
-      <div id="ca-warnings"></div>
-
-      <!-- Login Method Toggles -->
-      <div class="card" style="margin-bottom:1.2rem;">
-        <div class="card-header">
-          <div><div class="card-title"><i class="fa-solid fa-right-to-bracket" style="margin-right:.5rem;color:var(--blue-lt);"></i>Login Methods</div>
-          <div class="card-sub">Control how customers can log in</div></div>
+      <!-- ── Customer Auth Settings Page ──────────────────────────── -->
+      <div class="page" id="page-custauth">
+        <div class="section-hdr">
+          <div class="section-hdr-title">CUSTOMER AUTH SETTINGS</div>
+          <div class="section-hdr-sub">Configure customer login, SMTP, SMS gateway & portal features</div>
         </div>
-        <div id="ca-toggle-error" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:.6rem 1rem;font-size:.78rem;color:#f87171;margin-bottom:.8rem;"></div>
-        <div style="display:flex;flex-wrap:wrap;gap:2rem;">
-          <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="ca-email-login" onchange="saveCaToggles()"><span class="toggle-slider"></span></label><span class="toggle-label">Allow Email Login</span></div>
-          <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="ca-phone-login" onchange="saveCaToggles()"><span class="toggle-slider"></span></label><span class="toggle-label">Allow Phone Number Login</span></div>
+
+        <!-- Warning Banners -->
+        <div id="ca-warnings"></div>
+
+        <!-- Login Method Toggles -->
+        <div class="card" style="margin-bottom:1.2rem;">
+          <div class="card-header">
+            <div>
+              <div class="card-title"><i class="fa-solid fa-right-to-bracket"
+                  style="margin-right:.5rem;color:var(--blue-lt);"></i>Login Methods</div>
+              <div class="card-sub">Control how customers can log in</div>
+            </div>
+          </div>
+          <div id="ca-toggle-error"
+            style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:.6rem 1rem;font-size:.78rem;color:#f87171;margin-bottom:.8rem;">
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:2rem;">
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="ca-email-login"
+                  onchange="saveCaToggles()"><span class="toggle-slider"></span></label><span class="toggle-label">Allow
+                Email Login</span></div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="ca-phone-login"
+                  onchange="saveCaToggles()"><span class="toggle-slider"></span></label><span class="toggle-label">Allow
+                Phone Number Login</span></div>
+          </div>
+          <div id="ca-toggles-updated" style="font-size:.68rem;color:var(--gray);margin-top:.6rem;"></div>
         </div>
-        <div id="ca-toggles-updated" style="font-size:.68rem;color:var(--gray);margin-top:.6rem;"></div>
-      </div>
 
         <!-- SMTP Config -->
         <div class="card" style="margin-bottom:1.2rem;">
           <div class="card-header">
-            <div><div class="card-title"><i class="fa-solid fa-envelope" style="margin-right:.5rem;color:var(--blue-lt);"></i>Customer Auth SMTP</div>
-            <div class="card-sub">Email gateway for OTP delivery</div></div>
+            <div>
+              <div class="card-title"><i class="fa-solid fa-envelope"
+                  style="margin-right:.5rem;color:var(--blue-lt);"></i>Customer Auth SMTP</div>
+              <div class="card-sub">Email gateway for OTP delivery</div>
+            </div>
           </div>
-          <div class="form-group"><label class="form-label">SMTP Host</label><input class="form-input" type="text" id="ca-smtp-host" placeholder="smtp.gmail.com"></div>
+          <div class="form-group"><label class="form-label">SMTP Host</label><input class="form-input" type="text"
+              id="ca-smtp-host" placeholder="smtp.gmail.com"></div>
           <div class="form-row">
-            <div class="form-group"><label class="form-label">Port</label><input class="form-input" type="number" id="ca-smtp-port" placeholder="587" value="587"></div>
-            <div class="form-group"><label class="form-label">Encryption</label><select class="form-select" id="ca-smtp-enc"><option value="TLS">TLS</option><option value="SSL">SSL</option></select></div>
+            <div class="form-group"><label class="form-label">Port</label><input class="form-input" type="number"
+                id="ca-smtp-port" placeholder="587" value="587"></div>
+            <div class="form-group"><label class="form-label">Encryption</label><select class="form-select"
+                id="ca-smtp-enc">
+                <option value="TLS">TLS</option>
+                <option value="SSL">SSL</option>
+              </select></div>
           </div>
-          <div class="form-group"><label class="form-label">Username</label><input class="form-input" type="text" id="ca-smtp-user" placeholder="you@example.com"></div>
+          <div class="form-group"><label class="form-label">Username</label><input class="form-input" type="text"
+              id="ca-smtp-user" placeholder="you@example.com"></div>
           <div class="form-group"><label class="form-label">Password</label>
-            <div style="position:relative;"><input class="form-input" type="password" id="ca-smtp-pass" placeholder="••••••" style="padding-right:3rem;">
-            <button type="button" onclick="togglePassVis('ca-smtp-pass',this)" style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-lt);font-size:.8rem;cursor:pointer;"><i class="fa-solid fa-eye"></i></button></div>
-            <div id="ca-smtp-pass-hint" style="font-size:.68rem;color:var(--gray);margin-top:.2rem;display:none;">Leave blank to keep existing password</div>
+            <div style="position:relative;"><input class="form-input" type="password" id="ca-smtp-pass"
+                placeholder="••••••" style="padding-right:3rem;">
+              <button type="button" onclick="togglePassVis('ca-smtp-pass',this)"
+                style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-lt);font-size:.8rem;cursor:pointer;"><i
+                  class="fa-solid fa-eye"></i></button>
+            </div>
+            <div id="ca-smtp-pass-hint" style="font-size:.68rem;color:var(--gray);margin-top:.2rem;display:none;">Leave
+              blank to keep existing password</div>
           </div>
           <div class="form-row">
-            <div class="form-group"><label class="form-label">From Name</label><input class="form-input" type="text" id="ca-smtp-fname" placeholder="Hashlay"></div>
-            <div class="form-group"><label class="form-label">From Email</label><input class="form-input" type="email" id="ca-smtp-femail" placeholder="noreply@hashlay.in"></div>
+            <div class="form-group"><label class="form-label">From Name</label><input class="form-input" type="text"
+                id="ca-smtp-fname" placeholder="Hashlay"></div>
+            <div class="form-group"><label class="form-label">From Email</label><input class="form-input" type="email"
+                id="ca-smtp-femail" placeholder="noreply@hashlay.in"></div>
           </div>
           <div style="display:flex;gap:.6rem;margin-top:.4rem;">
             <button class="btn btn-primary" id="ca-smtp-save-btn" onclick="saveCaSmtp()">Save SMTP</button>
-            <button class="btn btn-secondary" id="ca-smtp-test-btn" onclick="testCaSmtp()"><i class="fa-solid fa-paper-plane" style="margin-right:.3rem;"></i>Test Connection</button>
+            <button class="btn btn-secondary" id="ca-smtp-test-btn" onclick="testCaSmtp()"><i
+                class="fa-solid fa-paper-plane" style="margin-right:.3rem;"></i>Test Connection</button>
           </div>
-          <div id="ca-smtp-result" style="font-size:.78rem;margin-top:.6rem;display:none;border-radius:8px;padding:.5rem .8rem;"></div>
+          <div id="ca-smtp-result"
+            style="font-size:.78rem;margin-top:.6rem;display:none;border-radius:8px;padding:.5rem .8rem;"></div>
         </div>
 
         <!-- SMS Config -->
         <div class="card" style="margin-bottom:1.2rem;">
           <div class="card-header">
-            <div><div class="card-title"><i class="fa-solid fa-comment-sms" style="margin-right:.5rem;color:var(--blue-lt);"></i>SMS Gateway</div>
-            <div class="card-sub">Fast2SMS or compatible gateway for OTP</div></div>
+            <div>
+              <div class="card-title"><i class="fa-solid fa-comment-sms"
+                  style="margin-right:.5rem;color:var(--blue-lt);"></i>SMS Gateway</div>
+              <div class="card-sub">Fast2SMS or compatible gateway for OTP</div>
+            </div>
           </div>
           <div class="form-group"><label class="form-label">API Key</label>
-            <div style="position:relative;"><input class="form-input" type="password" id="ca-sms-key" placeholder="••••••" style="padding-right:3rem;">
-            <button type="button" onclick="togglePassVis('ca-sms-key',this)" style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-lt);font-size:.8rem;cursor:pointer;"><i class="fa-solid fa-eye"></i></button></div>
-            <div id="ca-sms-key-hint" style="font-size:.68rem;color:var(--gray);margin-top:.2rem;display:none;">Leave blank to keep existing key</div>
+            <div style="position:relative;"><input class="form-input" type="password" id="ca-sms-key"
+                placeholder="••••••" style="padding-right:3rem;">
+              <button type="button" onclick="togglePassVis('ca-sms-key',this)"
+                style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gray-lt);font-size:.8rem;cursor:pointer;"><i
+                  class="fa-solid fa-eye"></i></button>
+            </div>
+            <div id="ca-sms-key-hint" style="font-size:.68rem;color:var(--gray);margin-top:.2rem;display:none;">Leave
+              blank to keep existing key</div>
           </div>
-          <div class="form-group"><label class="form-label">Sender ID</label><input class="form-input" type="text" id="ca-sms-sender" placeholder="FSTSMS"></div>
-          <div class="form-group"><label class="form-label">Gateway URL</label><input class="form-input" type="text" id="ca-sms-url" placeholder="https://www.fast2sms.com/dev/bulkV2"></div>
-          <div class="form-group"><label class="form-label">Route / Template ID</label><input class="form-input" type="text" id="ca-sms-route" placeholder="v3"></div>
+          <div class="form-group"><label class="form-label">Sender ID</label><input class="form-input" type="text"
+              id="ca-sms-sender" placeholder="FSTSMS"></div>
+          <div class="form-group"><label class="form-label">Gateway URL</label><input class="form-input" type="text"
+              id="ca-sms-url" placeholder="https://www.fast2sms.com/dev/bulkV2"></div>
+          <div class="form-group"><label class="form-label">Route / Template ID</label><input class="form-input"
+              type="text" id="ca-sms-route" placeholder="v3"></div>
           <div style="display:flex;gap:.6rem;margin-top:.4rem;">
             <button class="btn btn-primary" id="ca-sms-save-btn" onclick="saveCaSms()">Save SMS</button>
-            <button class="btn btn-secondary" id="ca-sms-test-btn" onclick="showSmsTest()"><i class="fa-solid fa-paper-plane" style="margin-right:.3rem;"></i>Send Test SMS</button>
+            <button class="btn btn-secondary" id="ca-sms-test-btn" onclick="showSmsTest()"><i
+                class="fa-solid fa-paper-plane" style="margin-right:.3rem;"></i>Send Test SMS</button>
           </div>
           <div id="ca-sms-test-row" style="display:none;margin-top:.6rem;">
             <div style="display:flex;gap:.5rem;">
-              <input class="form-input" type="tel" id="ca-sms-test-phone" placeholder="+91XXXXXXXXXX" style="flex:1;margin-bottom:0;">
+              <input class="form-input" type="tel" id="ca-sms-test-phone" placeholder="+91XXXXXXXXXX"
+                style="flex:1;margin-bottom:0;">
               <button class="btn btn-primary" id="ca-sms-send-btn" onclick="testCaSms()">Send</button>
             </div>
           </div>
-          <div id="ca-sms-result" style="font-size:.78rem;margin-top:.6rem;display:none;border-radius:8px;padding:.5rem .8rem;"></div>
+          <div id="ca-sms-result"
+            style="font-size:.78rem;margin-top:.6rem;display:none;border-radius:8px;padding:.5rem .8rem;"></div>
         </div>
 
-      <!-- Portal Feature Toggles -->
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title"><i class="fa-solid fa-puzzle-piece" style="margin-right:.5rem;color:var(--blue-lt);"></i>Portal Features</div>
-          <div class="card-sub">Enable or disable customer portal sections</div></div>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:2rem;">
-          <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="ca-feat-orders" onchange="saveCaToggles()"><span class="toggle-slider"></span></label><span class="toggle-label">My Orders</span></div>
-          <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="ca-feat-track" onchange="saveCaToggles()"><span class="toggle-slider"></span></label><span class="toggle-label">Track Order</span></div>
-          <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="ca-feat-chat" onchange="saveCaToggles()"><span class="toggle-slider"></span></label><span class="toggle-label">Live Support Chat</span></div>
+        <!-- Portal Feature Toggles -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title"><i class="fa-solid fa-puzzle-piece"
+                  style="margin-right:.5rem;color:var(--blue-lt);"></i>Portal Features</div>
+              <div class="card-sub">Enable or disable customer portal sections</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:2rem;">
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="ca-feat-orders"
+                  onchange="saveCaToggles()"><span class="toggle-slider"></span></label><span class="toggle-label">My
+                Orders</span></div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="ca-feat-track"
+                  onchange="saveCaToggles()"><span class="toggle-slider"></span></label><span class="toggle-label">Track
+                Order</span></div>
+            <div class="toggle-wrap"><label class="toggle"><input type="checkbox" id="ca-feat-chat"
+                  onchange="saveCaToggles()"><span class="toggle-slider"></span></label><span class="toggle-label">Live
+                Support Chat</span></div>
+          </div>
         </div>
       </div>
-    </div>
-  </div><!-- /main -->
+    </div><!-- /main -->
 
 
     <!-- ─────────────────────────────────────────────────── SCRIPT -->
@@ -4691,7 +4829,7 @@
           document.getElementById('login-screen').classList.add('hidden');
           try {
             initApp();
-          } catch(err) {
+          } catch (err) {
             console.error('Error during app initialization:', err);
           }
         } else {
@@ -5271,7 +5409,7 @@
         const nameEl = document.querySelector('.sidebar-user-name');
         const emailEl = document.querySelector('.sidebar-user-role');
         const avatarEl = document.querySelector('.sidebar-avatar');
-        
+
         if (currentAdmin.name) {
           if (nameEl) nameEl.textContent = currentAdmin.name;
           if (avatarEl) {
@@ -5449,7 +5587,7 @@
         let subText = 'Last 7 days performance';
         if (range === '30d') subText = 'Last 30 days performance';
         else if (range === '3m') subText = 'Last 3 months performance';
-        
+
         // Find the card-sub element and update it
         const cardSub = document.querySelector('#revenue-range-select').parentElement.querySelector('.card-sub');
         if (cardSub) {
@@ -5564,14 +5702,14 @@
         setEl('analytics-aov', '₹' + (d.avgOrderValue || 0).toLocaleString());
         setEl('analytics-page-views', (d.pageViews || 0).toLocaleString());
         setEl('analytics-cart-abandon', d.cartAbandonment || '0%');
-        
+
         const convSub = document.querySelector('#analytics-conversion-rate')?.nextElementSibling;
         if (convSub) {
           const ch = d.changes?.conversion || 0;
           convSub.className = 'stat-change ' + (ch >= 0 ? 'up' : 'down');
           convSub.innerHTML = `${ch >= 0 ? '▲' : '▼'} ${Math.abs(ch).toFixed(1)}% vs last period`;
         }
-        
+
         const pvSub = document.querySelector('#analytics-page-views')?.nextElementSibling;
         if (pvSub) {
           const ch = d.changes?.pageViews || 0;
@@ -5818,7 +5956,7 @@
         const id = document.getElementById('status-order-id').value;
         const newStatus = document.getElementById('new-status-select').value;
         const newPayment = document.getElementById('new-payment-select').value;
-        const result = await apiPatch('/api/orders/' + id + '/status', { 
+        const result = await apiPatch('/api/orders/' + id + '/status', {
           orderStatus: newStatus,
           paymentStatus: newPayment
         });
@@ -5849,7 +5987,7 @@
           selectEl.disabled = true;
           selectEl.style.opacity = '0.5';
         }
-        const result = await apiPatch('/api/orders/' + id + '/status', { 
+        const result = await apiPatch('/api/orders/' + id + '/status', {
           orderStatus: newStatus
         });
         if (result && result.success) {
@@ -5873,7 +6011,7 @@
           selectEl.disabled = true;
           selectEl.style.opacity = '0.5';
         }
-        const result = await apiPatch('/api/orders/' + id + '/status', { 
+        const result = await apiPatch('/api/orders/' + id + '/status', {
           paymentStatus: newPayment
         });
         if (result && result.success) {
@@ -6137,7 +6275,7 @@
                 <div style="font-size:0.75rem;color:var(--gray-4);"><i class="fa-solid fa-key" style="margin-right:4px;"></i> Password Set</div>
               </td>
               <td>${contact.join('')}</td>
-              <td>${new Date(a.createdAt).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'})}</td>
+              <td>${new Date(a.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
               <td style="text-align:center;">
                 <button class="btn btn-secondary btn-sm" onclick="editAccount('${a._id}')">
                   <i class="fa-solid fa-pen"></i> Edit
@@ -6152,14 +6290,14 @@
       }
 
       async function deleteAccount(id) {
-        if(!confirm('Are you sure you want to delete this account credentials? Their order history will remain, but they will need to sign up again.')) return;
+        if (!confirm('Are you sure you want to delete this account credentials? Their order history will remain, but they will need to sign up again.')) return;
         try {
           const r = await apiPut('/api/customers/' + id + '/remove-account');
           if (r.success) {
             toast('Account credentials deleted');
             loadAccounts(currentAccountPage);
           }
-        } catch(e) {}
+        } catch (e) { }
       }
 
       function editAccount(id) {
@@ -6776,7 +6914,7 @@
 
         try {
           const result = await apiPost('/api/whatsapp-orders/parse-screenshot', { imageUrl });
-          
+
           document.getElementById('wa-parse-status').style.display = 'none';
           document.getElementById('wa-parse-btn').disabled = false;
 
@@ -7069,7 +7207,7 @@
 
       function viewContactMessage(id) {
         const c = CONTACTS.find(x => x._id === id);
-        if(!c) return;
+        if (!c) return;
         document.getElementById('cm-name').value = c.name || '';
         document.getElementById('cm-email').value = c.email || '';
         document.getElementById('cm-msg').value = c.message || '';
@@ -8537,8 +8675,8 @@
         document.getElementById('ca-email-login').checked = !!d.emailLoginEnabled;
         document.getElementById('ca-phone-login').checked = !!d.phoneLoginEnabled;
         document.getElementById('ca-feat-orders').checked = !!d.featureOrdersEnabled;
-        document.getElementById('ca-feat-track').checked  = !!d.featureTrackEnabled;
-        document.getElementById('ca-feat-chat').checked   = !!d.featureChatEnabled;
+        document.getElementById('ca-feat-track').checked = !!d.featureTrackEnabled;
+        document.getElementById('ca-feat-chat').checked = !!d.featureChatEnabled;
         if (d.updatedAt) document.getElementById('ca-toggles-updated').textContent = 'Last updated: ' + new Date(d.updatedAt).toLocaleString();
         // SMTP
         if (d.smtpHost) document.getElementById('ca-smtp-host').value = d.smtpHost;
@@ -8666,168 +8804,168 @@
       /* ═══════════════════════════════════════════════════
          SUPPORT INBOX
       ═══════════════════════════════════════════════════ */
-      let _siSessions=[], _siFilter='all', _siActiveId=null, _siSocket=null, _siTypingTmr=null;
+      let _siSessions = [], _siFilter = 'all', _siActiveId = null, _siSocket = null, _siTypingTmr = null;
 
       // Beep using Web Audio API
-      function playBeep(){try{const c=new(window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator();const g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.value=0.15;o.start();o.stop(c.currentTime+0.12);}catch{}}
+      function playBeep() { try { const c = new (window.AudioContext || window.webkitAudioContext)(); const o = c.createOscillator(); const g = c.createGain(); o.connect(g); g.connect(c.destination); o.frequency.value = 880; g.gain.value = 0.15; o.start(); o.stop(c.currentTime + 0.12); } catch { } }
 
-      async function loadSupportInbox(){
+      async function loadSupportInbox() {
         await loadSiSessions();
         initSiSocket();
-        if(Notification.permission==='default')Notification.requestPermission();
+        if (Notification.permission === 'default') Notification.requestPermission();
       }
 
-      async function loadSiSessions(){
-        const url=_siFilter==='all'?'/api/admin/chat/sessions':'/api/admin/chat/sessions?status='+_siFilter;
-        const r=await apiGet(url);
-        if(!r?.success)return;
-        _siSessions=r.sessions||[];
+      async function loadSiSessions() {
+        const url = _siFilter === 'all' ? '/api/admin/chat/sessions' : '/api/admin/chat/sessions?status=' + _siFilter;
+        const r = await apiGet(url);
+        if (!r?.success) return;
+        _siSessions = r.sessions || [];
         renderSiList();
       }
 
-      function renderSiList(){
-        const q=(document.getElementById('si-search')?.value||'').toLowerCase();
-        const filtered=_siSessions.filter(s=>{
-          const e=(s.customer?.email||s.customer?.phone||s.customer?.name||'').toLowerCase();
-          return !q||e.includes(q);
+      function renderSiList() {
+        const q = (document.getElementById('si-search')?.value || '').toLowerCase();
+        const filtered = _siSessions.filter(s => {
+          const e = (s.customer?.email || s.customer?.phone || s.customer?.name || '').toLowerCase();
+          return !q || e.includes(q);
         });
-        const el=document.getElementById('si-list');
-        if(!filtered.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--gray);font-size:.82rem;">No conversations</div>';return;}
-        el.innerHTML=filtered.map(s=>{
-          const name=s.customer?.name||s.customer?.email||s.customer?.phone||'Unknown';
-          const preview=s.lastMessage?s.lastMessage.text.slice(0,60)+(s.lastMessage.text.length>60?'...':''):'No messages';
-          const ago=timeAgo(s.lastMessage?.at||s.updatedAt);
-          const active=s._id===_siActiveId?' style="background:rgba(0,87,255,.08);"':'';
-          const badge=s.unread?'<span style="background:var(--blue);color:#fff;font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:99px;min-width:18px;text-align:center;">'+s.unread+'</span>':'';
-          const dot=s.status==='open'?'<span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px;"></span>':'';
-          return '<div onclick="openSiThread(\''+s._id+'\')" style="padding:.7rem .9rem;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s;"'+active+'><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:600;font-size:.8rem;">'+dot+name+'</span>'+badge+'</div><div style="font-size:.72rem;color:var(--gray);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+preview+'</div><div style="font-size:.62rem;color:var(--gray);margin-top:2px;">'+ago+'</div></div>';
+        const el = document.getElementById('si-list');
+        if (!filtered.length) { el.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--gray);font-size:.82rem;">No conversations</div>'; return; }
+        el.innerHTML = filtered.map(s => {
+          const name = s.customer?.name || s.customer?.email || s.customer?.phone || 'Unknown';
+          const preview = s.lastMessage ? s.lastMessage.text.slice(0, 60) + (s.lastMessage.text.length > 60 ? '...' : '') : 'No messages';
+          const ago = timeAgo(s.lastMessage?.at || s.updatedAt);
+          const active = s._id === _siActiveId ? ' style="background:rgba(0,87,255,.08);"' : '';
+          const badge = s.unread ? '<span style="background:var(--blue);color:#fff;font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:99px;min-width:18px;text-align:center;">' + s.unread + '</span>' : '';
+          const dot = s.status === 'open' ? '<span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px;"></span>' : '';
+          return '<div onclick="openSiThread(\'' + s._id + '\')" style="padding:.7rem .9rem;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s;"' + active + '><div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:600;font-size:.8rem;">' + dot + name + '</span>' + badge + '</div><div style="font-size:.72rem;color:var(--gray);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + preview + '</div><div style="font-size:.62rem;color:var(--gray);margin-top:2px;">' + ago + '</div></div>';
         }).join('');
       }
 
-      function filterSessions(f,btn){
-        _siFilter=f;
-        document.querySelectorAll('.si-filter').forEach(b=>{b.style.background='transparent';b.style.color='var(--gray-lt)';});
-        if(btn){btn.style.background='var(--blue)';btn.style.color='#fff';}
+      function filterSessions(f, btn) {
+        _siFilter = f;
+        document.querySelectorAll('.si-filter').forEach(b => { b.style.background = 'transparent'; b.style.color = 'var(--gray-lt)'; });
+        if (btn) { btn.style.background = 'var(--blue)'; btn.style.color = '#fff'; }
         loadSiSessions();
       }
-      function filterSessionSearch(){renderSiList();}
+      function filterSessionSearch() { renderSiList(); }
 
-      async function openSiThread(sid){
-        _siActiveId=sid;
+      async function openSiThread(sid) {
+        _siActiveId = sid;
         renderSiList();
-        const r=await apiGet('/api/admin/chat/sessions/'+sid+'/messages');
-        if(!r?.success)return;
-        const s=_siSessions.find(x=>x._id===sid);
-        const name=s?.customer?.name||s?.customer?.email||s?.customer?.phone||'Customer';
-        document.getElementById('si-thread-info').innerHTML='<strong>'+name+'</strong> <span style="font-size:.7rem;color:var(--gray);margin-left:.4rem;">'+(s?.customer?.email||'')+'</span>';
-        document.getElementById('si-thread-actions').style.display='block';
-        const sel=document.getElementById('si-status-sel');
-        sel.innerHTML='<option value="open"'+(s?.status==='open'?' selected':'')+'>Open</option><option value="resolved"'+(s?.status==='resolved'?' selected':'')+'>Resolved</option>';
-        document.getElementById('si-input-bar').style.display='block';
-        renderSiMsgs(r.messages||[]);
+        const r = await apiGet('/api/admin/chat/sessions/' + sid + '/messages');
+        if (!r?.success) return;
+        const s = _siSessions.find(x => x._id === sid);
+        const name = s?.customer?.name || s?.customer?.email || s?.customer?.phone || 'Customer';
+        document.getElementById('si-thread-info').innerHTML = '<strong>' + name + '</strong> <span style="font-size:.7rem;color:var(--gray);margin-left:.4rem;">' + (s?.customer?.email || '') + '</span>';
+        document.getElementById('si-thread-actions').style.display = 'block';
+        const sel = document.getElementById('si-status-sel');
+        sel.innerHTML = '<option value="open"' + (s?.status === 'open' ? ' selected' : '') + '>Open</option><option value="resolved"' + (s?.status === 'resolved' ? ' selected' : '') + '>Resolved</option>';
+        document.getElementById('si-input-bar').style.display = 'block';
+        renderSiMsgs(r.messages || []);
         // Update unread in list
-        if(s)s.unread=0;
+        if (s) s.unread = 0;
         renderSiList();
         refreshChatBadge();
       }
 
-      function renderSiMsgs(msgs){
-        const el=document.getElementById('si-msgs');
-        if(!msgs.length){el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--gray);font-size:.82rem;">No messages yet</div>';return;}
-        el.innerHTML=msgs.map(m=>{
-          const isAdmin=m.senderRole==='admin';
-          const align=isAdmin?'flex-start':'flex-end';
-          const bg=isAdmin?'rgba(255,255,255,.06)':'rgba(0,87,255,.15)';
-          const t=new Date(m.createdAt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-          return '<div style="align-self:'+align+';max-width:75%;padding:.55rem .8rem;border-radius:10px;background:'+bg+';font-size:.82rem;line-height:1.45;word-wrap:break-word;">'+m.message+'<div style="font-size:.58rem;color:var(--gray);margin-top:3px;text-align:'+(isAdmin?'left':'right')+';">'+t+'</div></div>';
+      function renderSiMsgs(msgs) {
+        const el = document.getElementById('si-msgs');
+        if (!msgs.length) { el.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--gray);font-size:.82rem;">No messages yet</div>'; return; }
+        el.innerHTML = msgs.map(m => {
+          const isAdmin = m.senderRole === 'admin';
+          const align = isAdmin ? 'flex-start' : 'flex-end';
+          const bg = isAdmin ? 'rgba(255,255,255,.06)' : 'rgba(0,87,255,.15)';
+          const t = new Date(m.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+          return '<div style="align-self:' + align + ';max-width:75%;padding:.55rem .8rem;border-radius:10px;background:' + bg + ';font-size:.82rem;line-height:1.45;word-wrap:break-word;">' + m.message + '<div style="font-size:.58rem;color:var(--gray);margin-top:3px;text-align:' + (isAdmin ? 'left' : 'right') + ';">' + t + '</div></div>';
         }).join('');
-        el.scrollTop=el.scrollHeight;
+        el.scrollTop = el.scrollHeight;
       }
 
-      async function sendAdminReply(){
-        const inp=document.getElementById('si-input');
-        const msg=inp.value.trim();if(!msg||!_siActiveId)return;
-        inp.value='';
-        const r=await apiPost('/api/admin/chat/sessions/'+_siActiveId+'/reply',{message:msg});
-        if(!r?.success){toast('Failed to send','error');return;}
+      async function sendAdminReply() {
+        const inp = document.getElementById('si-input');
+        const msg = inp.value.trim(); if (!msg || !_siActiveId) return;
+        inp.value = '';
+        const r = await apiPost('/api/admin/chat/sessions/' + _siActiveId + '/reply', { message: msg });
+        if (!r?.success) { toast('Failed to send', 'error'); return; }
         // Append locally
-        const el=document.getElementById('si-msgs');
-        const empty=el.querySelector('div[style*="text-align:center"]');if(empty)empty.remove();
-        const d=document.createElement('div');
-        d.style.cssText='align-self:flex-start;max-width:75%;padding:.55rem .8rem;border-radius:10px;background:rgba(255,255,255,.06);font-size:.82rem;line-height:1.45;';
-        d.innerHTML=msg+'<div style="font-size:.58rem;color:var(--gray);margin-top:3px;">Just now</div>';
-        el.appendChild(d);el.scrollTop=el.scrollHeight;
+        const el = document.getElementById('si-msgs');
+        const empty = el.querySelector('div[style*="text-align:center"]'); if (empty) empty.remove();
+        const d = document.createElement('div');
+        d.style.cssText = 'align-self:flex-start;max-width:75%;padding:.55rem .8rem;border-radius:10px;background:rgba(255,255,255,.06);font-size:.82rem;line-height:1.45;';
+        d.innerHTML = msg + '<div style="font-size:.58rem;color:var(--gray);margin-top:3px;">Just now</div>';
+        el.appendChild(d); el.scrollTop = el.scrollHeight;
         // Emit typing stop
-        if(_siSocket){const s=_siSessions.find(x=>x._id===_siActiveId);if(s)_siSocket.emit('admin_typing',{customerId:s.customer?._id||''});}
+        if (_siSocket) { const s = _siSessions.find(x => x._id === _siActiveId); if (s) _siSocket.emit('admin_typing', { customerId: s.customer?._id || '' }); }
         loadSiSessions();
       }
 
-      async function changeSessionStatus(){
-        const st=document.getElementById('si-status-sel').value;
-        await apiPatch('/api/admin/chat/sessions/'+_siActiveId+'/status',{status:st});
-        toast('Status updated','success');
+      async function changeSessionStatus() {
+        const st = document.getElementById('si-status-sel').value;
+        await apiPatch('/api/admin/chat/sessions/' + _siActiveId + '/status', { status: st });
+        toast('Status updated', 'success');
         loadSiSessions();
       }
 
-      function initSiSocket(){
-        if(typeof io === 'undefined') {
+      function initSiSocket() {
+        if (typeof io === 'undefined') {
           console.warn('Socket.io not loaded. Live chat features disabled.');
           return;
         }
-        if(_siSocket)return;
-        _siSocket=io(API_BASE);
+        if (_siSocket) return;
+        _siSocket = io(API_BASE);
         _siSocket.emit('join_admin');
-        _siSocket.on('customer_message',data=>{
+        _siSocket.on('customer_message', data => {
           // Update session list
           loadSiSessions();
           // If this session is open, append message
-          if(data.sessionId===_siActiveId){
-            const el=document.getElementById('si-msgs');
-            const d=document.createElement('div');
-            d.style.cssText='align-self:flex-end;max-width:75%;padding:.55rem .8rem;border-radius:10px;background:rgba(0,87,255,.15);font-size:.82rem;line-height:1.45;';
-            d.innerHTML=data.message+'<div style="font-size:.58rem;color:var(--gray);margin-top:3px;">Just now</div>';
-            el.appendChild(d);el.scrollTop=el.scrollHeight;
+          if (data.sessionId === _siActiveId) {
+            const el = document.getElementById('si-msgs');
+            const d = document.createElement('div');
+            d.style.cssText = 'align-self:flex-end;max-width:75%;padding:.55rem .8rem;border-radius:10px;background:rgba(0,87,255,.15);font-size:.82rem;line-height:1.45;';
+            d.innerHTML = data.message + '<div style="font-size:.58rem;color:var(--gray);margin-top:3px;">Just now</div>';
+            el.appendChild(d); el.scrollTop = el.scrollHeight;
           }
           // Browser notification
-          if(document.hidden&&Notification.permission==='granted'){
-            new Notification('New message from '+(data.customerEmail||'Customer'),{body:data.message?.slice(0,80),icon:'https://res.cloudinary.com/drj19ghhl/image/upload/v1777176961/f47e171f-1606-4005-9edd-41239b24ea44_ovi6oo.jpg'});
+          if (document.hidden && Notification.permission === 'granted') {
+            new Notification('New message from ' + (data.customerEmail || 'Customer'), { body: data.message?.slice(0, 80), icon: 'https://res.cloudinary.com/drj19ghhl/image/upload/v1777176961/f47e171f-1606-4005-9edd-41239b24ea44_ovi6oo.jpg' });
           }
           playBeep();
           refreshChatBadge();
         });
-        _siSocket.on('customer_typing',data=>{
-          if(data.sessionId===_siActiveId||data.customerId){
-            document.getElementById('si-typing').textContent='Customer is typing...';
+        _siSocket.on('customer_typing', data => {
+          if (data.sessionId === _siActiveId || data.customerId) {
+            document.getElementById('si-typing').textContent = 'Customer is typing...';
             clearTimeout(_siTypingTmr);
-            _siTypingTmr=setTimeout(()=>{document.getElementById('si-typing').textContent='';},2000);
+            _siTypingTmr = setTimeout(() => { document.getElementById('si-typing').textContent = ''; }, 2000);
           }
         });
         // Enter to send (shift+enter for newline)
         const siInput = document.getElementById('si-input');
         if (siInput) {
-          siInput.addEventListener('keydown',e=>{
-            if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAdminReply();}
+          siInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAdminReply(); }
           });
         }
       }
 
-      function timeAgo(d){
-        if(!d)return '';
-        const s=Math.floor((Date.now()-new Date(d))/1000);
-        if(s<60)return 'Just now';if(s<3600)return Math.floor(s/60)+' min ago';
-        if(s<86400)return Math.floor(s/3600)+' hr ago';return Math.floor(s/86400)+' day ago';
+      function timeAgo(d) {
+        if (!d) return '';
+        const s = Math.floor((Date.now() - new Date(d)) / 1000);
+        if (s < 60) return 'Just now'; if (s < 3600) return Math.floor(s / 60) + ' min ago';
+        if (s < 86400) return Math.floor(s / 3600) + ' hr ago'; return Math.floor(s / 86400) + ' day ago';
       }
 
       // Nav badge
-      async function refreshChatBadge(){
-        const r=await apiGet('/api/admin/chat/unread-count');
-        const b=document.getElementById('chat-nav-badge');
-        if(!b||!r)return;
-        if(r.count>0){b.textContent=r.count;b.style.display='inline-flex';}
-        else b.style.display='none';
+      async function refreshChatBadge() {
+        const r = await apiGet('/api/admin/chat/unread-count');
+        const b = document.getElementById('chat-nav-badge');
+        if (!b || !r) return;
+        if (r.count > 0) { b.textContent = r.count; b.style.display = 'inline-flex'; }
+        else b.style.display = 'none';
       }
       refreshChatBadge();
-      setInterval(refreshChatBadge,60000);
+      setInterval(refreshChatBadge, 60000);
 
     </script>
 </body>
