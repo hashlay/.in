@@ -3,6 +3,7 @@ const r = express.Router();
 const { getAnalytics } = require('../controllers/miscControllers');
 const dc = require('../controllers/dashboardController');
 const { verifyToken } = require('../middleware/auth');
+r.post('/track', dc.trackVisit);
 r.get('/', verifyToken, getAnalytics);
 r.get('/revenue', verifyToken, dc.getRevenueChart);
 r.get('/orders/status', verifyToken, dc.getOrderStatusChart);

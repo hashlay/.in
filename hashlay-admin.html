@@ -5562,6 +5562,11 @@
         const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
         setEl('analytics-conversion-rate', d.conversionRate || '0%');
         setEl('analytics-aov', '₹' + (d.avgOrderValue || 0).toLocaleString());
+        setEl('analytics-page-views', (d.pageViews || 0).toLocaleString());
+        setEl('analytics-cart-abandon', d.cartAbandonment || '0%');
+        
+        const convSub = document.querySelector('#analytics-conversion-rate')?.nextElementSibling;
+        if (convSub) convSub.textContent = 'Based on page views';
 
         // Render Top Products list
         const topList = document.getElementById('analytics-top-products');
@@ -5586,6 +5591,37 @@
         // Load Real Charts
         loadAnalyticsRevenueChart();
         loadCustomerGrowthChart();
+        loadTrafficChart(d.trafficSources);
+      }
+
+      function loadTrafficChart(traffic) {
+        if (typeof Chart === 'undefined' || !traffic) return;
+        const chartEl = document.getElementById('traffic-chart');
+        if (!chartEl) return;
+
+        const existing = Chart.getChart(chartEl);
+        if (existing) existing.destroy();
+
+        new Chart(chartEl, {
+          type: 'doughnut',
+          data: {
+            labels: ['Instagram', 'WhatsApp', 'Google', 'Facebook', 'Direct', 'Other'],
+            datasets: [{
+              data: [traffic.instagram, traffic.whatsapp, traffic.google, traffic.facebook, traffic.direct, traffic.other],
+              backgroundColor: ['#e1306c', '#25d366', '#4285f4', '#1877f2', '#9ca3af', '#f59e0b'],
+              borderWidth: 0,
+              hoverOffset: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,0.7)', padding: 15, font: { size: 11 } } }
+            },
+            cutout: '70%'
+          }
+        });
       }
 
       async function loadAnalyticsRevenueChart() {

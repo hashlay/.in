@@ -8349,6 +8349,33 @@
       } else if (loggedIn) {
         sessionStorage.setItem('loginNudgeShown', 'true');
       }
+
+      // Track page view and traffic source
+      setTimeout(async () => {
+        if (!sessionStorage.getItem('pageViewTracked')) {
+          try {
+            const params = new URLSearchParams(window.location.search);
+            const utmSource = params.get('utm_source') || params.get('source');
+            let source = 'direct';
+            if (utmSource) {
+              source = utmSource.toLowerCase();
+            } else if (document.referrer) {
+              const ref = document.referrer.toLowerCase();
+              if (ref.includes('instagram.com')) source = 'instagram';
+              else if (ref.includes('facebook.com') || ref.includes('fb.com')) source = 'facebook';
+              else if (ref.includes('google.com')) source = 'google';
+              else if (ref.includes('wa.me') || ref.includes('whatsapp.com')) source = 'whatsapp';
+              else source = 'other';
+            }
+            await fetch(API_BASE + '/api/analytics/track', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({ source })
+            });
+            sessionStorage.setItem('pageViewTracked', 'true');
+          } catch (e) {}
+        }
+      }, 1000);
     });
 
     function showLoginNudge() {

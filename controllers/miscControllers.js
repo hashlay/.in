@@ -499,12 +499,14 @@ exports.deleteAdmin = async (req, res) => {
 
 // ── Analytics ─────────────────────────────────────────────────────
 const Order = require('../models/Order');
+const SiteVisit = require('../models/SiteVisit');
+const Cart = require('../models/Cart');
 exports.getAnalytics = async (req, res) => {
   const { range='30d' } = req.query;
   const days = range==='7d'?7:range==='30d'?30:range==='3m'?90:365;
   const from = new Date(); from.setDate(from.getDate()-days); from.setHours(0,0,0,0);
 
-  const [revenue, orders, customers, topProducts, avgOrder] = await Promise.all([
+  const [revenue, orders, customers, topProducts, avgOrder, totalCarts, convertedCarts, pageViews, trafficAgg] = await Promise.all([
     Order.aggregate([{ $match:{ createdAt:{$gte:from}, paymentStatus:'paid' } },{ $group:{ _id:null, total:{$sum:'$total'} } }]),
     Order.countDocuments({ createdAt:{ $gte:from } }),
     Customer.countDocuments({ createdAt:{ $gte:from } }),
@@ -514,13 +516,29 @@ exports.getAnalytics = async (req, res) => {
       { $sort:{ sales:-1 } },{ $limit:10 },
     ]),
     Order.aggregate([{ $match:{ createdAt:{$gte:from} } },{ $group:{ _id:null, avg:{$avg:'$total'} } }]),
+    Cart.countDocuments({ createdAt: { $gte: from } }),
+    Cart.countDocuments({ createdAt: { $gte: from }, status: 'converted' }),
+    SiteVisit.countDocuments({ createdAt: { $gte: from } }),
+    SiteVisit.aggregate([
+      { $match: { createdAt: { $gte: from } } },
+      { $group: { _id: '$source', count: { $sum: 1 } } }
+    ])
   ]);
 
-  // Conversion rate calculated from orders vs total customers (visits tracking not yet implemented)
   const totalCustomers = await Customer.countDocuments({ isActive: true });
-  const conversionRate = totalCustomers > 0
-    ? ((orders / totalCustomers) * 100).toFixed(1) + '%'
+  const conversionRate = pageViews > 0
+    ? ((orders / pageViews) * 100).toFixed(1) + '%'
     : '0%';
+
+  const abandonRate = totalCarts > 0 
+    ? (((totalCarts - convertedCarts) / totalCarts) * 100).toFixed(1) + '%'
+    : '0%';
+
+  const trafficSources = { instagram: 0, whatsapp: 0, google: 0, facebook: 0, direct: 0, other: 0 };
+  trafficAgg.forEach(t => {
+    if (trafficSources[t._id] !== undefined) trafficSources[t._id] = t.count;
+    else trafficSources.other += t.count;
+  });
 
   res.json({
     success:true,
@@ -531,6 +549,9 @@ exports.getAnalytics = async (req, res) => {
       avgOrderValue: +(avgOrder[0]?.avg||0).toFixed(2),
       topProducts,
       conversionRate,
+      pageViews,
+      cartAbandonment: abandonRate,
+      trafficSources
     },
   });
 };

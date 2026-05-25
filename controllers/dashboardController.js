@@ -3,6 +3,7 @@ const Product = require('../models/Product');
 const Customer = require('../models/Customer');
 const { Review } = require('../models/index');
 const { getOrSet } = require('../config/cache');
+const SiteVisit = require('../models/SiteVisit');
 
 exports.getStats = async (req, res) => {
   // Cache dashboard stats for 45s — many parallel queries, expensive
@@ -165,5 +166,29 @@ exports.resetStats = async (req, res) => {
   } catch (err) {
     console.error('[Dashboard] Reset stats error:', err);
     res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+exports.trackVisit = async (req, res) => {
+  try {
+    let source = req.body.source || 'direct';
+    source = source.toLowerCase();
+    
+    // Normalize source
+    if (source.includes('instagram')) source = 'instagram';
+    else if (source.includes('facebook') || source.includes('fb')) source = 'facebook';
+    else if (source.includes('whatsapp') || source.includes('wa')) source = 'whatsapp';
+    else if (source.includes('google')) source = 'google';
+    else if (source === 'direct') source = 'direct';
+    else source = 'other';
+
+    await SiteVisit.create({
+      source,
+      ip: req.ip,
+      userAgent: req.headers['user-agent']
+    });
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false }); // silent fail is fine
   }
 };
