@@ -35,12 +35,14 @@ const customerAuth = async (req, res, next) => {
     });
 
     if (!session || session.expiresAt < new Date()) {
+      res.clearCookie('customer_token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', path: '/' });
       return res.status(401).json({ success: false, message: 'Session expired or revoked' });
     }
 
     // 3. Fetch customer
     const customer = await Customer.findById(decoded.id).select('-password -passwordHash');
     if (!customer || !customer.isActive) {
+      res.clearCookie('customer_token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', path: '/' });
       return res.status(401).json({ success: false, message: 'Account not found or disabled' });
     }
 
@@ -48,6 +50,7 @@ const customerAuth = async (req, res, next) => {
     req.customerSession = session;
     next();
   } catch (err) {
+    res.clearCookie('customer_token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', path: '/' });
     return res.status(401).json({ success: false, message: 'Invalid or expired token' });
   }
 };

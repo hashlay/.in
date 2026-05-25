@@ -526,8 +526,14 @@ router.get('/me', async (req, res) => {
       return res.json({ loggedIn: false });
     }
 
-    const customer = await Customer.findById(decoded.id).select('email phone name addresses');
-    if (!customer) {
+    const customer = await Customer.findById(decoded.id).select('email phone name addresses isActive');
+    if (!customer || !customer.isActive) {
+      res.clearCookie('customer_token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/'
+      });
       return res.json({ loggedIn: false });
     }
 

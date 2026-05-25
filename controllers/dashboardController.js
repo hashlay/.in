@@ -19,7 +19,7 @@ exports.getStats = async (req, res) => {
       Order.countDocuments({ createdAt: { $gte: today, $lt: tomorrow }, isActive: true }),
       Order.countDocuments({ isActive: true }),
       Product.countDocuments({ isActive: true }),
-      Customer.countDocuments({ isActive: true }),
+      Customer.countDocuments({ isActive: true, $or: [ { totalOrders: { $gt: 0 } }, { passwordHash: { $exists: true, $ne: null } } ] }),
       Order.aggregate([{ $match: { isActive: true, orderStatus: { $ne: 'cancelled' } } }, { $group: { _id: null, total: { $sum: '$total' } } }]),
       Order.countDocuments({ isActive: true, orderStatus: 'pending' }),
       Order.countDocuments({ isActive: true, orderStatus: { $in: ['confirmed','processing','shipped','out_for_delivery'] } }),

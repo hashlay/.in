@@ -514,7 +514,7 @@ exports.getAnalytics = async (req, res) => {
   ] = await Promise.all([
     Order.aggregate([{ $match:{ isActive:true, createdAt:{$gte:from}, paymentStatus:'paid' } },{ $group:{ _id:null, total:{$sum:'$total'} } }]),
     Order.countDocuments({ isActive:true, createdAt:{ $gte:from } }),
-    Customer.countDocuments({ isActive:true, createdAt:{ $gte:from } }),
+    Customer.countDocuments({ isActive:true, createdAt:{ $gte:from }, $or: [ { totalOrders: { $gt: 0 } }, { passwordHash: { $exists: true, $ne: null } } ] }),
     Order.aggregate([
       { $match:{ isActive:true, createdAt:{$gte:from} } },{ $unwind:'$items' },
       { $lookup: { from: 'products', localField: 'items.product', foreignField: '_id', as: 'productDoc' } },
@@ -538,7 +538,7 @@ exports.getAnalytics = async (req, res) => {
     Cart.countDocuments({ createdAt: { $gte:prevFrom, $lt:from }, status: 'converted' })
   ]);
 
-  const totalCustomers = await Customer.countDocuments({ isActive: true });
+  const totalCustomers = await Customer.countDocuments({ isActive: true, $or: [ { totalOrders: { $gt: 0 } }, { passwordHash: { $exists: true, $ne: null } } ] });
   const conversionRate = pageViews > 0
     ? ((orders / pageViews) * 100).toFixed(1) + '%'
     : '0%';
