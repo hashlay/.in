@@ -506,12 +506,19 @@ exports.getAnalytics = async (req, res) => {
   const days = range==='7d'?7:range==='30d'?30:range==='3m'?90:365;
   const from = new Date(); from.setDate(from.getDate()-days); from.setHours(0,0,0,0);
 
-  const [revenue, orders, customers, topProducts, avgOrder, totalCarts, convertedCarts, pageViews, trafficAgg] = await Promise.all([
+  const prevFrom = new Date(from); prevFrom.setDate(prevFrom.getDate()-days);
+
+  const [
+    revenue, orders, customers, topProducts, avgOrder, totalCarts, convertedCarts, pageViews, trafficAgg,
+    prevRevenue, prevOrders, prevPageViews, prevTotalCarts, prevConvertedCarts
+  ] = await Promise.all([
     Order.aggregate([{ $match:{ createdAt:{$gte:from}, paymentStatus:'paid' } },{ $group:{ _id:null, total:{$sum:'$total'} } }]),
     Order.countDocuments({ createdAt:{ $gte:from } }),
     Customer.countDocuments({ createdAt:{ $gte:from } }),
     Order.aggregate([
       { $match:{ createdAt:{$gte:from} } },{ $unwind:'$items' },
+      { $lookup: { from: 'products', localField: 'items.product', foreignField: '_id', as: 'productDoc' } },
+      { $match: { 'productDoc.0': { $exists: true } } },
       { $group:{ _id:'$items.name', sales:{$sum:'$items.quantity'}, revenue:{$sum:'$items.total'} } },
       { $sort:{ sales:-1 } },{ $limit:10 },
     ]),
@@ -522,7 +529,13 @@ exports.getAnalytics = async (req, res) => {
     SiteVisit.aggregate([
       { $match: { createdAt: { $gte: from } } },
       { $group: { _id: '$source', count: { $sum: 1 } } }
-    ])
+    ]),
+    // Previous period stats
+    Order.aggregate([{ $match:{ createdAt:{$gte:prevFrom, $lt:from}, paymentStatus:'paid' } },{ $group:{ _id:null, total:{$sum:'$total'} } }]),
+    Order.countDocuments({ createdAt:{ $gte:prevFrom, $lt:from } }),
+    SiteVisit.countDocuments({ createdAt: { $gte:prevFrom, $lt:from } }),
+    Cart.countDocuments({ createdAt: { $gte:prevFrom, $lt:from } }),
+    Cart.countDocuments({ createdAt: { $gte:prevFrom, $lt:from }, status: 'converted' })
   ]);
 
   const totalCustomers = await Customer.countDocuments({ isActive: true });
@@ -530,9 +543,8 @@ exports.getAnalytics = async (req, res) => {
     ? ((orders / pageViews) * 100).toFixed(1) + '%'
     : '0%';
 
-  const abandonRate = totalCarts > 0 
-    ? (((totalCarts - convertedCarts) / totalCarts) * 100).toFixed(1) + '%'
-    : '0%';
+  const abandonRateNum = totalCarts > 0 ? ((totalCarts - convertedCarts) / totalCarts) * 100 : 0;
+  const abandonRate = abandonRateNum.toFixed(1) + '%';
 
   const trafficSources = { instagram: 0, whatsapp: 0, google: 0, facebook: 0, direct: 0, other: 0 };
   trafficAgg.forEach(t => {
@@ -540,18 +552,42 @@ exports.getAnalytics = async (req, res) => {
     else trafficSources.other += t.count;
   });
 
+  // Calculate changes
+  const calcChange = (curr, prev) => {
+    if (prev === 0) return curr > 0 ? 100 : 0;
+    return ((curr - prev) / prev) * 100;
+  };
+
+  const currentRevenue = revenue[0]?.total||0;
+  const previousRevenue = prevRevenue[0]?.total||0;
+  const currentAvgOrder = +(avgOrder[0]?.avg||0).toFixed(2);
+  const previousAvgOrder = prevOrders > 0 ? +(previousRevenue / prevOrders).toFixed(2) : 0;
+  
+  const currentConvRate = pageViews > 0 ? (orders / pageViews) * 100 : 0;
+  const previousConvRate = prevPageViews > 0 ? (prevOrders / prevPageViews) * 100 : 0;
+  
+  const prevAbandonRate = prevTotalCarts > 0 ? ((prevTotalCarts - prevConvertedCarts) / prevTotalCarts) * 100 : 0;
+
+  const changes = {
+    pageViews: calcChange(pageViews, prevPageViews),
+    conversion: currentConvRate - previousConvRate, // Absolute change in %
+    abandonment: abandonRateNum - prevAbandonRate, // Absolute change in %
+    aov: calcChange(currentAvgOrder, previousAvgOrder)
+  };
+
   res.json({
     success:true,
     data: {
-      revenue: revenue[0]?.total||0,
+      revenue: currentRevenue,
       orders,
       customers,
-      avgOrderValue: +(avgOrder[0]?.avg||0).toFixed(2),
+      avgOrderValue: currentAvgOrder,
       topProducts,
       conversionRate,
       pageViews,
       cartAbandonment: abandonRate,
-      trafficSources
+      trafficSources,
+      changes
     },
   });
 };

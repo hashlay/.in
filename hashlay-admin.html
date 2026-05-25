@@ -5566,7 +5566,33 @@
         setEl('analytics-cart-abandon', d.cartAbandonment || '0%');
         
         const convSub = document.querySelector('#analytics-conversion-rate')?.nextElementSibling;
-        if (convSub) convSub.textContent = 'Based on page views';
+        if (convSub) {
+          const ch = d.changes?.conversion || 0;
+          convSub.className = 'stat-change ' + (ch >= 0 ? 'up' : 'down');
+          convSub.innerHTML = `${ch >= 0 ? '▲' : '▼'} ${Math.abs(ch).toFixed(1)}% vs last period`;
+        }
+        
+        const pvSub = document.querySelector('#analytics-page-views')?.nextElementSibling;
+        if (pvSub) {
+          const ch = d.changes?.pageViews || 0;
+          pvSub.className = 'stat-change ' + (ch >= 0 ? 'up' : 'down');
+          pvSub.innerHTML = `${ch >= 0 ? '▲' : '▼'} ${Math.abs(ch).toFixed(1)}% vs last period`;
+        }
+
+        const aovSub = document.querySelector('#analytics-aov')?.nextElementSibling;
+        if (aovSub) {
+          const ch = d.changes?.aov || 0;
+          aovSub.className = 'stat-change ' + (ch >= 0 ? 'up' : 'down');
+          aovSub.innerHTML = `${ch >= 0 ? '▲' : '▼'} ${Math.abs(ch).toFixed(1)}% vs last period`;
+        }
+
+        const abandonSub = document.querySelector('#analytics-cart-abandon')?.nextElementSibling;
+        if (abandonSub) {
+          const ch = d.changes?.abandonment || 0;
+          // For abandonment, down is good (green), up is bad (red)
+          abandonSub.className = 'stat-change ' + (ch <= 0 ? 'up' : 'down');
+          abandonSub.innerHTML = `${ch > 0 ? '▲' : '▼'} ${Math.abs(ch).toFixed(1)}% vs last period`;
+        }
 
         // Render Top Products list
         const topList = document.getElementById('analytics-top-products');
@@ -5668,9 +5694,6 @@
         const labels = data.data.map(d => d._id);
         const counts = data.data.map(d => d.count);
 
-        let cumulative = 0;
-        const cumulativeData = counts.map(c => { cumulative += c; return cumulative; });
-
         const chartEl = document.getElementById('customer-growth-chart');
         if (!chartEl) return;
 
@@ -5683,7 +5706,7 @@
             labels,
             datasets: [{
               label: 'New Customers',
-              data: cumulativeData,
+              data: counts,
               borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.08)',
               borderWidth: 2, fill: true, tension: 0.4,
               pointBackgroundColor: '#22c55e', pointRadius: 3,
