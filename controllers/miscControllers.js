@@ -512,17 +512,17 @@ exports.getAnalytics = async (req, res) => {
     revenue, orders, customers, topProducts, avgOrder, totalCarts, convertedCarts, pageViews, trafficAgg,
     prevRevenue, prevOrders, prevPageViews, prevTotalCarts, prevConvertedCarts
   ] = await Promise.all([
-    Order.aggregate([{ $match:{ createdAt:{$gte:from}, paymentStatus:'paid' } },{ $group:{ _id:null, total:{$sum:'$total'} } }]),
-    Order.countDocuments({ createdAt:{ $gte:from } }),
-    Customer.countDocuments({ createdAt:{ $gte:from } }),
+    Order.aggregate([{ $match:{ isActive:true, createdAt:{$gte:from}, paymentStatus:'paid' } },{ $group:{ _id:null, total:{$sum:'$total'} } }]),
+    Order.countDocuments({ isActive:true, createdAt:{ $gte:from } }),
+    Customer.countDocuments({ isActive:true, createdAt:{ $gte:from } }),
     Order.aggregate([
-      { $match:{ createdAt:{$gte:from} } },{ $unwind:'$items' },
+      { $match:{ isActive:true, createdAt:{$gte:from} } },{ $unwind:'$items' },
       { $lookup: { from: 'products', localField: 'items.product', foreignField: '_id', as: 'productDoc' } },
       { $match: { 'productDoc.0': { $exists: true } } },
       { $group:{ _id:'$items.name', sales:{$sum:'$items.quantity'}, revenue:{$sum:'$items.total'} } },
       { $sort:{ sales:-1 } },{ $limit:10 },
     ]),
-    Order.aggregate([{ $match:{ createdAt:{$gte:from} } },{ $group:{ _id:null, avg:{$avg:'$total'} } }]),
+    Order.aggregate([{ $match:{ isActive:true, createdAt:{$gte:from} } },{ $group:{ _id:null, avg:{$avg:'$total'} } }]),
     Cart.countDocuments({ createdAt: { $gte: from } }),
     Cart.countDocuments({ createdAt: { $gte: from }, status: 'converted' }),
     SiteVisit.countDocuments({ createdAt: { $gte: from } }),
@@ -531,8 +531,8 @@ exports.getAnalytics = async (req, res) => {
       { $group: { _id: '$source', count: { $sum: 1 } } }
     ]),
     // Previous period stats
-    Order.aggregate([{ $match:{ createdAt:{$gte:prevFrom, $lt:from}, paymentStatus:'paid' } },{ $group:{ _id:null, total:{$sum:'$total'} } }]),
-    Order.countDocuments({ createdAt:{ $gte:prevFrom, $lt:from } }),
+    Order.aggregate([{ $match:{ isActive:true, createdAt:{$gte:prevFrom, $lt:from}, paymentStatus:'paid' } },{ $group:{ _id:null, total:{$sum:'$total'} } }]),
+    Order.countDocuments({ isActive:true, createdAt:{ $gte:prevFrom, $lt:from } }),
     SiteVisit.countDocuments({ createdAt: { $gte:prevFrom, $lt:from } }),
     Cart.countDocuments({ createdAt: { $gte:prevFrom, $lt:from } }),
     Cart.countDocuments({ createdAt: { $gte:prevFrom, $lt:from }, status: 'converted' })

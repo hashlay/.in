@@ -128,7 +128,7 @@ exports.resetStats = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Invalid reset password' });
     }
 
-    const validTypes = ['totalRevenue', 'pendingOrders', 'deliveredOrders'];
+    const validTypes = ['totalRevenue', 'pendingOrders', 'deliveredOrders', 'analytics'];
     if (!validTypes.includes(statType)) {
       return res.status(400).json({ success: false, message: 'Invalid stat type' });
     }
@@ -152,6 +152,12 @@ exports.resetStats = async (req, res) => {
         { orderStatus: 'delivered', isActive: true },
         { $set: { isActive: false } }
       );
+    } else if (statType === 'analytics') {
+      const SiteVisit = require('../models/SiteVisit');
+      const Cart = require('../models/Cart');
+      await SiteVisit.deleteMany({});
+      await Cart.deleteMany({});
+      result = { modifiedCount: 1 }; // Dummy to indicate success
     }
 
     // Clear dashboard cache

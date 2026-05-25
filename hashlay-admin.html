@@ -3400,9 +3400,16 @@
          PAGE: ANALYTICS
     ════════════════════════════════════════════════════ -->
       <div class="page" id="page-analytics">
-        <div class="section-hdr">
-          <div class="section-hdr-title">ANALYTICS</div>
-          <div class="section-hdr-sub">Deep insights into your business</div>
+        <div class="section-hdr" style="display: flex; justify-content: space-between; align-items: flex-end;">
+          <div>
+            <div class="section-hdr-title">ANALYTICS</div>
+            <div class="section-hdr-sub">Deep insights into your business</div>
+          </div>
+          <div class="section-hdr-right">
+            <button class="btn btn-secondary btn-sm stat-btn-reset" onclick="openResetModal('analytics')" title="Reset Analytics to Zero" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);">
+              <i class="fa-solid fa-triangle-exclamation"></i> Reset Analytics
+            </button>
+          </div>
         </div>
 
         <div class="stats-grid" style="margin-bottom:1.5rem;">
@@ -5575,6 +5582,9 @@
           toast('✅ ' + (result.message || 'Stat reset successfully!'), 'success');
           // Refresh dashboard to reflect zero values
           await loadDashboard();
+          if (statType === 'analytics') {
+            await loadAnalytics();
+          }
         } else {
           errorEl.textContent = '❌ ' + (result?.message || 'Incorrect password. Try again.');
           errorEl.style.display = 'block';
