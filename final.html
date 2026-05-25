@@ -6422,6 +6422,11 @@
         footer.style.display = 'block';
         document.getElementById('cart-total').textContent = `₹${total}`;
       }
+      
+      // Sync cart with backend for logged-in users to enable abandoned cart emails
+      if (typeof portalCustomer !== 'undefined' && portalCustomer && portalCustomer.email) {
+        API.post('/api/cart/sync', { email: portalCustomer.email, items: CART }).catch(() => {});
+      }
     }
 
     function changeQty(id, delta) {

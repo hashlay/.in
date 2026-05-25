@@ -114,16 +114,38 @@ exports.createWhatsappOrder = async (req, res) => {
 
     await notifyNewOrder(createdOrder).catch(() => {});
 
-    // Trigger Automatic Email with Invoice (if email is provided)
-    if (createdOrder.customerEmail) {
-      try {
-        const { generateInvoiceBuffer } = require('../services/invoiceService');
-        const { sendOrderConfirmation } = require('../services/emailService');
-        const invoiceBuffer = await generateInvoiceBuffer(createdOrder).catch(() => null);
-        await sendOrderConfirmation(createdOrder, invoiceBuffer).catch(() => {});
-      } catch (e) {
-        console.error('Failed to send WhatsApp order email:', e);
+    // Trigger Automatic Emails
+    try {
+      const { generateInvoiceBuffer } = require('../services/invoiceService');
+      const { sendOrderConfirmation, sendAdminNotification } = require('../services/emailService');
+      
+      const invoiceBuffer = await generateInvoiceBuffer(createdOrder).catch(() => null);
+
+      // Always notify Admin about the manual WhatsApp order
+      const addr = createdOrder.address || {};
+      const addrStr = typeof addr === 'string' ? addr : [addr.fullName || createdOrder.customerName, addr.addressLine1, addr.addressLine2, addr.city, addr.state, addr.pincode, addr.country || 'India'].filter(Boolean).join(', ');
+      
+      await sendAdminNotification(
+        `New WhatsApp Order: ${createdOrder.orderId}`,
+        `<div style="font-family:sans-serif;background:#f9fafb;padding:20px;border-radius:8px;">
+          <h2 style="color:#111827;margin-top:0;">New Manual Order Added</h2>
+          <p><strong>Order ID:</strong> ${createdOrder.orderId}</p>
+          <p><strong>Customer:</strong> ${createdOrder.customerName}</p>
+          <p><strong>Email:</strong> ${createdOrder.customerEmail || 'No Email Provided'}</p>
+          <p><strong>Phone:</strong> ${createdOrder.customerPhone}</p>
+          <p><strong>Address:</strong> ${addrStr}</p>
+          <p><strong>Total Amount:</strong> ₹${parseFloat(createdOrder.total).toFixed(2)}</p>
+          <p><strong>Source:</strong> WhatsApp</p>
+        </div>`,
+        invoiceBuffer ? [{ filename: `Invoice-${createdOrder.orderId}.pdf`, content: invoiceBuffer, contentType: 'application/pdf' }] : []
+      ).catch(() => {});
+
+      // Only send customer confirmation if they provided an email
+      if (createdOrder.customerEmail) {
+        await sendOrderConfirmation(createdOrder, invoiceBuffer, true).catch(() => {}); // Passing true to skip duplicate admin alert
       }
+    } catch (e) {
+      console.error('Failed to send WhatsApp order emails:', e);
     }
 
     return res.status(201).json({ success: true, data: createdOrder, message: 'WhatsApp order created' });

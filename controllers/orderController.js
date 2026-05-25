@@ -2,6 +2,7 @@ const Order    = require('../models/Order');
 const Customer = require('../models/Customer');
 const Product  = require('../models/Product');
 const { Coupon } = require('../models/index');
+const Cart = require('../models/Cart');
 const { notifyNewOrder, notifyOrderUpdate } = require('../services/notificationService');
 const { sendOrderConfirmation } = require('../services/emailService');
 const csv = require('fast-csv');
@@ -191,6 +192,11 @@ exports.createOrder = async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
+    // Mark cart as converted if exists
+    if (body.customerEmail) {
+      await Cart.updateOne({ email: body.customerEmail }, { status: 'converted', items: [] }).catch(() => {});
+    }
+
     await notifyNewOrder(createdOrder);
     
     // Trigger Automatic Email
@@ -232,6 +238,7 @@ exports.updateOrderStatus = async (req, res) => {
 
   if (orderStatus && order.orderStatus !== orderStatus) {
     order.orderStatus = orderStatus;
+    if (orderStatus === 'delivered') order.deliveredAt = new Date();
     updated = true;
   }
   if (paymentStatus && order.paymentStatus !== paymentStatus) {

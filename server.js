@@ -116,6 +116,7 @@ app.use('/api/razorpay', apiLimiter, require('./routes/razorpay'));
 app.use('/api/dashboard', apiLimiter, require('./routes/dashboard'));
 app.use('/api/sync', apiLimiter, require('./routes/sync'));
 app.use('/api/whatsapp-orders', apiLimiter, require('./routes/whatsappOrders'));
+app.use('/api/cart', apiLimiter, require('./routes/cart'));
 
 // ── Customer Auth Portal ─────────────────────────────────────────
 app.use('/api/customer/auth', require('./routes/customerAuth'));
@@ -163,6 +164,10 @@ if (process.env.NODE_ENV !== 'production' || process.env.FORCE_LISTEN === 'true'
   const PORT = process.env.PORT || 5000;
 
   const server = http.createServer(app);
+  
+  // Start abandoned cart cron job
+  const { startCartCron } = require('./services/cartCron');
+  startCartCron();
 
   server.listen(PORT, () => {
     logger.info(`🚀 Hashlay Backend running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);

@@ -56,6 +56,8 @@ const orderSchema = new mongoose.Schema({
   orderNumber:    { type: String }, // Added to bypass legacy MongoDB unique index
   source:         { type: String, enum: ['website','whatsapp'], default: 'website' },
   screenshotUrl:  { type: String },
+  deliveredAt:    { type: Date },
+  reviewEmailSent:{ type: Boolean, default: false },
 }, { timestamps: true });
 
 const { v4: uuidv4 } = require('uuid');

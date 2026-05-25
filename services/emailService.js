@@ -58,7 +58,7 @@ const sendBrevoEmail = async ({ to, subject, html, text, attachments }) => {
   }
 };
 
-exports.sendOrderConfirmation = async (order, invoiceBuffer = null) => {
+exports.sendOrderConfirmation = async (order, invoiceBuffer = null, skipAdminAlert = false) => {
   const itemsHtml = order.items.map(i =>
     `<tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
       <td style="padding:.75rem .5rem;text-align:left;font-size:.88rem;">${i.name}</td>
@@ -154,23 +154,25 @@ exports.sendOrderConfirmation = async (order, invoiceBuffer = null) => {
 
   const attachments = invoiceBuffer ? [{ filename: `Invoice-${order.orderId}.pdf`, content: invoiceBuffer, contentType: 'application/pdf' }] : [];
   
-  // Also notify Admin about the new order!
-  await exports.sendAdminNotification(
-    `New Order Placed: ${order.orderId}`,
-    `<div style="font-family:sans-serif;background:#f9fafb;padding:20px;border-radius:8px;">
-      <h2 style="color:#111827;margin-top:0;">New Order Alert!</h2>
-      <p><strong>Order ID:</strong> ${order.orderId}</p>
-      <p><strong>Customer:</strong> ${order.customerName}</p>
-      <p><strong>Email:</strong> ${order.customerEmail}</p>
-      <p><strong>Phone:</strong> ${order.customerPhone}</p>
-      <p><strong>Address:</strong> ${addrStr}</p>
-      <p><strong>Total Amount:</strong> ₹${parseFloat(order.total).toFixed(2)}</p>
-      <p><strong>Payment Method:</strong> ${displayMethod}</p>
-      <p><strong>Source:</strong> ${order.source || 'website'}</p>
-      <p><em>Check the attached invoice or log into the admin dashboard to manage.</em></p>
-    </div>`,
-    attachments
-  ).catch(() => {});
+  if (!skipAdminAlert) {
+    // Also notify Admin about the new order!
+    await exports.sendAdminNotification(
+      `New Order Placed: ${order.orderId}`,
+      `<div style="font-family:sans-serif;background:#f9fafb;padding:20px;border-radius:8px;">
+        <h2 style="color:#111827;margin-top:0;">New Order Alert!</h2>
+        <p><strong>Order ID:</strong> ${order.orderId}</p>
+        <p><strong>Customer:</strong> ${order.customerName}</p>
+        <p><strong>Email:</strong> ${order.customerEmail}</p>
+        <p><strong>Phone:</strong> ${order.customerPhone}</p>
+        <p><strong>Address:</strong> ${addrStr}</p>
+        <p><strong>Total Amount:</strong> ₹${parseFloat(order.total).toFixed(2)}</p>
+        <p><strong>Payment Method:</strong> ${displayMethod}</p>
+        <p><strong>Source:</strong> ${order.source || 'website'}</p>
+        <p><em>Check the attached invoice or log into the admin dashboard to manage.</em></p>
+      </div>`,
+      attachments
+    ).catch(() => {});
+  }
 
   return sendResendEmail({ to: order.customerEmail, subject: `Order Confirmed — ${order.orderId} | Hashlay`, html, attachments });
 };
