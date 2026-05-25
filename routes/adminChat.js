@@ -138,4 +138,22 @@ router.get('/unread-count', async (req, res) => {
   res.json({ success: true, count });
 });
 
+// ═══════════════════════════════════════════════════════════════════
+// ── DELETE /sessions/:id — Delete a chat session and its messages
+// ═══════════════════════════════════════════════════════════════════
+
+router.delete('/sessions/:id', async (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({ success: false, message: 'Invalid session ID' });
+  }
+
+  const session = await ChatSession.findByIdAndDelete(req.params.id);
+  if (!session) return res.status(404).json({ success: false, message: 'Session not found' });
+
+  // Delete all messages associated with this session
+  await ChatMessage.deleteMany({ sessionId: req.params.id });
+
+  res.json({ success: true, message: 'Chat deleted completely' });
+});
+
 module.exports = router;
