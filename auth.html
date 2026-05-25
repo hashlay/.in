@@ -327,6 +327,7 @@ async function submitSignup() {
   const email = document.getElementById('signup-email').value.trim();
   const phone = document.getElementById('signup-phone').value.trim();
   if (!name || !email || !phone) return showErr('signup-err', 'Please fill all fields');
+  if (!/^[6-9]\d{9}$/.test(phone.replace(/[\s-]/g, ''))) return showErr('signup-err', 'Please enter a valid 10-digit phone number without +91');
   
   setLoading('btn-signup', true);
   try {

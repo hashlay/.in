@@ -5371,6 +5371,8 @@
           <span class="popup-discount-badge" id="popup-discount"></span>
         </div>
 
+        <div id="popup-stock-status" style="margin-top: 0.5rem;"></div>
+
         <hr class="popup-divider">
 
         <div>
@@ -6144,14 +6146,16 @@
         <div class="product-name">${p.name}</div>
         ${p.reviewCount > 0 ? `<div style="display:flex;align-items:center;gap:.3rem;font-size:.72rem;color:#ffd700;margin:.2rem 0;">★★★★★ <span style="color:var(--gray-5);font-size:.68rem;">(${p.reviewCount} reviews)</span></div>` : ''}
         ${p.desc ? `<div class="product-desc-short">${p.desc}</div>` : ''}
+        ${p.stock !== undefined && p.stock > 0 && p.stock <= 5 ? `<div style="color: #ff4757; font-size: 0.85rem; font-weight: 600; margin-top: 0.5rem; display: flex; align-items: center; gap: 4px;"><span>🔥</span> Only ${p.stock} left in stock - order soon!</div>` : ''}
+        ${p.stock === 0 ? `<div style="color: #ff4757; font-size: 0.85rem; font-weight: 600; margin-top: 0.5rem;">Out of stock</div>` : ''}
         <div class="product-footer">
           <div class="product-price">
             ${p.original ? `<span class="original">₹${p.original}</span>` : ''}₹${p.price}
           </div>
         </div>
         <div class="product-card-btns">
-          <button class="card-add-btn" onclick="event.stopPropagation();addToCart('${p.id}')">Add to Cart</button>
-          <button class="card-buy-btn" onclick="event.stopPropagation();buyNow('${p.id}')">Buy Now →</button>
+          <button class="card-add-btn" onclick="event.stopPropagation();addToCart('${p.id}')" ${p.stock === 0 ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}</button>
+          <button class="card-buy-btn" onclick="event.stopPropagation();buyNow('${p.id}')" ${p.stock === 0 ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>${p.stock === 0 ? 'Out of Stock' : 'Buy Now →'}</button>
         </div>
       </div>
     </div>`).join('');
@@ -6779,8 +6783,8 @@
         showToast('⚠️ Please enter a valid 6-digit PIN code');
         return;
       }
-      if (!/^\+?[\d\s-]{10,13}$/.test(phone.replace(/\s/g, ''))) {
-        showToast('⚠️ Please enter a valid phone number');
+      if (!/^[6-9]\d{9}$/.test(phone.replace(/[\s-]/g, ''))) {
+        showToast('⚠️ Please enter a valid 10-digit Indian phone number (without +91)');
         return;
       }
 
@@ -7124,6 +7128,26 @@
       } else {
         document.getElementById('popup-original').style.display = 'none';
         document.getElementById('popup-discount').style.display = 'none';
+      }
+
+      // Stock Status
+      const addBtn = document.getElementById('popup-add-cart-btn');
+      const buyBtn = document.getElementById('popup-buy-now-btn');
+      if (p.stock !== undefined && p.stock > 0 && p.stock <= 5) {
+        document.getElementById('popup-stock-status').innerHTML = `<div style="color: #ff4757; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 4px;"><span>🔥</span> Only ${p.stock} left in stock - order soon!</div>`;
+        addBtn.disabled = false; buyBtn.disabled = false;
+        addBtn.style.opacity = '1'; buyBtn.style.opacity = '1';
+        addBtn.textContent = 'Add to Cart'; buyBtn.textContent = 'Buy Now →';
+      } else if (p.stock === 0) {
+        document.getElementById('popup-stock-status').innerHTML = `<div style="color: #ff4757; font-size: 0.9rem; font-weight: 600;">Out of stock</div>`;
+        addBtn.disabled = true; buyBtn.disabled = true;
+        addBtn.style.opacity = '0.5'; buyBtn.style.opacity = '0.5';
+        addBtn.textContent = 'Out of Stock'; buyBtn.textContent = 'Out of Stock';
+      } else {
+        document.getElementById('popup-stock-status').innerHTML = ``;
+        addBtn.disabled = false; buyBtn.disabled = false;
+        addBtn.style.opacity = '1'; buyBtn.style.opacity = '1';
+        addBtn.textContent = 'Add to Cart'; buyBtn.textContent = 'Buy Now →';
       }
 
       // About This Product
