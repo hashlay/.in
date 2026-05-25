@@ -8432,6 +8432,111 @@
     }
 
     /* ══════════════════════════════════════════════════════════════
+       REAL ORDER NOTIFICATION POPUP
+    ══════════════════════════════════════════════════════════════ */
+    (function initRealOrderPopup() {
+      const style = document.createElement('style');
+      style.innerHTML = `
+        #real-order-popup {
+          position: fixed;
+          bottom: 24px;
+          left: 24px;
+          background: rgba(15,15,20,0.95);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 12px;
+          padding: 12px 16px;
+          z-index: 999990;
+          box-shadow: 0 12px 40px rgba(0,0,0,0.8);
+          backdrop-filter: blur(8px);
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          transform: translateY(150%);
+          opacity: 0;
+          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          pointer-events: none;
+          max-width: 320px;
+        }
+        #real-order-popup.show {
+          transform: translateY(0);
+          opacity: 1;
+        }
+        @media (max-width: 768px) {
+          #real-order-popup {
+            bottom: auto;
+            top: 80px;
+            left: 50%;
+            transform: translate(-50%, -150%);
+            width: calc(100% - 32px);
+          }
+          #real-order-popup.show {
+            transform: translate(-50%, 0);
+          }
+        }
+      `;
+      document.head.appendChild(style);
+
+      const div = document.createElement('div');
+      div.id = 'real-order-popup';
+      document.body.appendChild(div);
+
+      let orders = [];
+      let currentIndex = 0;
+
+      async function fetchRecentOrders() {
+        try {
+          const res = await fetch(API_BASE + '/api/sync/recent-purchases');
+          const data = await res.json();
+          if (data.success && data.data && data.data.length > 0) {
+            orders = data.data;
+            scheduleNextPopup();
+          }
+        } catch (e) {}
+      }
+
+      function getTimeAgo(dateString) {
+        const diff = Math.floor((new Date() - new Date(dateString)) / 1000 / 60);
+        if (diff < 1) return 'Just now';
+        if (diff < 60) return diff + ' min ago';
+        const hrs = Math.floor(diff / 60);
+        if (hrs < 24) return hrs + ' hour' + (hrs > 1 ? 's' : '') + ' ago';
+        const days = Math.floor(hrs / 24);
+        return days + ' day' + (days > 1 ? 's' : '') + ' ago';
+      }
+
+      function showPopup() {
+        if (!orders.length) return;
+        const order = orders[currentIndex];
+        currentIndex = (currentIndex + 1) % orders.length;
+
+        const timeStr = order.time ? getTimeAgo(order.time) : 'Recently';
+
+        div.innerHTML = \`
+          <img src="\${order.image}" style="width:50px;height:50px;border-radius:8px;object-fit:cover;border:1px solid rgba(255,255,255,0.1);" alt="Product">
+          <div style="flex:1;">
+            <div style="font-size:0.8rem;color:var(--gray-4);margin-bottom:2px;">\${order.name} from \${order.city} purchased</div>
+            <div style="font-size:0.9rem;font-weight:600;color:var(--white);line-height:1.2;margin-bottom:4px;">\${order.product}</div>
+            <div style="font-size:0.7rem;color:var(--blue-1);font-weight:600;">\${timeStr}</div>
+          </div>
+        \`;
+
+        div.classList.add('show');
+        
+        setTimeout(() => {
+          div.classList.remove('show');
+          scheduleNextPopup();
+        }, 5000);
+      }
+
+      function scheduleNextPopup() {
+        const delay = Math.floor(Math.random() * (45000 - 15000 + 1) + 15000);
+        setTimeout(showPopup, delay);
+      }
+
+      setTimeout(fetchRecentOrders, 5000);
+    })();
+
+    /* ══════════════════════════════════════════════════════════════
        INIT — Boot the Hashlay frontend
     ══════════════════════════════════════════════════════════════ */
     initHashlay();
