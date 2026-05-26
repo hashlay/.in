@@ -2588,17 +2588,17 @@
         <div class="nav-item active" onclick="goPage('dashboard',this)"><i
             class="nav-icon fa-solid fa-chart-line"></i>Dashboard</div>
         <div class="nav-item" onclick="goPage('orders',this)"><i
-            class="nav-icon fa-solid fa-cart-shopping"></i>Orders<span class="nav-badge" id="pending-badge">4</span>
+            class="nav-icon fa-solid fa-cart-shopping"></i>Orders<span class="nav-badge" id="pending-badge" style="display:none">0</span>
         </div>
         <div class="nav-item" onclick="goPage('waorders',this)"><i class="nav-icon fa-brands fa-whatsapp"></i>WhatsApp
-          Orders</div>
+          Orders<span class="nav-badge" id="pending-wa-badge" style="display:none">0</span></div>
         <div class="nav-item" onclick="goPage('products',this)"><i class="nav-icon fa-solid fa-box"></i>Products</div>
         <div class="nav-item" onclick="goPage('accounts',this)"><i
             class="nav-icon fa-solid fa-address-card"></i>Accounts</div>
         <div class="nav-item" onclick="goPage('customers',this)"><i class="nav-icon fa-solid fa-users"></i>Customers
         </div>
         <div class="nav-item" onclick="goPage('reviews',this)"><i class="nav-icon fa-solid fa-star"></i>Reviews<span
-            class="nav-badge" id="review-badge">3</span></div>
+            class="nav-badge" id="review-badge" style="display:none">0</span></div>
 
         <div class="sidebar-section-label" style="margin-top:.6rem;">Growth</div>
         <div class="nav-item" onclick="goPage('marketing',this)"><i class="nav-icon fa-solid fa-bullseye"></i>Marketing
@@ -5498,9 +5498,9 @@
         setEl('stat-delivered', d.deliveredOrders ?? 0);
 
         // Recent orders on dashboard
-        if (d.recentOrders && d.recentOrders.length) {
-          const tbody = document.getElementById('dash-recent-orders');
-          if (tbody) {
+        const tbody = document.getElementById('dash-recent-orders');
+        if (tbody) {
+          if (d.recentOrders && d.recentOrders.length) {
             tbody.innerHTML = d.recentOrders.map(o => {
               let badge = 'badge-gray';
               if (o.orderStatus === 'pending') badge = 'badge-yellow';
@@ -5518,7 +5518,26 @@
           </tr>
         `;
             }).join('');
+          } else {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--gray-4);">No recent orders found</td></tr>`;
           }
+        }
+
+        // Update sidebar badges dynamically
+        const pendingBadge = document.getElementById('pending-badge');
+        if(pendingBadge) {
+          pendingBadge.textContent = d.pendingOrders || 0;
+          pendingBadge.style.display = d.pendingOrders > 0 ? 'inline-block' : 'none';
+        }
+        const pendingWaBadge = document.getElementById('pending-wa-badge');
+        if(pendingWaBadge) {
+          pendingWaBadge.textContent = d.pendingWaOrders || 0;
+          pendingWaBadge.style.display = d.pendingWaOrders > 0 ? 'inline-block' : 'none';
+        }
+        const reviewBadge = document.getElementById('review-badge');
+        if(reviewBadge) {
+          reviewBadge.textContent = d.pendingReviews || 0;
+          reviewBadge.style.display = d.pendingReviews > 0 ? 'inline-block' : 'none';
         }
 
         // Low stock alerts

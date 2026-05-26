@@ -14,7 +14,7 @@ exports.getStats = async (req, res) => {
     const [
       todayOrders, totalOrders, totalProducts, totalCustomers, totalRevenue,
       pendingOrders, processingOrders, deliveredOrders, cancelledOrders,
-      todayRevenue, lowStock, recentOrders, pendingReviews,
+      todayRevenue, lowStock, recentOrders, pendingReviews, pendingWaOrders
     ] = await Promise.all([
       Order.countDocuments({ createdAt: { $gte: today, $lt: tomorrow }, isActive: true }),
       Order.countDocuments({ isActive: true }),
@@ -33,6 +33,7 @@ exports.getStats = async (req, res) => {
       Order.find({ isActive: true }).sort({ createdAt: -1 }).limit(8)
         .select('orderId customerName total orderStatus createdAt paymentMethod').lean(),
       Review.countDocuments({ status: 'pending' }),
+      Order.countDocuments({ isActive: true, orderStatus: 'pending', source: 'whatsapp' })
     ]);
 
     return {
@@ -49,6 +50,7 @@ exports.getStats = async (req, res) => {
       lowStock,
       recentOrders,
       pendingReviews,
+      pendingWaOrders,
     };
   });
 
