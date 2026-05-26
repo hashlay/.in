@@ -90,10 +90,8 @@ exports.updateProduct = async (req, res) => {
 };
 
 exports.deleteProduct = async (req, res) => {
-  const product = await Product.findById(req.params.id);
+  const product = await Product.findByIdAndDelete(req.params.id);
   if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
-  product.isActive = false;
-  await product.save();
 
   // Bust product caches on delete
   invalidate('products:');
@@ -102,7 +100,7 @@ exports.deleteProduct = async (req, res) => {
   await sendAdminNotification(
     `Product Deleted: ${product.name}`,
     `<div style="font-family:sans-serif;background:#fff1f2;padding:20px;border-radius:8px;">
-      <h2 style="color:#be123c;margin-top:0;">Product Deleted (Archived)</h2>
+      <h2 style="color:#be123c;margin-top:0;">Product Permanently Deleted</h2>
       <p><strong>Product ID:</strong> ${product._id}</p>
       <p><strong>Name:</strong> ${product.name}</p>
       <p><strong>Category:</strong> ${product.category}</p>
@@ -129,13 +127,16 @@ exports.bulkAction = async (req, res) => {
   if (!Array.isArray(ids) || !ids.length)
     return res.status(400).json({ success: false, message: 'No IDs provided' });
 
-  let update = {};
-  if (action === 'delete') update = { isActive: false };
-  if (action === 'feature') update = { isFeatured: true };
-  if (action === 'unfeature') update = { isFeatured: false };
-  if (action === 'activate') update = { inStock: true };
-
-  await Product.updateMany({ _id: { $in: ids } }, update);
+  if (action === 'delete') {
+    // Actually delete products from the database
+    await Product.deleteMany({ _id: { $in: ids } });
+  } else {
+    let update = {};
+    if (action === 'feature') update = { isFeatured: true };
+    if (action === 'unfeature') update = { isFeatured: false };
+    if (action === 'activate') update = { inStock: true };
+    await Product.updateMany({ _id: { $in: ids } }, update);
+  }
 
   invalidate('products:');
 

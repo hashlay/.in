@@ -4641,9 +4641,9 @@
         <div class="section-label">Customer Reviews</div>
         <h2 class="section-title">WHAT PEOPLE <em>SAY</em></h2>
         <div style="display:flex;align-items:center;gap:0.8rem;justify-content:center;margin-top:1rem;flex-wrap:wrap;">
-          <span style="font-size:1.3rem;color:#ffd700;">★★★★★</span>
-          <span style="font-size:1.1rem;font-weight:700;">4.9</span>
-          <span style="color:var(--gray-5);font-size:0.85rem;">/ 5.0 · Based on <span id="review-count">4</span> reviews</span>
+          <span id="review-stars-display" style="font-size:1.3rem;color:#ffd700;">★★★★★</span>
+          <span id="review-avg-rating" style="font-size:1.1rem;font-weight:700;">4.9</span>
+          <span style="color:var(--gray-5);font-size:0.85rem;">/ 5.0 · Based on <span id="review-count">0</span> reviews</span>
           <button id="btn-toggle-autoscroll" class="btn-toggle-autoscroll" onclick="toggleReviewsAutoscroll()">
             <span class="status-dot"></span> <span id="autoscroll-btn-text">Autoscroll On</span>
           </button>
@@ -5640,12 +5640,7 @@
       }
     ];
 
-    const REVIEWS_DATA = [
-      { name: 'Rahul S.', rating: 5, text: 'Absolutely blown away. My Jordan 1s look brand new after months of use. The foam works like magic and the brush is perfect for detailed cleaning. Worth every rupee.', date: 'Dec 2024', initials: 'RS' },
-      { name: 'Priya M.', rating: 5, text: 'Finally a sneaker care product that actually works in India. Used it on my white Forces and the results were unreal. Fast shipping too, received in 2 days!', date: 'Nov 2024', initials: 'PM' },
-      { name: 'Arjun K.', rating: 5, text: 'I was skeptical at first but this product exceeded my expectations. My Yeezys look fresh again. The microfiber cloth is super soft and premium quality.', date: 'Nov 2024', initials: 'AK' },
-      { name: 'Neha R.', rating: 4, text: 'Great product overall. The foam smells nice and works well on my canvas sneakers. Delivery was quick. Would love a larger bottle option in the future!', date: 'Oct 2024', initials: 'NR' },
-    ];
+    let REVIEWS_DATA = [];
 
     let CART = [];
     // Restore cart from session
@@ -5715,12 +5710,13 @@
       const [
         settingsData,
         productsData,
-        categoriesData
+        categoriesData,
+        reviewsData
       ] = await Promise.all([
         API.get('/api/settings/public', null),
-
         API.get('/api/products?isActive=true&limit=50', null),
-        API.get('/api/products/categories', null)
+        API.get('/api/products/categories', null),
+        API.get('/api/reviews?status=approved&limit=50', null)
       ]);
       // Load Razorpay key from backend settings
       if (settingsData?.data?.payment?.razorpayKeyId) {
@@ -5755,6 +5751,17 @@
 
       // Apply categories
       if (categoriesData?.data?.length) applyCategories(categoriesData.data);
+
+      // Apply approved reviews from database
+      if (reviewsData?.data?.docs?.length) {
+        REVIEWS_DATA = reviewsData.data.docs.map(r => ({
+          name: r.name,
+          rating: r.rating || 5,
+          text: r.body || r.comment || r.text || '',
+          date: r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '',
+          initials: (r.name || '?').split(' ').map(n => n[0]).join('').toUpperCase(),
+        }));
+      }
 
       // Always render
       initAnnouncementBar();
@@ -6185,23 +6192,50 @@
       const track1 = document.getElementById('reviews-track-1');
       if (!track1 || !wrapper1) return;
 
-      document.getElementById('review-count').textContent = REVIEWS_DATA.length;
+      const reviewCount = document.getElementById('review-count');
+      if (reviewCount) reviewCount.textContent = REVIEWS_DATA.length;
+
+      // Update average rating display
+      const avgRatingEl = document.getElementById('review-avg-rating');
+      const starsEl = document.getElementById('review-stars-display');
+      if (REVIEWS_DATA.length > 0) {
+        const avg = (REVIEWS_DATA.reduce((sum, r) => sum + r.rating, 0) / REVIEWS_DATA.length).toFixed(1);
+        if (avgRatingEl) avgRatingEl.textContent = avg;
+        const fullStars = Math.round(parseFloat(avg));
+        if (starsEl) starsEl.textContent = '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
+      } else {
+        if (avgRatingEl) avgRatingEl.textContent = '0';
+        if (starsEl) starsEl.textContent = '☆☆☆☆☆';
+      }
+
+      // If no approved reviews, hide the section
+      const reviewSection = document.getElementById('reviews');
+      if (!REVIEWS_DATA.length) {
+        if (reviewSection) reviewSection.style.display = 'none';
+        return;
+      }
+      if (reviewSection) reviewSection.style.display = '';
 
       // Helper function to build card HTML
-      const buildCard = r => `
+      const buildCard = r => {
+        const text = r.text || r.body || r.comment || '';
+        const initials = r.initials || (r.name || '?').split(' ').map(n => n[0]).join('').toUpperCase();
+        const date = r.date || (r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '');
+        return `
         <div class="review-card" onclick="toggleReviewsAutoscroll()">
           <div class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
-          <div class="review-text">"${r.text}"</div>
+          <div class="review-text">"${text}"</div>
           <div class="reviewer">
-            <div class="reviewer-avatar">${r.initials}</div>
+            <div class="reviewer-avatar">${initials}</div>
             <div>
               <div class="reviewer-name">${r.name}</div>
-              <div class="reviewer-date">${r.date}</div>
+              <div class="reviewer-date">${date}</div>
             </div>
             <div style="margin-left:auto;"><span class="review-verified">✓ Verified</span></div>
           </div>
         </div>
       `;
+      };
 
       // Render cards
       const tHtml = REVIEWS_DATA.map(buildCard).join('');

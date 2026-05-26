@@ -278,20 +278,22 @@ exports.updateOrderStatus = async (req, res) => {
 };
 
 exports.deleteOrder = async (req, res) => {
-  const order = await Order.findByIdAndUpdate(req.params.id, { isActive: false });
-  if (order) {
-    const { sendAdminNotification } = require('../services/emailService');
-    await sendAdminNotification(
-      `Order Deleted: ${order.orderId}`,
-      `<div style="font-family:sans-serif;background:#fff1f2;padding:20px;border-radius:8px;">
-        <h2 style="color:#be123c;margin-top:0;">Order Deleted (Archived)</h2>
-        <p><strong>Order ID:</strong> ${order.orderId}</p>
-        <p><strong>Customer:</strong> ${order.customerName} (${order.customerEmail || 'No Email'})</p>
-        <p><strong>Total Amount:</strong> ₹${order.total}</p>
-        <p><strong>Deleted By Admin IP:</strong> ${req.ip}</p>
-      </div>`
-    ).catch(() => {});
-  }
+  const order = await Order.findByIdAndDelete(req.params.id);
+  if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+
+  // Send admin notification about the deletion (for audit trail)
+  const { sendAdminNotification } = require('../services/emailService');
+  await sendAdminNotification(
+    `Order Deleted: ${order.orderId}`,
+    `<div style="font-family:sans-serif;background:#fff1f2;padding:20px;border-radius:8px;">
+      <h2 style="color:#be123c;margin-top:0;">Order Permanently Deleted</h2>
+      <p><strong>Order ID:</strong> ${order.orderId}</p>
+      <p><strong>Customer:</strong> ${order.customerName} (${order.customerEmail || 'No Email'})</p>
+      <p><strong>Total Amount:</strong> ₹${order.total}</p>
+      <p><strong>Deleted By Admin IP:</strong> ${req.ip}</p>
+    </div>`
+  ).catch(() => {});
+
   res.json({ success: true, message: 'Order deleted' });
 };
 

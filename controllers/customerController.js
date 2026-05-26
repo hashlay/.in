@@ -1,6 +1,7 @@
-const Customer = require('../models/Customer');
-const Order    = require('../models/Order');
-const csv      = require('fast-csv');
+const Customer        = require('../models/Customer');
+const CustomerSession = require('../models/CustomerSession');
+const Order           = require('../models/Order');
+const csv             = require('fast-csv');
 const { notifyNewCustomer } = require('../services/notificationService');
 
 exports.getCustomers = async (req, res) => {
@@ -87,13 +88,21 @@ exports.updateCustomer = async (req, res) => {
 };
 
 exports.removeAccount = async (req, res) => {
-  await Customer.findByIdAndUpdate(req.params.id, { $unset: { password: 1, passwordHash: 1 } });
-  res.json({ success: true, message: 'Account credentials removed' });
+  // Actually delete the customer document from the database
+  const customer = await Customer.findByIdAndDelete(req.params.id);
+  if (!customer) return res.status(404).json({ success: false, message: 'Customer not found' });
+  // Revoke all active sessions so the user is logged out immediately
+  await CustomerSession.deleteMany({ customerId: req.params.id });
+  res.json({ success: true, message: 'Account deleted successfully' });
 };
 
 exports.deleteCustomer = async (req, res) => {
-  await Customer.findByIdAndUpdate(req.params.id, { isActive: false });
-  res.json({ success: true, message: 'Customer deactivated' });
+  // Actually delete the customer document from the database
+  const customer = await Customer.findByIdAndDelete(req.params.id);
+  if (!customer) return res.status(404).json({ success: false, message: 'Customer not found' });
+  // Revoke all active sessions so the user is logged out immediately
+  await CustomerSession.deleteMany({ customerId: req.params.id });
+  res.json({ success: true, message: 'Customer deleted successfully' });
 };
 
 exports.getCustomerOrders = async (req, res) => {
