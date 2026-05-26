@@ -5530,8 +5530,7 @@
   </div>
 
   <!-- ─── JAVASCRIPT ─────────────────────────────────────────── -->
-  <!-- Socket.io for Live Chat -->
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <!-- No socket.io needed, using polling fallback -->
   
   <script>
     const API_BASE = location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? 'http://localhost:5000' : location.origin;
@@ -8129,6 +8128,7 @@
     async function fetchPortalOrders() {
       try {
         const r = await fetch(API_BASE + '/api/customer/portal/orders?page=' + portalPage + '&limit=10', {credentials: 'include'});
+        if (r.status === 401) { window.location.href = '/auth'; return; }
         const d = await r.json();
         if(!d.success) return;
         portalOrders = portalOrders.concat(d.orders);
@@ -8260,39 +8260,18 @@
     }
 
     async function setupPortalChat() {
-      if(portalSocket || portalPollTmr) return;
+      if(portalPollTmr) return;
       try {
         const r = await fetch(API_BASE + '/api/customer/portal/chat/messages?t=' + Date.now(), {credentials: 'include'});
+        if (r.status === 401) { window.location.href = '/auth'; return; }
         const d = await r.json();
         portalSessionId = d.sessionId;
         renderPortalMsgs(d.messages || []);
       } catch(e) {}
       
-      // Fallback: Use silent polling every 5s since WebSockets are unsupported on Vercel Serverless
+      // Use silent polling every 5s since WebSockets are unsupported on Vercel Serverless
       portalPollTmr = setInterval(fetchLatestMessages, 5000);
-
-      if(typeof io === 'undefined') {
-        document.getElementById('portal-chat-offline').style.display = 'none';
-        return;
-      }
-      portalSocket = io(API_BASE, { transports: ['websocket', 'polling'] });
-      portalSocket.on('connect', () => {
-        document.getElementById('portal-chat-offline').style.display = 'none';
-        if(portalCustomer) portalSocket.emit('join_customer', portalCustomer._id || portalCustomer.email);
-      });
-      portalSocket.on('disconnect', () => { document.getElementById('portal-chat-offline').style.display = 'none'; });
-      portalSocket.on('admin_message', data => { 
-        // We might get duplicate if polling also caught it, but renderPortalMsgs handles full sync anyway.
-        // Let's just fetch full sync to be safe
-        fetchLatestMessages();
-      });
-      portalSocket.on('admin_typing', () => {
-        document.getElementById('portal-chat-typing').textContent = 'Support is typing...';
-        clearTimeout(portalTypingTmr); portalTypingTmr = setTimeout(() => { document.getElementById('portal-chat-typing').textContent = ''; }, 2000);
-      });
-      document.getElementById('portal-chat-input').addEventListener('input', () => {
-        if(portalSocket && portalSessionId) portalSocket.emit('customer_typing', {sessionId: portalSessionId});
-      });
+      document.getElementById('portal-chat-offline').style.display = 'none';
     }
 
     function renderPortalMsgs(msgs) {
