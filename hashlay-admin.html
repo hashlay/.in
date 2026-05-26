@@ -5408,8 +5408,8 @@
         loadCarCareSettings();
         loadActivityLogPage();
         loadNotifications();
+        loadNotifications();
         loadShippingZones();
-        initCharts();
       }
 
       function applyRBAC() {
@@ -5614,9 +5614,15 @@
       async function loadRevenueChart(range = '7d') {
         if (typeof Chart === 'undefined') return;
         const data = await apiGet(`/api/dashboard/revenue-chart?range=${range}`);
-        if (!data || !data.success) return;
-        const labels = data.data.map(d => d._id);
-        const revenues = data.data.map(d => d.revenue);
+        
+        let labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        let revenues = [0, 0, 0, 0, 0, 0, 0];
+        
+        if (data && data.success && data.data && data.data.length > 0) {
+          labels = data.data.map(d => d._id);
+          revenues = data.data.map(d => d.revenue);
+        }
+
         const chartEl = document.getElementById('revenue-chart');
         if (!chartEl) return;
         // Destroy existing chart if present
@@ -5649,27 +5655,28 @@
       async function loadOrderStatusChart() {
         if (typeof Chart === 'undefined') return;
         const data = await apiGet('/api/dashboard/order-status');
-        if (!data || !data.success || !data.data) return;
+        
+        let labels = ['No Orders'];
+        let counts = [1];
+        let bgColors = ['rgba(255,255,255,0.05)'];
 
-        const rawData = data.data; // array of { _id: 'pending', count: 5 }
-        if (rawData.length === 0) return;
-
-        const labels = rawData.map(d => d._id.charAt(0).toUpperCase() + d._id.slice(1).replace('_', ' '));
-        const counts = rawData.map(d => d.count);
-
-        // Custom colors for different statuses
-        const bgColors = rawData.map(d => {
-          switch (d._id) {
-            case 'pending': return '#fbbf24'; // yellow
-            case 'confirmed': return '#22d3ee'; // cyan
-            case 'processing': return '#3b82f6'; // blue
-            case 'shipped': return '#a855f7'; // purple
-            case 'out_for_delivery': return '#ec4899'; // pink
-            case 'delivered': return '#4ade80'; // green
-            case 'cancelled': return '#ef4444'; // red
-            default: return '#9ca3af'; // gray
-          }
-        });
+        if (data && data.success && data.data && data.data.length > 0) {
+          const rawData = data.data;
+          labels = rawData.map(d => d._id.charAt(0).toUpperCase() + d._id.slice(1).replace('_', ' '));
+          counts = rawData.map(d => d.count);
+          bgColors = rawData.map(d => {
+            switch (d._id) {
+              case 'pending': return '#fbbf24'; // yellow
+              case 'confirmed': return '#22d3ee'; // cyan
+              case 'processing': return '#3b82f6'; // blue
+              case 'shipped': return '#a855f7'; // purple
+              case 'out_for_delivery': return '#ec4899'; // pink
+              case 'delivered': return '#4ade80'; // green
+              case 'cancelled': return '#ef4444'; // red
+              default: return '#9ca3af'; // gray
+            }
+          });
+        }
 
         const chartEl = document.getElementById('order-donut');
         if (!chartEl) return;
@@ -5773,20 +5780,30 @@
       }
 
       function loadTrafficChart(traffic) {
-        if (typeof Chart === 'undefined' || !traffic) return;
+        if (typeof Chart === 'undefined') return;
         const chartEl = document.getElementById('traffic-chart');
         if (!chartEl) return;
 
         const existing = Chart.getChart(chartEl);
         if (existing) existing.destroy();
+        
+        let labels = ['No Data'];
+        let dataCounts = [1];
+        let bgColors = ['rgba(255,255,255,0.05)'];
+
+        if (traffic && (traffic.instagram > 0 || traffic.whatsapp > 0 || traffic.google > 0 || traffic.facebook > 0 || traffic.direct > 0 || traffic.other > 0)) {
+           labels = ['Instagram', 'WhatsApp', 'Google', 'Facebook', 'Direct', 'Other'];
+           dataCounts = [traffic.instagram, traffic.whatsapp, traffic.google, traffic.facebook, traffic.direct, traffic.other];
+           bgColors = ['#e1306c', '#25d366', '#4285f4', '#1877f2', '#9ca3af', '#f59e0b'];
+        }
 
         new Chart(chartEl, {
           type: 'doughnut',
           data: {
-            labels: ['Instagram', 'WhatsApp', 'Google', 'Facebook', 'Direct', 'Other'],
+            labels: labels,
             datasets: [{
-              data: [traffic.instagram, traffic.whatsapp, traffic.google, traffic.facebook, traffic.direct, traffic.other],
-              backgroundColor: ['#e1306c', '#25d366', '#4285f4', '#1877f2', '#9ca3af', '#f59e0b'],
+              data: dataCounts,
+              backgroundColor: bgColors,
               borderWidth: 0,
               hoverOffset: 4
             }]
@@ -7732,63 +7749,8 @@
       }
 
       function initCharts() {
-        if (typeof Chart === 'undefined') { console.warn('[Admin] Chart.js not loaded — skipping charts'); return; }
-        // Revenue Chart
-        new Chart(document.getElementById('revenue-chart'), {
-          type: 'line',
-          data: {
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-            datasets: [{
-              label: 'Revenue (₹)',
-              data: [3200, 4800, 3700, 6200, 4100, 8900, 4197],
-              borderColor: '#0057ff', backgroundColor: 'rgba(0,87,255,0.08)',
-              borderWidth: 2, fill: true, tension: 0.4,
-              pointBackgroundColor: '#0057ff', pointBorderWidth: 0, pointRadius: 4,
-            }]
-          },
-          options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-              x: { grid: { display: false } },
-              y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { callback: v => '₹' + v.toLocaleString() } }
-            }
-          }
-        });
-
-        // Order Donut
-        new Chart(document.getElementById('order-donut'), {
-          type: 'doughnut',
-          data: {
-            labels: ['Delivered', 'Shipped', 'Processing', 'Pending', 'Cancelled'],
-            datasets: [{
-              data: [198, 23, 12, 4, 8],
-              backgroundColor: ['#22c55e', '#0057ff', '#06b6d4', '#f59e0b', '#ef4444'],
-              borderWidth: 0, hoverOffset: 6
-            }]
-          },
-          options: {
-            responsive: true, maintainAspectRatio: false, cutout: '72%',
-            plugins: { legend: { position: 'bottom', labels: { padding: 12, boxWidth: 10 } } }
-          }
-        });
-
-        // Traffic Sources
-        new Chart(document.getElementById('traffic-chart'), {
-          type: 'doughnut',
-          data: {
-            labels: ['Instagram', 'WhatsApp', 'Google', 'Direct'],
-            datasets: [{
-              data: [42, 28, 18, 12],
-              backgroundColor: ['#e1306c', '#25d366', '#4285f4', '#9999bb'],
-              borderWidth: 0, hoverOffset: 6
-            }]
-          },
-          options: {
-            responsive: true, maintainAspectRatio: false, cutout: '68%',
-            plugins: { legend: { position: 'bottom', labels: { padding: 12, boxWidth: 10 } } }
-          }
-        });
+        if (typeof Chart === 'undefined') { console.warn('[Admin] Chart.js not loaded'); return; }
+        // All charts are now initialized dynamically via loadDashboard() and loadAnalytics()
       }
 
       /* Old fake notification system removed — using real API-backed notifications above */
