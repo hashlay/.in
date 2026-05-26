@@ -135,29 +135,26 @@ exports.resetStats = async (req, res) => {
 
     let result;
     if (statType === 'totalRevenue') {
-      // Mark all non-cancelled orders as inactive so they won't count in revenue
-      result = await Order.updateMany(
-        { isActive: true, orderStatus: { $ne: 'cancelled' } },
-        { $set: { isActive: false } }
+      // Delete all non-cancelled orders
+      result = await Order.deleteMany(
+        { orderStatus: { $ne: 'cancelled' } }
       );
     } else if (statType === 'pendingOrders') {
-      // Mark all pending orders as cancelled
-      result = await Order.updateMany(
-        { orderStatus: 'pending', isActive: true },
-        { $set: { orderStatus: 'cancelled', isActive: false } }
+      // Delete all pending orders
+      result = await Order.deleteMany(
+        { orderStatus: 'pending' }
       );
     } else if (statType === 'deliveredOrders') {
-      // Mark all delivered orders as inactive (archived)
-      result = await Order.updateMany(
-        { orderStatus: 'delivered', isActive: true },
-        { $set: { isActive: false } }
+      // Delete all delivered orders
+      result = await Order.deleteMany(
+        { orderStatus: 'delivered' }
       );
     } else if (statType === 'analytics') {
       const SiteVisit = require('../models/SiteVisit');
       const Cart = require('../models/Cart');
       await SiteVisit.deleteMany({});
       await Cart.deleteMany({});
-      result = { modifiedCount: 1 }; // Dummy to indicate success
+      result = { deletedCount: 1 };
     }
 
     // Clear dashboard cache

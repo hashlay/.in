@@ -483,18 +483,18 @@ exports.deleteAdmin = async (req, res) => {
   if (admin.role === 'super_admin' && req.admin.role !== 'super_admin') {
     return res.status(403).json({ success:false, message:'Cannot delete a super_admin' });
   }
-  await Admin.findByIdAndUpdate(req.params.id, { isActive:false });
+  await Admin.findByIdAndDelete(req.params.id);
 
   await ActivityLog.create({
     admin: req.admin._id,
     adminName: req.admin.name || req.admin.email,
     action: 'DELETE_ADMIN',
     module: 'admin',
-    details: `Deactivated admin user: ${admin.name || admin.email}`,
+    details: `Deleted admin user: ${admin.name || admin.email}`,
     ip: req.ip
   });
 
-  res.json({ success:true, message:'Admin deactivated' });
+  res.json({ success:true, message:'Admin deleted' });
 };
 
 // ── Analytics ─────────────────────────────────────────────────────

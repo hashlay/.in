@@ -5844,18 +5844,7 @@
         SYNC.lastSettingsAt = initManifest.data.settingsUpdatedAt;
       }
 
-      const reviewsData = await API.get('/api/reviews?status=approved&limit=20', null);
-      if (reviewsData?.data?.docs?.length) {
-        REVIEWS_DATA.length = 0;
-        REVIEWS_DATA.push(...reviewsData.data.docs.map(r => ({
-          name: r.name,
-          rating: r.rating,
-          text: r.body,
-          date: new Date(r.createdAt).toLocaleDateString('en-IN'),
-          initials: r.name.split(' ').map(n => n[0]).join('').toUpperCase()
-        })));
-        renderReviews();
-      }
+
 
       // Load live FAQs from backend
       const faqData = await API.get('/api/faqs', null);
@@ -6649,14 +6638,6 @@
     let appliedCoupon = null;
     let couponDiscountAmount = 0;
 
-    // Local fallback coupons — overridden by API
-    const LOCAL_COUPONS = [
-      { code: 'HASH5', type: 'percentage', value: 5, minOrder: 0, maxUses: 1000, active: true, expires: null },
-      { code: 'HASH10', type: 'percentage', value: 10, minOrder: 499, maxUses: 500, active: true, expires: null },
-      { code: 'FLAT50', type: 'flat', value: 50, minOrder: 299, maxUses: 200, active: true, expires: null },
-      { code: 'LAUNCH20', type: 'flat', value: 20, minOrder: 0, maxUses: 100, active: true, expires: null },
-    ];
-
     async function applyCoupon() {
       const code = document.getElementById('coupon-input').value.trim().toUpperCase();
       if (!code) { showCouponMsg('Please enter a coupon code', 'error'); return; }
@@ -6666,7 +6647,7 @@
       btn.textContent = '...';
 
       try {
-        // Try API first
+        // Validate coupon via API
         const subtotal = CART.reduce((s, i) => s + i.price * i.qty, 0);
         const apiResult = await API.post('/api/orders/validate-coupon', { code, subtotal });
 
@@ -6677,30 +6658,17 @@
             showCouponMsg(apiResult.message || 'Invalid or Expired Coupon', 'error');
             clearCoupon();
           }
-          return;
+        } else {
+          showCouponMsg('Unable to validate coupon. Please try again.', 'error');
+          clearCoupon();
         }
-      } catch (e) { }
-
-      // Fallback: local coupon validation
-      validateCouponLocally(code);
+      } catch (e) {
+        showCouponMsg('Unable to validate coupon. Please try again.', 'error');
+        clearCoupon();
+      }
 
       btn.classList.remove('loading');
       btn.textContent = 'Apply';
-    }
-
-    function validateCouponLocally(code) {
-      const subtotal = CART.reduce((s, i) => s + i.price * i.qty, 0);
-      const coupon = LOCAL_COUPONS.find(c => c.code === code);
-
-      if (!coupon) { showCouponMsg('Invalid or Expired Coupon', 'error'); clearCoupon(); return; }
-      if (!coupon.active) { showCouponMsg('This coupon is no longer active', 'error'); clearCoupon(); return; }
-      if (coupon.expires && new Date() > new Date(coupon.expires)) { showCouponMsg('This coupon has expired', 'error'); clearCoupon(); return; }
-      if (subtotal < coupon.minOrder) { showCouponMsg(`Minimum order of ₹${coupon.minOrder} required for this coupon`, 'error'); clearCoupon(); return; }
-
-      applyValidCoupon(coupon, subtotal);
-
-      document.getElementById('coupon-apply-btn').classList.remove('loading');
-      document.getElementById('coupon-apply-btn').textContent = 'Applied ✓';
     }
 
     function applyValidCoupon(coupon, subtotal) {
@@ -7622,29 +7590,32 @@
     /* ══════════════════════════════════════════════════════════════
        FAQ POPUP (floating button)
     ══════════════════════════════════════════════════════════════ */
-    function openFaqPopup() {
-      // Populate FAQ popup with first 4 FAQs
+    async function openFaqPopup() {
       const content = document.getElementById('faq-popup-content');
-      const faqs = [
-        { q: 'How do I use the Sneaker Foam?', a: 'Apply foam to brush, scrub in circular motions, wipe with microfiber cloth, air dry. Repeat for tough stains.' },
-        { q: 'Is it safe for suede?', a: 'Yes! pH-balanced formula safe for suede, leather, mesh, canvas, and all synthetic materials.' },
-        { q: 'How long does delivery take?', a: '3–5 business days. Metro cities: 2–3 days. Northeast India: up to 7 days.' },
-        { q: 'Is Cash on Delivery available?', a: 'Yes, COD is available across most pin codes with a small handling charge.' },
-        { q: 'What is the return policy?', a: '7-day hassle-free returns. Contact email contacthashlay@gmail.com with product photos.' },
-      ];
+      content.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--gray-5);">Loading FAQs...</div>';
+      document.getElementById('faq-popup-overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+
+      // Fetch FAQs from database
+      const faqData = await API.get('/api/faqs?active=true', null);
+      const faqs = (faqData?.data || []).filter(f => f.isActive !== false);
+
+      if (!faqs.length) {
+        content.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--gray-5);">No FAQs available.</div>';
+        return;
+      }
+
       content.innerHTML = faqs.map(f => `
     <div class="faq-item" style="margin-bottom:0.6rem;">
       <div class="faq-question" onclick="toggleFaq(this)" style="border-radius:12px;">
-        <span class="faq-q-text">${f.q}</span>
+        <span class="faq-q-text">${f.question}</span>
         <span class="faq-chevron">▼</span>
       </div>
       <div class="faq-answer">
-        <div class="faq-answer-inner">${f.a}</div>
+        <div class="faq-answer-inner">${f.answer}</div>
       </div>
     </div>
   `).join('');
-      document.getElementById('faq-popup-overlay').classList.add('open');
-      document.body.style.overflow = 'hidden';
     }
 
     function closeFaqPopup() {
@@ -7770,11 +7741,7 @@
     /* ══════════════════════════════════════════════════════════════
        ADMIN (preserved for future integration — Task 4)
     ══════════════════════════════════════════════════════════════ */
-    const MOCK_ORDERS = [
-      { id: '#HL001', customer: 'Rahul S.', amount: '₹599', status: 'delivered' },
-      { id: '#HL002', customer: 'Priya M.', amount: '₹898', status: 'confirmed' },
-      { id: '#HL003', customer: 'Arjun K.', amount: '₹599', status: 'pending' },
-    ];
+    const MOCK_ORDERS = [];
 
     function openAdmin(e) {
       e ? e.preventDefault() : null;
